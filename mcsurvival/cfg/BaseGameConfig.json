@@ -1,0 +1,20 @@
+{
+	"SectionGroups":
+	[
+		{
+			"Condition": "Multiplayer",
+			"Sections":
+			{
+				"SpawnInventory":
+				{
+					"HasSuit": true,
+					"Weapons":
+					{
+						"minecraft_wood_sword": {}
+					},
+					"WeaponToSelect": "minecraft_wood_sword"
+				}
+			}
+		}
+	]
+}
