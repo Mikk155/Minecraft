@@ -25,6 +25,7 @@
 #include "CHalfLifeMultiplay.h"
 #include "CHalfLifeRules.h"
 #include "CHalfLifeTeamplay.h"
+#include "CMinecraftSurvival.h"
 #include "PersistentInventorySystem.h"
 #include "SpawnInventorySystem.h"
 #include "spawnpoints.h"
@@ -441,6 +442,7 @@ static const std::vector<GameRulesEntry> GameRulesList{
 	CreateGameRulesEntry<CHalfLifeMultiplay>(),
 	CreateGameRulesEntry<CHalfLifeTeamplay>(),
 	CreateGameRulesEntry<CHalfLifeCTFplay>(),
+	CreateGameRulesEntry<CMinecraftSurvival>(),
 	CreateGameRulesEntry<CHalfLifeCoopplay>()};
 
 CGameRules* InstallGameRules(std::string_view gameModeName)
