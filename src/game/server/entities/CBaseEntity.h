@@ -25,6 +25,7 @@
 #include "DataMap.h"
 #include "EntityClassificationSystem.h"
 #include "skill.h"
+#include "CMinecraftSurvival.h"
 
 class CBaseEntity;
 class CBaseItem;
@@ -617,6 +618,17 @@ public:
 	 *	@details The entity's angles affect this offset.
 	 */
 	Vector m_SoundOffset{};
+
+	int enchant_index = 0;
+	// Insert in here minecraft::effect enchantments name
+	string_t enchant_name[32];
+	// Insert in here minecraft:effect enchantments level
+	string_t enchant_value[32];
+
+	int durability = minecraft::FUnbreakable;
+	int max_durability = minecraft::FUnbreakable;
+
+	void DestroyItem();
 };
 
 inline bool FNullEnt(CBaseEntity* ent) { return (ent == nullptr) || FNullEnt(ent->edict()); }

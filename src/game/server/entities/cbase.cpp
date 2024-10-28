@@ -21,6 +21,7 @@
 #include "world.h"
 #include "sound/ServerSoundSystem.h"
 #include "utils/ReplacementMaps.h"
+#include "CMinecraftSurvival.h"
 
 static void SetObjectCollisionBox(entvars_t* pev);
 
@@ -678,27 +679,71 @@ bool CBaseEntity::TakeDamage(CBaseEntity* inflictor, CBaseEntity* attacker, floa
 	if (0 == pev->takedamage)
 		return false;
 
-	// UNDONE: some entity types may be immune or resistant to some bitsDamageType
+	// Assume inflictor is a weapon
 
-	// if Attacker == Inflictor, the attack was a melee or other instant-hit attack.
-	// (that is, no actual entity projectile was involved in the attack so use the shooter's origin).
-	if (attacker == inflictor)
+	float flAdditionalKnockBack;
+
+	if( inflictor != nullptr )
 	{
-		vecTemp = inflictor->pev->origin - (VecBModelOrigin(this));
-	}
-	else
-	// an actual missile was involved.
-	{
-		vecTemp = inflictor->pev->origin - (VecBModelOrigin(this));
-	}
+		if( inflictor->enchant_index > 0 )
+		{
+			for( int i = 0; i < inflictor->enchant_index; ++i )
+			{
+				const char* szEnchant = STRING( inflictor->enchant_name[i] );
+				int iLevel = atoi( STRING( inflictor->enchant_value[i] ) );
 
-	// this global is still used for glass and other non-monster killables, along with decals.
-	g_vecAttackDir = vecTemp.Normalize();
+				if( FStrEq( szEnchant, "Life Steal" ) )
+				{
+					attacker->GiveHealth( flDamage * ( 1.0f - ( iLevel * 0.1f ) ), 0 );
+				}
+				else if( FStrEq( szEnchant, "Critic Chance" ) )
+				{
+					if( RANDOM_LONG( 0, 10 ) <= iLevel )
+					{
+						flDamage *= RANDOM_FLOAT( 1.0, 2.0 );
+					}
+				}
+				else if( FStrEq( szEnchant, "Fire Ascpect" ) )
+				{
+					// Schedule a damage loop
+				}
 
-	// save damage based on the target's armor level
+				if( FStrEq( szEnchant, "Sharpness" ) )
+				{
+					flDamage += ( 0.5 * iLevel + 0.5 );
+				}
+				else if( FStrEq( szEnchant, "Bane of Arthropods" ) )
+				{
+					if( std::find( std::begin( minecraft::arthropods ), std::end( minecraft::arthropods ), GetClassname() ) != std::end( minecraft::arthropods ) )
+					{
+						flDamage += ( 2.5 * iLevel );
+					}
+				}
+				else if( FStrEq( szEnchant, "Smite" ) )
+				{
+					if( std::find( std::begin( minecraft::undead ), std::end( minecraft::undead ), GetClassname() ) != std::end( minecraft::undead ) )
+					{
+						flDamage += ( 2.5 * iLevel );
+					}
+				}
+
+				if( FStrEq( szEnchant, "Knock Back" ) )
+				{
+					// Pass on more push knock back
+					// flAdditionalKnockBack = ?
+				}
+			}
+		}
+
+		if( inflictor->durability != minecraft::FUnbreakable ) {
+			inflictor->durability--;
+		if( inflictor->durability <= 0 )
+			inflictor->DestroyItem();
+		}
+	}
 
 	// figure momentum add (don't let hurt brushes or other triggers move player)
-	if ((!FNullEnt(inflictor)) && (pev->movetype == MOVETYPE_WALK || pev->movetype == MOVETYPE_STEP) && (attacker->pev->solid != SOLID_TRIGGER))
+	if( ( pev->movetype == MOVETYPE_WALK || pev->movetype == MOVETYPE_STEP) && (attacker->pev->solid != SOLID_TRIGGER) )
 	{
 		Vector vecDir = pev->origin - (inflictor->pev->absmin + inflictor->pev->absmax) * 0.5;
 		vecDir = vecDir.Normalize();

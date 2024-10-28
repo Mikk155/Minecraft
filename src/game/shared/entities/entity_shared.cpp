@@ -163,6 +163,9 @@ DEFINE_FIELD(m_pGoalEnt, FIELD_CLASSPTR),
 	DEFINE_FUNCTION(SUB_StartFadeOut),
 	DEFINE_FUNCTION(SUB_FadeOut),
 	DEFINE_FUNCTION(SUB_CallUseToggle),
+	DEFINE_FIELD(enchant_index, FIELD_INTEGER),
+	DEFINE_ARRAY(enchant_name, FIELD_STRING, 32),
+	DEFINE_ARRAY(enchant_value, FIELD_STRING, 32),
 	END_DATAMAP();
 
 void CBaseEntity::OnCreate()
