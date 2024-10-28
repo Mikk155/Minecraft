@@ -296,6 +296,8 @@ target_sources(server PRIVATE
 	gamerules/CHalfLifeRules.h
 	gamerules/CHalfLifeTeamplay.cpp
 	gamerules/CHalfLifeTeamplay.h
+	gamerules/CMinecraftSurvival.cpp
+	gamerules/CMinecraftSurvival.h
 	gamerules/MapCycleSystem.cpp
 	gamerules/MapCycleSystem.h
 	gamerules/PersistentInventorySystem.cpp
