@@ -254,6 +254,8 @@ public:
 
 	CBaseMonster* MyMonsterPointer() override { return this; }
 
+	bool IsMonster() override { return true; }
+
 	/**
 	 *	@brief Base class monster function to find enemies or food by sight.
 	 *	@details Sets the sight bits of the m_afConditions mask to indicate which types of entities were sighted.
@@ -788,18 +790,6 @@ public:
 	virtual Vector GetGunPosition();
 
 	bool GiveHealth(float flHealth, int bitsDamageType) override;
-
-	/**
-	 *	@copydoc CBaseEntity::TakeDamage()
-	 *	@details Time-based damage: only occurs while the monster is within the trigger_hurt.
-	 *	When a monster is poisoned via an arrow etc it takes all the poison damage at once.
-	 */
-	bool TakeDamage(CBaseEntity* inflictor, CBaseEntity* attacker, float flDamage, int bitsDamageType) override;
-
-	/**
-	 *	@brief takedamage function called when a monster's corpse is damaged.
-	 */
-	bool DeadTakeDamage(CBaseEntity* inflictor, CBaseEntity* attacker, float flDamage, int bitsDamageType);
 
 	void RadiusDamage(CBaseEntity* inflictor, CBaseEntity* attacker, float flDamage,
 		int bitsDamageType, EntityClassification iClassIgnore = ENTCLASS_NONE);

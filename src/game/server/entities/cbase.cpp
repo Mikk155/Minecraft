@@ -676,13 +676,12 @@ bool CBaseEntity::TakeDamage(CBaseEntity* inflictor, CBaseEntity* attacker, floa
 {
 	Vector vecTemp;
 
-	if (0 == pev->takedamage)
+	if( pev->takedamage == DAMAGE_NO || !IsAlive() || FBitSet( pev->flags, FL_GODMODE ) )
 		return false;
-
-	// Assume inflictor is a weapon
 
 	float flAdditionalKnockBack;
 
+	// Assume inflictor is a weapon
 	if( inflictor != nullptr )
 	{
 		if( inflictor->enchant_index > 0 )
@@ -740,6 +739,9 @@ bool CBaseEntity::TakeDamage(CBaseEntity* inflictor, CBaseEntity* attacker, floa
 		if( inflictor->durability <= 0 )
 			inflictor->DestroyItem();
 		}
+
+		pev->dmg_inflictor = inflictor->edict();
+		pev->dmg_take += flDamage;
 	}
 
 	// figure momentum add (don't let hurt brushes or other triggers move player)
@@ -757,7 +759,86 @@ bool CBaseEntity::TakeDamage(CBaseEntity* inflictor, CBaseEntity* attacker, floa
 
 	// do the damage
 	pev->health -= flDamage;
-	if (pev->health <= 0)
+
+	if( IsUnkillable() && pev->health < 1 )
+	{
+		pev->health = 1;
+	}
+
+	if( IsMonster() )
+	{
+		if( CBaseMonster* victim = static_cast<CBaseMonster*>(this); victim != nullptr )
+		{
+			if( pev->health > 0 )
+			{
+				victim->PainSound();
+			}
+
+			victim->m_bitsDamageType |= bitsDamageType;
+
+			// HACKHACK Don't kill monsters in a script.  Let them break their scripts first
+			if( victim->m_MonsterState == MONSTERSTATE_SCRIPT )
+			{
+				SetConditions(bits_COND_LIGHT_DAMAGE);
+				return false;
+			}
+
+			if( pev->health <= 0 )
+			{
+				g_pevLastInflictor = inflictor;
+
+				if ((bitsDamageType & DMG_ALWAYSGIB) != 0)
+				{
+					Killed(attacker, GIB_ALWAYS);
+				}
+				else if ((bitsDamageType & DMG_NEVERGIB) != 0)
+				{
+					Killed(attacker, GIB_NEVER);
+				}
+				else
+				{
+					Killed(attacker, GIB_NORMAL);
+				}
+
+				g_pevLastInflictor = nullptr;
+
+				return false;
+			}
+
+			if( attacker != nullptr && attacker->IsMonster() )
+			{
+				// enemy's last known position is somewhere down the vector that the attack came from.
+				if( inflictor != nullptr )
+				{
+					if (m_hEnemy == nullptr || inflictor == m_hEnemy || !HasConditions(bits_COND_SEE_ENEMY))
+					{
+						m_vecEnemyLKP = inflictor->pev->origin;
+					}
+				}
+				else
+				{
+					m_vecEnemyLKP = pev->origin + (g_vecAttackDir * 64);
+				}
+
+				MakeIdealYaw(m_vecEnemyLKP);
+
+				// add pain to the conditions
+				// !!!HACKHACK - fudged for now. Do we want to have a virtual function to determine what is light and
+				// heavy damage per monster class?
+				if (flDamage > 0)
+				{
+					SetConditions(bits_COND_LIGHT_DAMAGE);
+				}
+
+				if (flDamage >= 20)
+				{
+					SetConditions(bits_COND_HEAVY_DAMAGE);
+				}
+			}
+		}
+		return true;
+	}
+	else if (pev->health <= 0)
 	{
 		Killed(attacker, GIB_NORMAL);
 		return false;
