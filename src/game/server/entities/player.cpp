@@ -1385,111 +1385,29 @@ void CBasePlayer::PlayerUse()
 	if (((pev->button | m_afButtonPressed | m_afButtonReleased) & IN_USE) == 0)
 		return;
 
-	// Hit Use on a train?
-	if ((m_afButtonPressed & IN_USE) != 0)
-	{
-		if (m_pTank != nullptr)
-		{
-			// Stop controlling the tank
-			// TODO: Send HUD Update
-			m_pTank->Use(this, this, USE_OFF, 0);
-			m_pTank = nullptr;
-			return;
-		}
-		else
-		{
-			if ((m_afPhysicsFlags & PFLAG_ONTRAIN) != 0)
-			{
-				m_afPhysicsFlags &= ~PFLAG_ONTRAIN;
-				m_iTrain = TRAIN_NEW | TRAIN_OFF;
-				return;
-			}
-			else
-			{ // Start controlling the train!
-				CBaseEntity* pTrain = CBaseEntity::Instance(pev->groundentity);
+	minecraft::inventory* item;
 
-				if (pTrain && (pev->button & IN_JUMP) == 0 && FBitSet(pev->flags, FL_ONGROUND) && (pTrain->ObjectCaps() & FCAP_DIRECTIONAL_USE) != 0 && pTrain->OnControls(this))
-				{
-					m_afPhysicsFlags |= PFLAG_ONTRAIN;
-					m_iTrain = TrainSpeed(pTrain->pev->speed, pTrain->pev->impulse);
-					m_iTrain |= TRAIN_NEW;
-					EmitSound(CHAN_ITEM, "plats/train_use1.wav", 0.8, ATTN_NORM);
-					return;
-				}
-			}
+	for( size_t i = 0; i < inventory.size(); ++i )
+	{
+		item = &inventory[i];
+
+		if( item->pItem != nullptr )
+		{
+			/*
+			MESSAGE_BEGIN( MSG_ONE, gmsgInventoryUpdate, nullptr, this );
+				WRITE_BYTE( i ); // slot index
+				WRITE_STRING( item->pItem->GetClassname() ); // item name to print info and identify texture
+				WRITE_BYTE( item->amount ); // Amount of items in this slot
+				WRITE_BYTE( item->pItem->enchant_index ); // > 0 if is enchanted to bright and glow the texture
+				// -MC Convert to char[32]
+				WRITE_STRING( item->pItem->enchant_name ); // > enchant names
+				WRITE_STRING( item->pItem->enchant_value ); // > enchant values
+			MESSAGE_END();
+			*/
 		}
 	}
 
-	CBaseEntity* pObject = nullptr;
-	CBaseEntity* pClosest = nullptr;
-	Vector vecLOS;
-	float flMaxDot = VIEW_FIELD_NARROW;
-	float flDot;
-
-	UTIL_MakeVectors(pev->v_angle); // so we know which way we are facing
-
-	while ((pObject = UTIL_FindEntityInSphere(pObject, pev->origin, PLAYER_SEARCH_RADIUS)) != nullptr)
-	{
-		// Special behavior for ropes: check if the player is close enough to the rope segment origin
-		if (pObject->ClassnameIs("rope_segment"))
-		{
-			if ((pev->origin - pObject->pev->origin).Length() > PLAYER_SEARCH_RADIUS)
-			{
-				continue;
-			}
-		}
-
-		if ((pObject->ObjectCaps() & (FCAP_IMPULSE_USE | FCAP_CONTINUOUS_USE | FCAP_ONOFF_USE)) != 0)
-		{
-			// !!!PERFORMANCE- should this check be done on a per case basis AFTER we've determined that
-			// this object is actually usable? This dot is being done for every object within PLAYER_SEARCH_RADIUS
-			// when player hits the use key. How many objects can be in that area, anyway? (sjb)
-			vecLOS = (VecBModelOrigin(pObject) - (pev->origin + pev->view_ofs));
-
-			// This essentially moves the origin of the target to the corner nearest the player to test to see
-			// if it's "hull" is in the view cone
-			vecLOS = UTIL_ClampVectorToBox(vecLOS, pObject->pev->size * 0.5);
-
-			flDot = DotProduct(vecLOS, gpGlobals->v_forward);
-			if (flDot > flMaxDot)
-			{ // only if the item is in front of the user
-				pClosest = pObject;
-				flMaxDot = flDot;
-				// Logger->debug("{} : {}", STRING(pObject->pev->classname), flDot);
-			}
-			// Logger->debug("{} : {}", STRING(pObject->pev->classname), flDot);
-		}
-	}
-	pObject = pClosest;
-
-	// Found an object
-	if (pObject)
-	{
-		//!!!UNDONE: traceline here to prevent USEing buttons through walls
-		int caps = pObject->ObjectCaps();
-
-		if ((m_afButtonPressed & IN_USE) != 0)
-			EmitSound(CHAN_ITEM, "common/wpn_select.wav", 0.4, ATTN_NORM);
-
-		if (((pev->button & IN_USE) != 0 && (caps & FCAP_CONTINUOUS_USE) != 0) ||
-			((m_afButtonPressed & IN_USE) != 0 && (caps & (FCAP_IMPULSE_USE | FCAP_ONOFF_USE)) != 0))
-		{
-			if ((caps & FCAP_CONTINUOUS_USE) != 0)
-				m_afPhysicsFlags |= PFLAG_USING;
-
-			pObject->Use(this, this, USE_SET, 1);
-		}
-		// UNDONE: Send different USE codes for ON/OFF.  Cache last ONOFF_USE object to send 'off' if you turn away
-		else if ((m_afButtonReleased & IN_USE) != 0 && (pObject->ObjectCaps() & FCAP_ONOFF_USE) != 0) // BUGBUG This is an "off" use
-		{
-			pObject->Use(this, this, USE_SET, 0);
-		}
-	}
-	else
-	{
-		if ((m_afButtonPressed & IN_USE) != 0)
-			EmitSound(CHAN_ITEM, "common/wpn_denyselect.wav", 0.4, ATTN_NORM);
-	}
+	// -MC Open inventory
 }
 
 void CBasePlayer::Jump()
