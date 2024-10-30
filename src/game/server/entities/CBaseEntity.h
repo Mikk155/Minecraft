@@ -630,6 +630,8 @@ public:
 	int max_durability = minecraft::FUnbreakable;
 
 	void DestroyItem();
+	
+	std::vector<CBaseItem*> m_items;
 };
 
 inline bool FNullEnt(CBaseEntity* ent) { return (ent == nullptr) || FNullEnt(ent->edict()); }
