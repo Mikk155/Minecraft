@@ -227,13 +227,12 @@ install(TARGETS server
 	LIBRARY DESTINATION dlls
 )
 
-configure_file(config/liblist.gam.in liblist.gam @ONLY)
+install(DIRECTORY game/
+    DESTINATION .
+    FILES_MATCHING PATTERN "*"
+)
 
-install(FILES 
-	config/network/delta.lst
-	${CMAKE_BINARY_DIR}/liblist.gam
-	DESTINATION .)
-
+#==========================================================
 # CMake doesn't currently support installing imported libraries of type UNKNOWN.
 # See https://gitlab.kitware.com/cmake/cmake/-/issues/22406
 #install(IMPORTED_RUNTIME_ARTIFACTS OpenAL::OpenAL

@@ -21,7 +21,7 @@
 #include "world.h"
 #include "sound/ServerSoundSystem.h"
 #include "utils/ReplacementMaps.h"
-#include "CMinecraftSurvival.h"
+#include "minecraft.h"
 
 static void SetObjectCollisionBox(entvars_t* pev);
 
@@ -679,9 +679,9 @@ bool CBaseEntity::TakeDamage(CBaseEntity* inflictor, CBaseEntity* attacker, floa
 	if( pev->takedamage == DAMAGE_NO || !IsAlive() || FBitSet( pev->flags, FL_GODMODE ) )
 		return false;
 
-	float flAdditionalKnockBack;
+	float flAdditionalKnockBack = 0;
 
-	// Assume inflictor is a weapon
+	// We Assume inflictor is a weapon and attacker is never null
 	if( inflictor != nullptr )
 	{
 		if( inflictor->enchant_index > 0 )
@@ -693,18 +693,21 @@ bool CBaseEntity::TakeDamage(CBaseEntity* inflictor, CBaseEntity* attacker, floa
 
 				if( FStrEq( szEnchant, "Life Steal" ) )
 				{
+					// -MC Do a hud effect on attacker
 					attacker->GiveHealth( flDamage * ( 1.0f - ( iLevel * 0.1f ) ), 0 );
 				}
 				else if( FStrEq( szEnchant, "Critic Chance" ) )
 				{
 					if( RANDOM_LONG( 0, 10 ) <= iLevel )
 					{
+						// -MC Do sparkles effect based on the random number from bellow
 						flDamage *= RANDOM_FLOAT( 1.0, 2.0 );
 					}
+					
 				}
 				else if( FStrEq( szEnchant, "Fire Ascpect" ) )
 				{
-					// Schedule a damage loop
+					// -MC Schedule a damage loop based on the enchant level
 				}
 
 				if( FStrEq( szEnchant, "Sharpness" ) )
@@ -715,6 +718,7 @@ bool CBaseEntity::TakeDamage(CBaseEntity* inflictor, CBaseEntity* attacker, floa
 				{
 					if( std::find( std::begin( minecraft::arthropods ), std::end( minecraft::arthropods ), GetClassname() ) != std::end( minecraft::arthropods ) )
 					{
+						// -MC Apply slowness
 						flDamage += ( 2.5 * iLevel );
 					}
 				}
@@ -728,8 +732,55 @@ bool CBaseEntity::TakeDamage(CBaseEntity* inflictor, CBaseEntity* attacker, floa
 
 				if( FStrEq( szEnchant, "Knock Back" ) )
 				{
-					// Pass on more push knock back
+					// -MC Pass on more push knock back
 					// flAdditionalKnockBack = ?
+				}
+				else if( FStrEq( szEnchant, "Sweeping Edge" ) )
+				{
+					if( !FBitSet( bitsDamageType, DMG_SLASH ) )
+					{
+						CBaseEntity* target = nullptr;
+
+						while( ( target = UTIL_FindEntityInSphere( target, pev->origin, 512 ) ) != nullptr )
+						{
+							if( target == attacker || target == this )
+								continue;
+
+							Vector VecDifferenceVictimAttacker = ( attacker->pev->origin - pev->origin );
+							Vector VecDifferenceVictimTarget = ( target->pev->origin - pev->origin );
+							Vector VecDifferenceAttackerTarget = ( target->pev->origin - attacker->pev->origin );
+
+							// Only target is not in the slashed zone
+							if( VecDifferenceVictimTarget.z > 64 )
+								continue;
+
+							// The target is behind the attacker
+							if( VecDifferenceVictimAttacker.Length() <= VecDifferenceVictimTarget.Length() && VecDifferenceAttackerTarget.Length() < VecDifferenceVictimTarget.Length() )
+								continue;
+
+							float flSweepDamage = flDamage;
+
+							switch( iLevel )
+							{
+								case 1:
+									flSweepDamage /= 4; // 25%
+								break;
+								case 2:
+									flSweepDamage /= 2; // 50%
+								break;
+								case 3:
+									flSweepDamage *= 0.75f; // 75%
+								break;
+							}
+
+							if( flSweepDamage < flDamage )
+							{
+								int iSweepBits = bitsDamageType;
+								SetBits( iSweepBits, DMG_SLASH );
+								target->TakeDamage( inflictor, attacker, flSweepDamage, iSweepBits );
+							}
+						}
+					}
 				}
 			}
 		}
@@ -779,25 +830,25 @@ bool CBaseEntity::TakeDamage(CBaseEntity* inflictor, CBaseEntity* attacker, floa
 			// HACKHACK Don't kill monsters in a script.  Let them break their scripts first
 			if( victim->m_MonsterState == MONSTERSTATE_SCRIPT )
 			{
-				SetConditions(bits_COND_LIGHT_DAMAGE);
+				victim->SetConditions(bits_COND_LIGHT_DAMAGE);
 				return false;
 			}
 
-			if( pev->health <= 0 )
+			if( victim->pev->health <= 0 )
 			{
 				g_pevLastInflictor = inflictor;
 
 				if ((bitsDamageType & DMG_ALWAYSGIB) != 0)
 				{
-					Killed(attacker, GIB_ALWAYS);
+					victim->Killed(attacker, GIB_ALWAYS);
 				}
 				else if ((bitsDamageType & DMG_NEVERGIB) != 0)
 				{
-					Killed(attacker, GIB_NEVER);
+					victim->Killed(attacker, GIB_NEVER);
 				}
 				else
 				{
-					Killed(attacker, GIB_NORMAL);
+					victim->Killed(attacker, GIB_NORMAL);
 				}
 
 				g_pevLastInflictor = nullptr;
@@ -810,29 +861,29 @@ bool CBaseEntity::TakeDamage(CBaseEntity* inflictor, CBaseEntity* attacker, floa
 				// enemy's last known position is somewhere down the vector that the attack came from.
 				if( inflictor != nullptr )
 				{
-					if (m_hEnemy == nullptr || inflictor == m_hEnemy || !HasConditions(bits_COND_SEE_ENEMY))
+					if( victim->m_hEnemy == nullptr || inflictor == victim->m_hEnemy || !victim->HasConditions(bits_COND_SEE_ENEMY))
 					{
-						m_vecEnemyLKP = inflictor->pev->origin;
+						victim->m_vecEnemyLKP = inflictor->pev->origin;
 					}
 				}
 				else
 				{
-					m_vecEnemyLKP = pev->origin + (g_vecAttackDir * 64);
+					victim->m_vecEnemyLKP = pev->origin + (g_vecAttackDir * 64);
 				}
 
-				MakeIdealYaw(m_vecEnemyLKP);
+				victim->MakeIdealYaw(victim->m_vecEnemyLKP);
 
 				// add pain to the conditions
 				// !!!HACKHACK - fudged for now. Do we want to have a virtual function to determine what is light and
 				// heavy damage per monster class?
 				if (flDamage > 0)
 				{
-					SetConditions(bits_COND_LIGHT_DAMAGE);
+					victim->SetConditions(bits_COND_LIGHT_DAMAGE);
 				}
 
 				if (flDamage >= 20)
 				{
-					SetConditions(bits_COND_HEAVY_DAMAGE);
+					victim->SetConditions(bits_COND_HEAVY_DAMAGE);
 				}
 			}
 		}
@@ -1034,4 +1085,10 @@ void CBaseEntity::EmitAmbientSound(const Vector& vecOrigin, const char* samp, fl
 void CBaseEntity::StopSound(int channel, const char* sample)
 {
 	sound::g_ServerSound.EmitSound(this, channel, sample, 0, 0, SND_STOP, PITCH_NORM);
+}
+
+void CBaseEntity::DestroyItem()
+{
+	// -MC Play break sound
+	// -MC Remove item from inventory
 }

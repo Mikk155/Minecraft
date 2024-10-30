@@ -22,7 +22,7 @@
 	"LogFile":
 	{
 		"Enabled": false,
-		"BaseFileName": "mcsurvival",
+		"BaseFileName": "minecraft",
 		"MaxFiles": 8
 	}
 }

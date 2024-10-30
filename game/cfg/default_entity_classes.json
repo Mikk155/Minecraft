@@ -1,0 +1,153 @@
+{
+    // Class none is always added and should only have relationship "none" (default) to all classes.
+    "none": {},
+
+    // Class player is only used for CBasePlayer.
+    "player": {},
+
+    "pillager":
+    {
+        "Relationships":
+        {
+            "creeper":			"none",
+            "cat":				"none",
+            "player":			"hate",
+            "villager":			"nemesis",
+            "piglin":			"dislike",
+            "zombie_piglin":	"none",
+            "enderman":			"none",
+            "spider":			"none",
+            "monsters":			"none"
+        }
+    },
+
+    "villager":
+    {
+        "Relationships":
+        {
+            // None, if attack then golems will kill.
+            "creeper":			"fear",
+            "cat":				"none",
+            "player":			"none",
+            "pillager":			"fear",
+            "piglin":			"fear",
+            "zombie_piglin":	"fear",
+            "enderman":			"fear",
+            "spider":			"fear",
+            "monsters":			"fear"
+        }
+    },
+
+    "piglin":
+    {
+        "Relationships":
+        {
+            // Only agresive if provoked or not using gold armor, This is done in the SDK.
+            "player":			"none",
+            "monsters":			"none",
+            "pillager":			"none",
+
+            // Idk they are feared in minecraft.
+            "zombie_piglin":	"fear",
+
+            // They are agresive to other mobs. (Untested in minecraft, i just like to think they hate non-gold)
+            "creeper":			"dislike",
+            "cat":				"dislike",
+            "villager":			"dislike",
+            "spider":			"dislike",
+            "enderman":			"dislike"
+        }
+    },
+
+    // Class only agressive if provoked.
+    "zombie_piglin":
+    {
+        "Relationships":
+        {
+            "creeper":			"none",
+            "cat":				"none",
+            "player":			"none",
+            "pillager":			"none",
+            "villager":			"none",
+            "piglin":			"none",
+            "enderman":			"none",
+            "spider":			"none",
+            "monsters":			"none"
+        }
+    },
+
+    "enderman":
+    {
+        "Relationships":
+        {
+            // Only agressive if provoked or seen, This is done in the SDK.
+            "creeper":			"none",
+            "cat":				"none",
+            "player":			"none",
+            "pillager":			"none",
+            "villager":			"none",
+            "piglin":			"none",
+            "zombie_piglin":	"none",
+            "spider":			"none",
+            "monsters":			"none"
+        }
+    },
+
+    // Class spider is only agressive if provoked or is night, This is done in the SDK
+    "spider":
+    {
+        "Relationships":
+        {
+            "creeper":			"none",
+            "cat":				"none",
+            "player":			"hate",
+            "pillager":			"none",
+            "villager":			"dislike",
+            "piglin":			"dislike",
+            "zombie_piglin":	"none",
+            "enderman":			"none",
+            "monsters":			"ally"
+        }
+    },
+
+    "monsters":
+    {
+        "Relationships":
+        {
+            "creeper":			"ally",
+            "cat":				"none",
+            "player":			"hate",
+            "pillager":			"none",
+            "villager":			"dislike",
+            "piglin":			"dislike",
+            "zombie_piglin":	"none",
+            "enderman":			"none",
+            "spider":			"ally"
+        }
+    },
+
+    "creeper":
+    {
+        "Relationships":
+        {
+            "cat":				"fear",
+            "player":			"hate",
+            "pillager":			"none",
+            "villager":			"dislike",
+            "piglin":			"dislike",
+            "zombie_piglin":	"none",
+            "enderman":			"none",
+            "spider":			"ally"
+        }
+    },
+
+    // Class cat is just animal but creepers fears them
+    "cat": {},
+
+    "wolf":
+    {
+    },
+
+    // special because no one pays attention to it.
+    "animal": {}
+}

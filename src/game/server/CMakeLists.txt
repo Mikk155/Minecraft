@@ -40,6 +40,8 @@ target_sources(server PRIVATE
 	game.h
 	h_export.cpp
 	MapState.h
+	minecraft.cpp
+	minecraft.h
 	nodes.cpp
 	nodes.h
 	plane.cpp
@@ -296,8 +298,6 @@ target_sources(server PRIVATE
 	gamerules/CHalfLifeRules.h
 	gamerules/CHalfLifeTeamplay.cpp
 	gamerules/CHalfLifeTeamplay.h
-	gamerules/CMinecraftSurvival.cpp
-	gamerules/CMinecraftSurvival.h
 	gamerules/MapCycleSystem.cpp
 	gamerules/MapCycleSystem.h
 	gamerules/PersistentInventorySystem.cpp

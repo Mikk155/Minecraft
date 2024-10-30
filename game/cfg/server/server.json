@@ -40,7 +40,7 @@
 					"pausable 0",
 
 					// default server name. Change to "Bob's Server", etc.
-					// "hostname \"Half-Life\"",
+					"hostname \"Minecraft Server\"",
 
 					// maximum client movement speed 
 					"sv_maxspeed 270",

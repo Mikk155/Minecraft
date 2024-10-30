@@ -1,0 +1,23 @@
+// DON'T MESS WITH THIS.
+{
+    "monster_head": 3,
+    "monster_chest": 1,
+    "monster_stomach": 1,
+    "monster_arm": 1,
+    "monster_leg": 1,
+    "player_health": 100,
+    "player_maxhealth": 100,
+    "player_head": 3,
+    "player_chest": 2,
+    "player_stomach": 2,
+    "player_arm": 1,
+    "player_leg": 1,
+    "allow_monsters": 1,
+    "falldamagemode": 1,
+    "weapon_respawn_time": -1,
+    "ammo_respawn_time": -1,
+    "pickupitem_respawn_time": -1,
+    "weapon_instant_respawn": 0,
+    "allow_npc_item_dropping": 1,
+    "allow_player_weapon_dropping": 0
+}

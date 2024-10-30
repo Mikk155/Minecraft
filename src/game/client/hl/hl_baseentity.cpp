@@ -236,7 +236,6 @@ void CBaseMonster::BecomeDead() {}
 void CBaseMonster::RunAI() {}
 void CBaseMonster::Killed(CBaseEntity* attacker, int iGib) {}
 bool CBaseMonster::GiveHealth(float flHealth, int bitsDamageType) { return false; }
-bool CBaseMonster::TakeDamage(CBaseEntity* inflictor, CBaseEntity* attacker, float flDamage, int bitsDamageType) { return false; }
 void CBaseMonster::PostRestore() {}
 void CBaseMonster::StopFollowing(bool clearSchedule) {}
 void CBaseMonster::StartFollowing(CBaseEntity* pLeader) {}

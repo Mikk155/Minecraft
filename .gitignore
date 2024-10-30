@@ -2,4 +2,5 @@
 !utils/procinfo/lib/win32_vc6/procinfo.lib
 
 src/game/1.21-Template*
-mcsurvival/credits.txt
+.vscode*
+build*

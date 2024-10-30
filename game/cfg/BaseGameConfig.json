@@ -10,9 +10,9 @@
 					"HasSuit": true,
 					"Weapons":
 					{
-						"minecraft_wood_sword": {}
+						"minecraft_sword": {}
 					},
-					"WeaponToSelect": "minecraft_wood_sword"
+					"WeaponToSelect": "minecraft_sword"
 				}
 			}
 		}

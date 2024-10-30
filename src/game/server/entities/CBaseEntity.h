@@ -25,7 +25,7 @@
 #include "DataMap.h"
 #include "EntityClassificationSystem.h"
 #include "skill.h"
-#include "CMinecraftSurvival.h"
+#include "minecraft.h"
 
 class CBaseEntity;
 class CBaseItem;
