@@ -1061,7 +1061,10 @@ void CBaseEntity::TraceAttack(CBaseEntity* attacker, float flDamage, Vector vecD
 
 	if (0 != pev->takedamage)
 	{
-		AddMultiDamage(attacker, this, flDamage, bitsDamageType);
+		if( FNullEnt( attacker->pev->owner ) )
+			AddMultiDamage(attacker, this, flDamage, bitsDamageType);
+		else
+			AddMultiDamage( FNullEnt( attacker->pev->euser1 ) ? attacker : CBaseEntity::Instance( attacker->pev->euser1 ), CBaseEntity::Instance( attacker->pev->owner ), flDamage, bitsDamageType);
 
 		int blood = BloodColor();
 
@@ -1106,7 +1109,10 @@ void CBaseMonster::TraceAttack(CBaseEntity* attacker, float flDamage, Vector vec
 
 		SpawnBlood(ptr->vecEndPos, BloodColor(), flDamage); // a little surface blood.
 		TraceBleed(flDamage, vecDir, ptr, bitsDamageType);
-		AddMultiDamage(attacker, this, flDamage, bitsDamageType);
+		if( FNullEnt( attacker->pev->owner ) )
+			AddMultiDamage(attacker, this, flDamage, bitsDamageType);
+		else
+			AddMultiDamage( FNullEnt( attacker->pev->euser1 ) ? attacker : CBaseEntity::Instance( attacker->pev->euser1 ), CBaseEntity::Instance( attacker->pev->owner ), flDamage, bitsDamageType);
 	}
 }
 

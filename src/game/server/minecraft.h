@@ -2,10 +2,44 @@
 #include <vector>
 #include <string_view>
 
+#include "entities/cbase.h"
+
 #pragma once
 
 namespace minecraft
 {
+	namespace slot
+	{
+
+		const int LEFT_HAND = 0;
+		const int SLOT1 = 1;
+		const int SLOT2 = 2;
+		const int SLOT3 = 3;
+		const int SLOT4 = 4;
+		const int SLOT5 = 5;
+		const int SLOT6 = 6;
+		const int SLOT7 = 7;
+		const int SLOT8 = 8;
+		const int SLOT9 = 9;
+		const int HELMET = 10;
+		const int CHEST = 11;
+		const int LEGS = 12;
+		const int BOOTS = 13;
+		const int ARROWS = 14;
+		//
+		const int LAST_SLOT = 40;
+	}
+
+	struct inventory
+	{
+		CBaseEntity* pItem;
+		int max_stack;
+		int amount;
+
+		inventory( CBaseEntity* pItem = nullptr, int max_stack = 64, int amount = 1 )
+			: pItem(pItem), max_stack(max_stack), amount(amount) {}
+	};
+
 	const int FUnbreakable = -100;
 
 	constexpr std::string_view arthropods[] = {
@@ -25,7 +59,7 @@ namespace minecraft
 		"monster_skeleton_wither",
 		"monster_skeleton_stray",
 		"monster_skeleton_horse",
-		"monster_whither_boss",
+		"monster_wither_boss",
 		"monster_phantom"
 	};
 

@@ -39,16 +39,13 @@ public:
 	void OnCreate() override;
 	void Precache() override;
 	bool GetWeaponInfo(WeaponInfo& info) override;
-	void IncrementAmmo(CBasePlayer* pPlayer) override;
 
-	void FireBolt();
-	void FireSniperBolt();
-	void PrimaryAttack() override;
+	void FireArrow();
 	void SecondaryAttack() override;
 	bool Deploy() override;
 	void Holster() override;
-	void Reload() override;
 	void WeaponIdle() override;
+	bool ReloadArrow( int arrows = 1 );
 
 	bool UseDecrement() override
 	{
@@ -60,6 +57,6 @@ public:
 	}
 
 private:
-	unsigned short m_usCrossbow;
-	unsigned short m_usCrossbow2;
+	string_t m_type;
+	float flCharge = 0;
 };

@@ -1,17 +1,34 @@
 // DON'T MESS WITH THIS.
 {
+    // Arrow
+    "arrow": 15,
+
     "monster_head": 3,
     "monster_chest": 1,
     "monster_stomach": 1,
     "monster_arm": 1,
     "monster_leg": 1,
+
+    // Player
     "player_health": 100,
     "player_maxhealth": 100,
+
+    // Bow
+    "player_bow_charge_time": 6.0,
+    "player_bow_cooldown_time": 0.5,
+    // player_bow_distance * player_bow_charge_time current
+    "player_bow_distance": 333,
+    // half of velocity if in water
+    "player_bow_distance_water": 0.5,
+    "player_bow_decay": 15,
+
     "player_head": 3,
     "player_chest": 2,
     "player_stomach": 2,
     "player_arm": 1,
     "player_leg": 1,
+
+    // Misc
     "allow_monsters": 1,
     "falldamagemode": 1,
     "weapon_respawn_time": -1,

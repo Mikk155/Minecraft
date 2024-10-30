@@ -232,7 +232,6 @@ void W_Precache()
 	UTIL_PrecacheOther("ammo_357");
 	UTIL_PrecacheOther("ammo_gaussclip");
 	UTIL_PrecacheOther("ammo_rpgclip");
-	UTIL_PrecacheOther("ammo_crossbow");
 	UTIL_PrecacheOther("ammo_556");
 	UTIL_PrecacheOther("ammo_spore");
 	UTIL_PrecacheOther("ammo_762");
