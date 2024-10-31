@@ -1087,6 +1087,54 @@ void CBaseEntity::StopSound(int channel, const char* sample)
 	sound::g_ServerSound.EmitSound(this, channel, sample, 0, 0, SND_STOP, PITCH_NORM);
 }
 
+CBaseEntity* CBaseEntity::FindInventoryItem(const char* pszItemName, const int iInventoryIndex)
+{
+	CBaseEntity* pItem = nullptr;
+
+	minecraft::inventory* pInventory;
+
+	if( iInventoryIndex >= 0 )
+	{
+		pInventory = &inventory[iInventoryIndex];
+		pItem = pInventory->pItem;
+	}
+	else if( pszItemName != nullptr )
+	{
+		for( size_t i = 0; i < inventory.size(); ++i )
+		{
+			pInventory = &inventory[i];
+
+			if( pInventory->pItem != nullptr && FStrEq( pInventory->pItem->GetClassname(), pszItemName ) )
+			{
+				pItem = pInventory->pItem;
+			}
+		}
+	}
+
+	return pItem;
+}
+
+void CBaseEntity::ApplyEffect( std::string_view name, int level, float end, float time )
+{
+	std::string_view key = fmt::format( "{} {}", name, minecraft::level( level ));
+
+	auto it = effects.find( key );
+
+	if( it != effects.end() )
+	{
+		if( end > it->second->end )
+		{
+			it->second->end = end;
+			// Re-send to client
+			it->second->should_update = true;
+		}
+	}
+	else
+	{
+		effects[ key ] = std::make_unique<minecraft::effects>( name, level, end, time );
+	}
+}
+
 void CBaseEntity::DestroyItem()
 {
 	// -MC Play break sound

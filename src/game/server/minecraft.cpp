@@ -1,10 +1,10 @@
 #include "minecraft.h"
 
-std::string minecraft::effect::level( int num )
+std::string_view minecraft::level( int num )
 {
 	if( num == 0 )
 	{
-		return "";
+		return ""sv;
 	}
 
 	std::string result = " ";
@@ -18,5 +18,5 @@ std::string minecraft::effect::level( int num )
 		}
 	}
 
-	return result;
+	return std::string_view( result );
 }

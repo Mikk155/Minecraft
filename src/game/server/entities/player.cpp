@@ -1394,12 +1394,12 @@ void CBasePlayer::PlayerUse()
 		if( item->pItem != nullptr )
 		{
 			/*
-			MESSAGE_BEGIN( MSG_ONE, gmsgInventoryUpdate, nullptr, this );
+			MESSAGE_BEGIN( MSG_BROADCAST, gmsgInventory, nullptr, this );
 				WRITE_BYTE( i ); // slot index
 				WRITE_STRING( item->pItem->GetClassname() ); // item name to print info and identify texture
 				WRITE_BYTE( item->amount ); // Amount of items in this slot
 				WRITE_BYTE( item->pItem->enchant_index ); // > 0 if is enchanted to bright and glow the texture
-				// -MC Convert to char[32]
+				// -MC Elije como enviar esta array si en for o en string
 				WRITE_STRING( item->pItem->enchant_name ); // > enchant names
 				WRITE_STRING( item->pItem->enchant_value ); // > enchant values
 			MESSAGE_END();
@@ -3665,18 +3665,10 @@ void CBasePlayer::ItemPostFrame()
 	if (m_pTank != nullptr)
 		return;
 
-	const bool canUseItem = m_flNextAttack <= UTIL_WeaponTimeBase();
-
-	if (canUseItem || GetSkillFloat("allow_use_while_busy") != 0)
-	{
-		// Handle use events
+	if( m_flNextAttack <= UTIL_WeaponTimeBase() )
 		PlayerUse();
-	}
-
-	if (!canUseItem)
-	{
+	else
 		return;
-	}
 
 	ImpulseCommands();
 

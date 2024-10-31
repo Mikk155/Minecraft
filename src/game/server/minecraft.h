@@ -40,6 +40,25 @@ namespace minecraft
 			: pItem(pItem), max_stack(max_stack), amount(amount) {}
 	};
 
+	struct effects
+	{
+		// Effect name
+		std::string_view name;
+		// Effect level
+		int level = 1;
+		// Time till the effect ends
+		float end;
+		// Time, used for comparitions in Think, is the cooldown till apply the effect
+		float time;
+		// Last time, used in gamerules for comparing with the above float
+		float last_time = 0;
+		// Should we send the info to the client? This is managed entirely on gamerules.
+		bool should_update = true;
+
+		effects( std::string_view name = nullptr, float level = 1, float end = 1.0f, float time = 0.0f )
+			: name(name), level(level), end(end), time(time) {}
+	};
+
 	const int FUnbreakable = -100;
 
 	constexpr std::string_view arthropods[] = {
@@ -65,18 +84,6 @@ namespace minecraft
 
 	namespace effect
 	{
-		static constexpr std::string_view roman_numbs_literal[] = { "X", "IX", "V", "IV", "I" };
-
-		static constexpr int roman_numbs_integers[] = { 10, 9, 5, 4, 1  };
-
-		/**
-		*	@brief Converts the given integer to the roman value
-		*
-		*	A leading whitespace will be added to the string
-		*	@param num if 0 returns empty string
-		*/
-		std::string level( int num );
-
 		struct data
 		{
 			int max_level;
@@ -154,4 +161,16 @@ namespace minecraft
 			{ sweeping_edge, data( 3, { knockback } ) }
 		};
 	}
+
+	static constexpr std::string_view roman_numbs_literal[] = { "X", "IX", "V", "IV", "I" };
+
+	static constexpr int roman_numbs_integers[] = { 10, 9, 5, 4, 1  };
+
+	/**
+	*	@brief Converts the given integer to the roman value
+	*
+	*	A leading whitespace will be added to the string
+	*	@param num if 0 returns empty string
+	*/
+	std::string_view level( int num );
 }

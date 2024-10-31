@@ -626,6 +626,10 @@ public:
 	// Insert in here minecraft:effect enchantments level
 	string_t enchant_value[32];
 
+	// Effects Dictionary
+    void ApplyEffect( std::string_view name, int level, float end, float time = 0 );
+    std::unordered_map<std::string_view, std::unique_ptr<minecraft::effects>> effects;
+
 	int durability = minecraft::FUnbreakable;
 	int max_durability = minecraft::FUnbreakable;
 
@@ -634,6 +638,7 @@ public:
 	// Player inventory
 	std::vector<minecraft::inventory> inventory;
 	CBaseEntity() : inventory( minecraft::slot::LAST_SLOT ) {}
+	CBaseEntity* FindInventoryItem(const char* pszItemName = nullptr, const int iInventoryIndex = -1 );
 };
 
 inline bool FNullEnt(CBaseEntity* ent) { return (ent == nullptr) || FNullEnt(ent->edict()); }
