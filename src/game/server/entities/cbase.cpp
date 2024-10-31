@@ -1114,6 +1114,27 @@ CBaseEntity* CBaseEntity::FindInventoryItem(const char* pszItemName, const int i
 	return pItem;
 }
 
+void CBaseEntity::ApplyEffect( std::string_view name, int level, float end, float time )
+{
+	std::string_view key = fmt::format( "{} {}", name, minecraft::level( level ));
+
+	auto it = effects.find( key );
+
+	if( it != effects.end() )
+	{
+		if( end > it->second->end )
+		{
+			it->second->end = end;
+			// Re-send to client
+			it->second->should_update = true;
+		}
+	}
+	else
+	{
+		effects[ key ] = std::make_unique<minecraft::effects>( name, level, end, time );
+	}
+}
+
 void CBaseEntity::DestroyItem()
 {
 	// -MC Play break sound
