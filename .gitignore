@@ -4,3 +4,4 @@
 src/game/1.21-Template*
 .vscode*
 build*
+!build.bat
