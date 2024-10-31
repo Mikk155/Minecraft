@@ -1,5 +1,12 @@
+def env( env: str ) -> str:
+
+    from os import getenv
+
+    var: str = str( getenv( env ) ) if getenv( env ) else ''
+
+    return var
+
 from github import Github, GithubException
-from vars import env
 
 try:
 
@@ -16,7 +23,7 @@ except GithubException as e:
 
     if e.status == 422:
 
-        print( 'WARNING! version {} Already exists. Update the enviroment variable VERSION in the workflow.'.format( env( "VERSION" ) ) )
+        print( 'WARNING! version {} Already exists. Update the enviroment variable VERSION in the github workflow file.'.format( env( "VERSION" ) ) )
 
     print(e)
 
