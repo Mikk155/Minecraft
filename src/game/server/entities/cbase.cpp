@@ -1087,6 +1087,33 @@ void CBaseEntity::StopSound(int channel, const char* sample)
 	sound::g_ServerSound.EmitSound(this, channel, sample, 0, 0, SND_STOP, PITCH_NORM);
 }
 
+CBaseEntity* CBaseEntity::FindInventoryItem(const char* pszItemName, const int iInventoryIndex)
+{
+	CBaseEntity* pItem = nullptr;
+
+	minecraft::inventory* pInventory;
+
+	if( iInventoryIndex >= 0 )
+	{
+		pInventory = &inventory[iInventoryIndex];
+		pItem = pInventory->pItem;
+	}
+	else if( pszItemName != nullptr )
+	{
+		for( size_t i = 0; i < inventory.size(); ++i )
+		{
+			pInventory = &inventory[i];
+
+			if( pInventory->pItem != nullptr && FStrEq( pInventory->pItem->GetClassname(), pszItemName ) )
+			{
+				pItem = pInventory->pItem;
+			}
+		}
+	}
+
+	return pItem;
+}
+
 void CBaseEntity::DestroyItem()
 {
 	// -MC Play break sound
