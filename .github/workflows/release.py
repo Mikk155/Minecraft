@@ -15,7 +15,11 @@ try:
 
 except GithubException as e:
 
-    if e.status == 422:
+    if env.token == '':
+
+        print( 'WARNING! No variable \"token\" set in the repository secrets!' );
+
+    elif e.status == 422:
 
         print( 'WARNING! version {} Already exists. Update the enviroment variable VERSION in the github workflow file.'.format( env.version ) );
 
