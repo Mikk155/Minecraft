@@ -59,11 +59,8 @@ bool CHudInventory::Draw(float flTime)
 	const auto width = gEngfuncs.pfnSPR_Width(m_hudSprite, 0);
 	const auto height = gEngfuncs.pfnSPR_Height(m_hudSprite, 0);
 
-	const auto& originalColor = RGB_WHITE;
-	originalColor.Scale(255);
-
 	//gEngfuncs.pfnSPR_Set(m_hudSprite, 255, 255, 255);
-	SPR_Set(m_hudSprite, originalColor);
+	SPR_Set(m_hudSprite, RGB_WHITE);
 
 	Rect drawingRect;
 	drawingRect.left = 0;
