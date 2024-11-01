@@ -126,6 +126,8 @@ function(add_game_shared_sources target)
 			${CMAKE_CURRENT_FUNCTION_LIST_DIR}/utils/JSONSystem.h
 			${CMAKE_CURRENT_FUNCTION_LIST_DIR}/utils/LogSystem.cpp
 			${CMAKE_CURRENT_FUNCTION_LIST_DIR}/utils/LogSystem.h
+			${CMAKE_CURRENT_FUNCTION_LIST_DIR}/utils/minecraft.cpp
+			${CMAKE_CURRENT_FUNCTION_LIST_DIR}/utils/minecraft.h
 			${CMAKE_CURRENT_FUNCTION_LIST_DIR}/utils/PrecacheList.cpp
 			${CMAKE_CURRENT_FUNCTION_LIST_DIR}/utils/PrecacheList.h
 			${CMAKE_CURRENT_FUNCTION_LIST_DIR}/utils/ReplacementMaps.cpp

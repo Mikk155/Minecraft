@@ -679,6 +679,9 @@ bool CBaseEntity::TakeDamage(CBaseEntity* inflictor, CBaseEntity* attacker, floa
 	if( pev->takedamage == DAMAGE_NO || !IsAlive() || FBitSet( pev->flags, FL_GODMODE ) )
 		return false;
 
+	if( bitsDamageType == DMG_MC_FIRE && effects.find(minecraft::effect::fire_resistance) != effects.end() )
+		return false;
+
 	float flAdditionalKnockBack = 0;
 
 	// We Assume inflictor is a weapon and attacker is never null
@@ -1133,6 +1136,11 @@ void CBaseEntity::ApplyEffect( std::string_view name, int level, float end, floa
 	{
 		effects[ key ] = std::make_unique<minecraft::effects>( name, level, end, time );
 	}
+}
+
+void CBaseEntity::effect_fire(int level, CBaseEntity* inflictor, CBaseEntity* attacker)
+{
+	TakeDamage(inflictor, attacker, 0.5, DMG_MC_FIRE);
 }
 
 void CBaseEntity::DestroyItem()

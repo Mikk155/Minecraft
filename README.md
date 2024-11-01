@@ -2,9 +2,7 @@
 
 This SDK is based on [Half-Life: Unified SDK](https://github.com/twhl-community/halflife-unified-sdk)
 
-Please, refeer to the [README](https://github.com/twhl-community/halflife-unified-sdk/blob/master/README.md) of that SDK for information on building the project and/or features.
-
-For creating a map in this sdk check the wikis of this repository
+Please, Refeer to the [wiki](https://github.com/Mikk155/Minecraft/wiki) for more information.
 
 # Credits
 
@@ -25,3 +23,5 @@ For creating a map in this sdk check the wikis of this repository
     - Sword model's skeleton and animation
 - [Mojang](https://www.minecraft.net/)
     - Game Assets
+- [Minecraft fandom wiki](https://minecraft.fandom.com/wiki/Minecraft_Wiki)
+    - Formulas for various maths in the code

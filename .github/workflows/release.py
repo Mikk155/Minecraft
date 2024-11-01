@@ -1,30 +1,28 @@
-def env( env: str ) -> str:
-
-    from os import getenv
-
-    var: str = str( getenv( env ) ) if getenv( env ) else ''
-
-    return var
-
 from github import Github, GithubException
+from env import env
 
 try:
 
-    g = Github( env( "TOKEN" ) );
+    g = Github( env.token );
 
-    repo = g.get_repo( '{}/{}'.format( env( "USER" ), env( "REPOSITORY" ) ) );
+    repo = g.get_repo( '{}/{}'.format( env.user, env.repository ) );
 
-    release = repo.create_git_release( env( "VERSION" ), "# {}: {} ({})".format( env( "GAME_NAME" ), env( "MOD_NAME" ), env( "VERSION" ) ), '', draft=False, prerelease=False  );
+    release = repo.create_git_release( env.version, "# {}: {} ({})".format( env.game, env.mod, env.version ), '', draft=False, prerelease=False  );
 
-    print( 'Generated release version {}'.format( env( "VERSION" ) ) );
+    print( 'Generated release version {}'.format( env.version ) );
+
     print( 'Starting compiling binaries...');
 
 except GithubException as e:
 
-    if e.status == 422:
+    if env.token == '':
 
-        print( 'WARNING! version {} Already exists. Update the enviroment variable VERSION in the github workflow file.'.format( env( "VERSION" ) ) )
+        print( 'WARNING! No variable \"token\" set in the repository secrets!' );
 
-    print(e)
+    elif e.status == 422:
 
-    exit(1)
+        print( 'WARNING! version {} Already exists. Update the enviroment variable VERSION in the github workflow file.'.format( env.version ) );
+
+    print(e);
+
+    exit(1);

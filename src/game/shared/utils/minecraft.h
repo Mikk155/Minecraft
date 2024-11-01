@@ -1,3 +1,6 @@
+#ifndef MINECRAFT_H
+#define MINECRAFT_H
+
 #include <unordered_map>
 #include <vector>
 #include <string_view>
@@ -32,16 +35,19 @@ namespace minecraft
 
 	struct inventory
 	{
+#ifndef CLIENT_DLL
 		CBaseEntity* pItem;
 		int max_stack;
 		int amount;
 
 		inventory( CBaseEntity* pItem = nullptr, int max_stack = 64, int amount = 1 )
 			: pItem(pItem), max_stack(max_stack), amount(amount) {}
+#endif
 	};
 
 	struct effects
 	{
+#ifndef CLIENT_DLL
 		// Effect name
 		std::string_view name;
 		// Effect level
@@ -55,8 +61,13 @@ namespace minecraft
 		// Should we send the info to the client? This is managed entirely on gamerules.
 		bool should_update = true;
 
-		effects( std::string_view name = nullptr, float level = 1, float end = 1.0f, float time = 0.0f )
-			: name(name), level(level), end(end), time(time) {}
+		// These are for wither, poison, fire etc
+		CBaseEntity* inflictor = nullptr;
+		CBaseEntity* attacker = nullptr;
+
+		effects( std::string_view name = nullptr, float level = 1, float end = 1.0f, float time = 0.0f, CBaseEntity* inflictor = nullptr, CBaseEntity* attacker = nullptr )
+			: name(name), level(level), end(end), time(time), inflictor(inflictor), attacker(attacker) {}
+#endif
 	};
 
 	const int FUnbreakable = -100;
@@ -84,12 +95,12 @@ namespace minecraft
 
 	namespace effect
 	{
-		struct data
+		struct data_enchant
 		{
 			int max_level;
 			std::vector<std::string_view> incompatibilities;
 
-			data( int max_level, std::vector<std::string_view> incompatibilities )
+			data_enchant( int max_level, std::vector<std::string_view> incompatibilities )
 				: max_level( max_level ), incompatibilities( std::move( incompatibilities ) ) {}
 		};
 
@@ -147,19 +158,85 @@ namespace minecraft
 		*/
 		constexpr std::string_view sweeping_edge = "Sweeping Edge";
 
-		std::unordered_map<std::string_view, data> enchantment = {
+		std::unordered_map<std::string_view, data_enchant> enchantment = {
 
-			{ sharpness, data( 5, { bane_of_arthropods, smite } ) },
-			{ bane_of_arthropods, data( 5, { sharpness, smite } ) },
-			{ smite, data( 5, { sharpness, bane_of_arthropods } ) },
+			{ sharpness, data_enchant( 5, { bane_of_arthropods, smite } ) },
+			{ bane_of_arthropods, data_enchant( 5, { sharpness, smite } ) },
+			{ smite, data_enchant( 5, { sharpness, bane_of_arthropods } ) },
 
-			{ fire_aspect, data( 2, { life_steal, critical_chance } ) },
-			{ life_steal, data( 5, { fire_aspect, critical_chance } ) },
-			{ critical_chance, data( 7, { fire_aspect, life_steal } ) },
+			{ fire_aspect, data_enchant( 2, { life_steal, critical_chance } ) },
+			{ life_steal, data_enchant( 5, { fire_aspect, critical_chance } ) },
+			{ critical_chance, data_enchant( 7, { fire_aspect, life_steal } ) },
 
-			{ knockback, data( 2, { sweeping_edge } ) },
-			{ sweeping_edge, data( 3, { knockback } ) }
+			{ knockback, data_enchant( 2, { sweeping_edge } ) },
+			{ sweeping_edge, data_enchant( 3, { knockback } ) }
 		};
+
+		/**
+		*	@brief Fire burns the victim and apply 0.5 ♥ every second for 4 seconds,
+        *
+        *   When level 2 the seconds expands to 8.
+		* 
+		*	When level 3 it apply every half of a second
+		*/
+		constexpr std::string_view fire = "Fire";
+
+		/**
+		*	@brief Speed is a status effect that increases an entity's walking speed by 20% multiplied by the effect level. It expands a player's field of view (FOV)
+		*/
+		constexpr std::string_view speed = "Speed";
+
+		/**
+		*	@brief Slowness decreases walking speed by 15% × level and contracts the player's field of view accordingly.
+		*/
+		constexpr std::string_view slowness = "Slowness";
+
+		/**
+		*	@brief Fire burns the victim and apply 0.5 ♥ every second for 4 seconds,
+        *
+        *   When level 2 the seconds expands to 8.
+		* 
+		*	When level 3 it apply every half of a second
+		*/
+		constexpr std::string_view fire_resistance = "Fire Resistance";
+
+		std::unordered_map<std::string_view, int> effects = {
+
+			{ fire, 3 },
+			{ speed, 2 },
+			{ fire_resistance, 0 },
+			{ slowness, 4 }
+		};
+		/*
+			https://minecraft.fandom.com/wiki/Haste
+			https://minecraft.fandom.com/wiki/Mining_Fatigue
+			https://minecraft.fandom.com/wiki/Strength
+			https://minecraft.fandom.com/wiki/Instant_Health
+			https://minecraft.fandom.com/wiki/Instant_Damage
+			https://minecraft.fandom.com/wiki/Jump_Boost
+			https://minecraft.fandom.com/wiki/Nausea
+			https://minecraft.fandom.com/wiki/Regeneration
+			https://minecraft.fandom.com/wiki/Resistance
+			https://minecraft.fandom.com/wiki/Fire_Resistance
+			https://minecraft.fandom.com/wiki/Water_Breathing
+			https://minecraft.fandom.com/wiki/Invisibility
+			https://minecraft.fandom.com/wiki/Blindness
+			https://minecraft.fandom.com/wiki/Night_Vision
+			https://minecraft.fandom.com/wiki/Hunger_(effect)
+			https://minecraft.fandom.com/wiki/Weakness
+			https://minecraft.fandom.com/wiki/Poison
+			https://minecraft.fandom.com/wiki/Wither_(effect)
+			https://minecraft.fandom.com/wiki/Health_Boost
+			https://minecraft.fandom.com/wiki/Absorption
+			https://minecraft.fandom.com/wiki/Saturation
+			https://minecraft.fandom.com/wiki/Glowing
+			https://minecraft.fandom.com/wiki/Levitation
+			https://minecraft.fandom.com/wiki/Luck
+			https://minecraft.fandom.com/wiki/Bad_Luck
+			https://minecraft.fandom.com/wiki/Fatal_Poison
+			https://minecraft.fandom.com/wiki/Slow_Falling
+			https://minecraft.fandom.com/wiki/Darkness
+		*/
 	}
 
 	static constexpr std::string_view roman_numbs_literal[] = { "X", "IX", "V", "IV", "I" };
@@ -174,3 +251,5 @@ namespace minecraft
 	*/
 	std::string_view level( int num );
 }
+
+#endif // Linux my beloved

@@ -1,0 +1,39 @@
+name: Update Wiki
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'docs/*.md'
+
+env:
+  USER: ${{github.repository_owner}}
+  REPOSITORY: Minecraft
+
+jobs:
+  release:
+    name: release
+    runs-on: windows-latest
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: '3.11.4'
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install --no-cache-dir -r .github/workflows/wiki.txt
+        pip install --upgrade pip
+
+    - name: Update Wiki
+      id: generated
+      env:
+        TOKEN: ${{ secrets.TOKEN }}
+        USER: ${{ env.USER }}
+        REPOSITORY: ${{ env.REPOSITORY }}
+      run: python3 .github/workflows/wiki.py

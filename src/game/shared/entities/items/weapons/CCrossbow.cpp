@@ -238,6 +238,7 @@ bool CCrossbow::ReloadArrow( int arrows )
 		return true;
 	}
 
+#ifndef CLIENT_DLL
 	minecraft::inventory* item = &m_pPlayer->inventory[minecraft::slot::ARROWS];
 
 	// Check for other arrows and attempt to equip
@@ -268,6 +269,7 @@ bool CCrossbow::ReloadArrow( int arrows )
 
 		return true;
 	}
+#endif
 	return false;
 }
 

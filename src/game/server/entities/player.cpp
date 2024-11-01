@@ -2650,12 +2650,12 @@ void CBasePlayer::Spawn()
 			m_bIsSpawning = false;
 		}};
 
-	pev->health = 100;
-	pev->armorvalue = 0;
+	pev->health = GetSkillFloat( "player_health"sv );
 	pev->takedamage = DAMAGE_AIM;
 	pev->solid = SOLID_SLIDEBOX;
 	pev->movetype = MOVETYPE_WALK;
-	pev->max_health = pev->health;
+	pev->max_health = GetSkillFloat( "player_maxhealth"sv );
+	pev->armorvalue = 0;
 	pev->flags &= FL_PROXY | FL_FAKECLIENT; // keep proxy and fakeclient flags set by engine
 	pev->flags |= FL_CLIENT;
 	pev->air_finished = gpGlobals->time + 12;
