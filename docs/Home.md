@@ -1,6 +1,6 @@
 Welcome to the Minecraft wiki!
 
-Please, refeer to the [README](https://github.com/twhl-community/halflife-unified-sdk/blob/master/README.md) of that SDK for information on building the project and/or features.
+Please, refeer to the [README](https://github.com/twhl-community/halflife-unified-sdk/blob/master/README.md) of Half-Life: Unified SDK for information on building the project and/or features.
 
 # Modifying the minecraft mod
 
