@@ -8,13 +8,13 @@ on:
       - '.github/workflows/release.yml'
 
 env:
-  VERSION: 0.0.0
-  USER: Mikk155
-  REPOSITORY: Minecraft-Survival
+  version: 0.0.0
+  user: ${{github.repository_owner}}
+  repository: Minecraft # Can i get this automatically just as the above?
   BUILD_TYPE: Release
-  GAME_NAME: Half-Life
-  MOD_NAME: unity
-  VCPKG_ROOT: ${{github.workspace}}/vcpkg
+  game: Half-Life
+  mod: minecraft
+  vcpkg_root: ${{github.workspace}}/vcpkg
 
 jobs:
   release:
@@ -38,12 +38,12 @@ jobs:
     - name: Generate Release
       id: generated
       env:
-        TOKEN: ${{ secrets.TOKEN }}
-        VERSION: ${{ env.VERSION }}
-        USER: ${{ env.USER }}
-        REPOSITORY: ${{ env.REPOSITORY }}
-        GAME_NAME: ${{ env.GAME_NAME }}
-        MOD_NAME: ${{ env.MOD_NAME }}
+        token: ${{ secrets.TOKEN }}
+        version: ${{ env.version }}
+        user: ${{ env.user }}
+        repository: ${{ env.repository }}
+        game: ${{ env.game }}
+        mod: ${{ env.mod }}
       run: python3 .github/workflows/release.py
 
   linux:
@@ -72,13 +72,13 @@ jobs:
       - name: setup vcpkg
         uses: lukka/run-vcpkg@v10
         with:
-          vcpkgDirectory: '${{env.VCPKG_ROOT}}'
+          vcpkgDirectory: '${{env.vcpkg_root}}'
           runVcpkgInstall: false
           vcpkgJsonIgnores: "['**/vcpkg/**', '**/vcpkg_config/**', '**/utils/**']"
          
       - name: Configure
         run: >
-          cmake -B ${{github.workspace}}/build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} -DCMAKE_INSTALL_PREFIX=${{env.GAME_NAME}}/${{env.MOD_NAME}}
+          cmake -B ${{github.workspace}}/build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} -DCMAKE_INSTALL_PREFIX=${{env.game}}/${{env.mod}}
           -DCMAKE_TOOLCHAIN_FILE=${{github.workspace}}/cmake/LinuxToolchain.cmake
         
       - name: Build
@@ -88,16 +88,16 @@ jobs:
         run: cmake --install ${{github.workspace}}/build --config ${{env.BUILD_TYPE}}
 
       - name: Zip Binaries
-        run: zip -r Linux-x86 ${{ env.GAME_NAME }}
+        run: zip -r Linux-x86 ${{ env.game }}
 
       - name: Release
         uses: xresloader/upload-to-github-release@v1.6.0
         with:
           file: Linux-x86.zip
-          tag_name: ${{ env.VERSION }}
+          tag_name: ${{ env.version }}
           token: ${{ secrets.TOKEN }}
-          target_owner: ${{ env.USER }}
-          target_repo: ${{ env.REPOSITORY }}
+          target_owner: ${{ env.user }}
+          target_repo: ${{ env.repository }}
           tags: true
 
   win32:
@@ -119,13 +119,13 @@ jobs:
       - name: setup vcpkg
         uses: lukka/run-vcpkg@v10
         with:
-          vcpkgDirectory: '${{env.VCPKG_ROOT}}'
+          vcpkgDirectory: '${{env.vcpkg_root}}'
           runVcpkgInstall: false
           vcpkgJsonIgnores: "['**/vcpkg/**', '**/vcpkg_config/**', '**/utils/**']"
         
       - name: Configure
         run: >
-          cmake -B ${{github.workspace}}/build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} -DCMAKE_INSTALL_PREFIX=${{env.GAME_NAME}}/${{env.MOD_NAME}}
+          cmake -B ${{github.workspace}}/build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} -DCMAKE_INSTALL_PREFIX=${{env.game}}/${{env.mod}}
           -DCMAKE_TOOLCHAIN_FILE=${{github.workspace}}/cmake/WindowsToolchain.cmake -A Win32
         
       - name: Build
@@ -136,14 +136,14 @@ jobs:
 
       - name: Zip Binaries
         run: |
-          powershell Compress-Archive -Path ${{ env.GAME_NAME }} -DestinationPath Win32.zip
+          powershell Compress-Archive -Path ${{ env.game }} -DestinationPath Win32.zip
 
       - name: Release
         uses: xresloader/upload-to-github-release@v1.6.0
         with:
           file: Win32.zip
-          tag_name: ${{ env.VERSION }}
+          tag_name: ${{ env.version }}
           token: ${{ secrets.TOKEN }}
-          target_owner: ${{ env.USER }}
-          target_repo: ${{ env.REPOSITORY }}
+          target_owner: ${{ env.user }}
+          target_repo: ${{ env.repository }}
           tags: true
