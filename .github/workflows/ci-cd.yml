@@ -1,6 +1,6 @@
 name: CI/CD
 
-# Artifacts in this repo are removed in 15 days since they're generated
+# Artifacts in this repo are removed in 3 days since they're generated
 on:
   push:
     paths:
