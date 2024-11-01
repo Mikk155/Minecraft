@@ -1,8 +1,17 @@
 # Allow Half-Life-specific files that would otherwise be ignored
 !utils/procinfo/lib/win32_vc6/procinfo.lib
 
+# Minecraft assets
 src/game/1.21-Template*
-.vscode*
+
+# vs and vscode folders
+.vs*
+
+# Build directory for project solution
 build*
+
+# Don't ignore
 !build.bat
+
+# Python cache for utilities
 *.pyc
