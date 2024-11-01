@@ -8,7 +8,7 @@ on:
       - '.github/workflows/release.yml'
 
 env:
-  version: 0.0.0
+  version: 0.0.1
   user: ${{github.repository_owner}}
   repository: Minecraft # Can i get this automatically just as the above?
   BUILD_TYPE: Release
