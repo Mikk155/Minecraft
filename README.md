@@ -25,3 +25,5 @@ For creating a map in this sdk check the wikis of this repository
     - Sword model's skeleton and animation
 - [Mojang](https://www.minecraft.net/)
     - Game Assets
+- [Minecraft fandom wiki](https://minecraft.fandom.com/wiki/Minecraft_Wiki)
+    - Formulas for various maths in the code
