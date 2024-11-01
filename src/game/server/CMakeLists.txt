@@ -40,8 +40,6 @@ target_sources(server PRIVATE
 	game.h
 	h_export.cpp
 	MapState.h
-	minecraft.cpp
-	minecraft.h
 	nodes.cpp
 	nodes.h
 	plane.cpp

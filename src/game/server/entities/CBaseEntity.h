@@ -639,6 +639,9 @@ public:
 	std::vector<minecraft::inventory> inventory;
 	CBaseEntity() : inventory( minecraft::slot::LAST_SLOT ) {}
 	CBaseEntity* FindInventoryItem(const char* pszItemName = nullptr, const int iInventoryIndex = -1 );
+
+	// Various effect handlers, wrote this way so specific classes can override
+	void effect_fire(int level, CBaseEntity* inflictor, CBaseEntity* attacker);
 };
 
 inline bool FNullEnt(CBaseEntity* ent) { return (ent == nullptr) || FNullEnt(ent->edict()); }

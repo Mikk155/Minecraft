@@ -1,8 +1,6 @@
 // DON'T MESS WITH THIS.
 {
-    // Arrow
-    "arrow": 15,
-
+    // Mobs
     "monster_head": 3,
     "monster_chest": 1,
     "monster_stomach": 1,
@@ -10,8 +8,17 @@
     "monster_leg": 1,
 
     // Player
-    "player_health": 100,
-    "player_maxhealth": 100,
+    "player_health": 10.0,
+    "player_maxhealth": 10.0,
+
+    "player_head": 3,
+    "player_chest": 2,
+    "player_stomach": 2,
+    "player_arm": 1,
+    "player_leg": 1,
+
+    // Arrow
+    "arrow": 15,
 
     // Bow
     "player_bow_charge_time": 6.0,
@@ -21,12 +28,6 @@
     // half of velocity if in water
     "player_bow_distance_water": 0.5,
     "player_bow_decay": 15,
-
-    "player_head": 3,
-    "player_chest": 2,
-    "player_stomach": 2,
-    "player_arm": 1,
-    "player_leg": 1,
 
     // Misc
     "allow_monsters": 1,

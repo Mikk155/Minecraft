@@ -472,7 +472,10 @@ void CGameRules::m_pEffectShedule()
 
 				if( DoEffect )
 				{
-
+					if( effect->name == minecraft::effect::fire )
+					{
+						entity->effect_fire(effect->level, effect->inflictor, effect->attacker);
+					}
 				}
 
 				// If done remove, otherwise update timer.
