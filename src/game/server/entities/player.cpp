@@ -1378,13 +1378,16 @@ void CBasePlayer::StartObserver(Vector vecPosition, Vector vecViewAngle)
 
 void CBasePlayer::PlayerUse()
 {
-	if (IsObserver())
-		return;
-
 	// Was use pressed or released?
-	if (((pev->button | m_afButtonPressed | m_afButtonReleased) & IN_USE) == 0)
-		return;
+	// Quitado para probar
+	//if (!FBitSet(m_afButtonPressed, IN_USE))
+		//return;
 
+	MESSAGE_BEGIN(MSG_ONE, gmsgInventory, nullptr, this);
+	WRITE_BYTE((int)((pev->button & IN_USE) != 0));
+	MESSAGE_END();
+
+	/*
 	minecraft::inventory* item;
 
 	for( size_t i = 0; i < inventory.size(); ++i )
@@ -1393,7 +1396,6 @@ void CBasePlayer::PlayerUse()
 
 		if( item->pItem != nullptr )
 		{
-			/*
 			MESSAGE_BEGIN( MSG_BROADCAST, gmsgInventory, nullptr, this );
 				WRITE_BYTE( i ); // slot index
 				WRITE_STRING( item->pItem->GetClassname() ); // item name to print info and identify texture
@@ -1403,10 +1405,9 @@ void CBasePlayer::PlayerUse()
 				WRITE_STRING( item->pItem->enchant_name ); // > enchant names
 				WRITE_STRING( item->pItem->enchant_value ); // > enchant values
 			MESSAGE_END();
-			*/
 		}
 	}
-
+*/
 	// -MC Open inventory
 }
 
@@ -4010,6 +4011,9 @@ void CBasePlayer::UpdateClientData()
 		WRITE_SHORT((short)m_SndRoomtype); // sequence number
 		MESSAGE_END();
 	}
+
+	// Test Menu
+	PlayerUse();
 
 	if (fullHUDInitRequired || m_bRestored)
 	{
