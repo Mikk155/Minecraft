@@ -21,6 +21,11 @@
 					"name": "HalfLife_DEVELOPER_LEVEL",
 					"value": "1",
 					"type": "STRING"
+				},
+				{
+					"name": "HalfLife_ENABLE_DEV_MODE",
+					"value": "True",
+					"type": "BOOL"
 				}
 			]
 		}

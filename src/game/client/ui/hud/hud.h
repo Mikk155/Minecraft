@@ -712,6 +712,7 @@ public:
 	void MsgFunc_Inventory(const char* pszName, BufferReader& reader);
 
 private:
+	HSPRITE m_hsprCursor;
 	HSPRITE m_hudSprite;
 	bool m_fOn;
 };

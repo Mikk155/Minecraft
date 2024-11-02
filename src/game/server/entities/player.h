@@ -307,6 +307,8 @@ public:
 
 	char m_szTeamName[TEAM_NAME_LENGTH];
 
+	bool m_fOnInventory = false; //Inventario abierto o cerrado
+
 	void OnCreate() override;
 	void Spawn() override;
 	void Pain();

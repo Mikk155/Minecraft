@@ -1378,14 +1378,16 @@ void CBasePlayer::StartObserver(Vector vecPosition, Vector vecViewAngle)
 
 void CBasePlayer::PlayerUse()
 {
-	// Was use pressed or released?
-	// Quitado para probar
-	//if (!FBitSet(m_afButtonPressed, IN_USE))
-		//return;
+    // Was use pressed or released?
+    if (((m_afButtonPressed) & IN_USE) == 0)
+        return;
+
+	m_fOnInventory = !m_fOnInventory;
 
 	MESSAGE_BEGIN(MSG_ONE, gmsgInventory, nullptr, this);
-	WRITE_BYTE((int)((pev->button & IN_USE) != 0));
+	WRITE_BYTE((int)m_fOnInventory);
 	MESSAGE_END();
+
 
 	/*
 	minecraft::inventory* item;
@@ -3848,7 +3850,6 @@ void CBasePlayer::UpdateClientData()
 		m_iClientHealth = pev->health;
 	}
 
-
 	if (pev->armorvalue != m_iClientBattery)
 	{
 		m_iClientBattery = pev->armorvalue;
@@ -4011,9 +4012,6 @@ void CBasePlayer::UpdateClientData()
 		WRITE_SHORT((short)m_SndRoomtype); // sequence number
 		MESSAGE_END();
 	}
-
-	// Test Menu
-	PlayerUse();
 
 	if (fullHUDInitRequired || m_bRestored)
 	{

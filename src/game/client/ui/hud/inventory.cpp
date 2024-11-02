@@ -22,6 +22,9 @@
 
 #include "vgui_TeamFortressViewport.h"
 
+void IN_ResetMouse();
+extern bool g_iVisibleMouse;
+
 bool CHudInventory::Init()
 {
 	g_ClientUserMessages.RegisterHandler("Inventory", &CHudInventory::MsgFunc_Inventory, this);
@@ -41,7 +44,14 @@ void CHudInventory::Reset()
 
 bool CHudInventory::VidInit()
 {
-	m_hudSprite = SPR_Load("sprites/gui/inventory.spr");
+	const int HUD_inventory = gHUD.GetSpriteIndex("inventory");
+
+	if (HUD_inventory != -1)
+		m_hudSprite = gHUD.GetSprite(HUD_inventory);
+	else
+		m_hudSprite = SPR_Load("sprites/gui/inventory.spr");
+
+	m_hsprCursor = 0;
 
 	return true;
 }
@@ -78,4 +88,15 @@ void CHudInventory::MsgFunc_Inventory(const char* pszName, BufferReader& reader)
 {
 	int x = reader.ReadByte();
 	m_fOn = 0 != x;
+	g_iVisibleMouse = m_fOn;
+
+	if (g_iVisibleMouse)
+	{
+		App::getInstance()->setCursorOveride(App::getInstance()->getScheme()->getCursor(Scheme::scu_arrow));
+	}
+	else
+	{
+		IN_ResetMouse();
+		App::getInstance()->setCursorOveride(App::getInstance()->getScheme()->getCursor(Scheme::scu_none));
+	}
 }
