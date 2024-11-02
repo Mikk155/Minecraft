@@ -627,8 +627,8 @@ public:
 	string_t enchant_value[32];
 
 	// Effects Dictionary
-    void ApplyEffect( std::string_view name, int level, float end, float time = 0 );
-    std::unordered_map<std::string_view, std::unique_ptr<minecraft::effects>> effects;
+	void ApplyEffect( std::string_view name, int level, float end, float time = 0 );
+	std::unordered_map<std::string_view, std::unique_ptr<minecraft::effects>> effects;
 
 	int durability = minecraft::FUnbreakable;
 	int max_durability = minecraft::FUnbreakable;

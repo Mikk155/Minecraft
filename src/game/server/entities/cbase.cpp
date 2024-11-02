@@ -1108,7 +1108,7 @@ void CBaseEntity::effect_fire(int level, CBaseEntity* inflictor, CBaseEntity* at
 void CBaseEntity::DestroyItem()
 {
 	// -MC Play break sound
-	// -MC Remove item from inventory
+	UTIL_Remove(this);
 }
 
 int CBaseEntity::GetConfiguration(const char* pszConfigFileName)

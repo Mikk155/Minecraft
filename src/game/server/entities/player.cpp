@@ -1378,10 +1378,8 @@ void CBasePlayer::StartObserver(Vector vecPosition, Vector vecViewAngle)
 
 void CBasePlayer::PlayerUse()
 {
-	// Was use pressed or released?
-	// Quitado para probar
-	//if (!FBitSet(m_afButtonPressed, IN_USE))
-		//return;
+	if( IsObserver() || ( ( pev->button | m_afButtonPressed | m_afButtonReleased) & IN_USE) == 0 )
+		return;
 
 	MESSAGE_BEGIN(MSG_ONE, gmsgInventory, nullptr, this);
 	WRITE_BYTE((int)((pev->button & IN_USE) != 0));
@@ -4011,9 +4009,6 @@ void CBasePlayer::UpdateClientData()
 		WRITE_SHORT((short)m_SndRoomtype); // sequence number
 		MESSAGE_END();
 	}
-
-	// Test Menu
-	PlayerUse();
 
 	if (fullHUDInitRequired || m_bRestored)
 	{
