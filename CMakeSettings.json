@@ -3,7 +3,7 @@
 		{
 			"name": "Win32-Debug",
 			"generator": "Visual Studio 17 2022",
-			"configurationType": "Debug",
+			"configurationType": "Release",
 			"inheritEnvironments": [],
 			"buildRoot": "${projectDir}\\out\\build\\${name}",
 			"installRoot": "D:\\SteamLibrary\\steamapps\\common\\Half-Life\\mc",
