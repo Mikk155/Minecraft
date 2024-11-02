@@ -111,10 +111,10 @@ jobs:
   #       with:
   #         file: Linux-x86.zip
   #         tag_name: ${{ env.version }}
-          token: ${{ secrets.TOKEN }}
-          target_owner: ${{ env.user }}
-          target_repo: ${{ env.repository }}
-          tags: true
+  #         token: ${{ secrets.TOKEN }}
+  #         target_owner: ${{ env.user }}
+  #         target_repo: ${{ env.repository }}
+  #         tags: true
 
   win32:
     needs: release
