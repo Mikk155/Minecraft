@@ -642,6 +642,11 @@ public:
 
 	// Various effect handlers, wrote this way so specific classes can override
 	void effect_fire(int level, CBaseEntity* inflictor, CBaseEntity* attacker);
+
+	// Configuration file
+    std::unique_ptr<json> m_config;
+	const char* m_CustomConfig = nullptr;
+	bool GetConfiguration(const char* pszConfigFileName);
 };
 
 inline bool FNullEnt(CBaseEntity* ent) { return (ent == nullptr) || FNullEnt(ent->edict()); }
