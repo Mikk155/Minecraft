@@ -1111,8 +1111,10 @@ void CBaseEntity::DestroyItem()
 	// -MC Remove item from inventory
 }
 
-bool CBaseEntity::GetConfiguration(const char* pszConfigFileName)
+int CBaseEntity::GetConfiguration(const char* pszConfigFileName)
 {
+	int iReturnCode = 0;
+
 	const char* szPath = fmt::format( "cfg/entity_config/{}.json", pszConfigFileName ).c_str();
 
     std::optional<json> m_Configuration = g_JSON.LoadJSONFile( szPath );
@@ -1120,9 +1122,11 @@ bool CBaseEntity::GetConfiguration(const char* pszConfigFileName)
     if( m_Configuration.has_value() )
 	{
         m_config = std::make_unique<json>( m_Configuration.value() );
+		iReturnCode |= 1;
     }
 	else
 	{
+		m_config = std::make_unique<json>();
 		Logger->error( "{}:{} failed to load \"{}\".", GetClassname(), entindex(), szPath );
     }
 
@@ -1140,20 +1144,15 @@ bool CBaseEntity::GetConfiguration(const char* pszConfigFileName)
 			{
 		        (*m_config)[ it.key() ] = it.value();
 			}
+			iReturnCode |= 2;
 		}
 		else
 		{
 			Logger->error( "{}:{} failed to load \"{}\".", GetClassname(), entindex(), szCustomPath );
 		}
+		// No more use, free
 		m_CustomConfig = nullptr;
 	}
 
-	if( !( m_config != nullptr ) )
-	{
-		Logger->error( "Removing entity to prevent issues." );
-		UTIL_Remove(this);
-		return false;
-	}
-
-	return true;
+	return iReturnCode;
 }

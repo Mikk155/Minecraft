@@ -645,8 +645,19 @@ public:
 
 	// Configuration file
     std::unique_ptr<json> m_config;
+private:
 	const char* m_CustomConfig = nullptr;
-	bool GetConfiguration(const char* pszConfigFileName);
+public:
+	/**
+	 *	@brief Base Entity. All entity types derive from this
+	 *
+	 * ( GetConfiguration == 0 ) no files loaded.
+	 * 
+	 * ( ( GetConfiguration & 1 ) != 0 ) default file loaded.
+	 * 
+	 * ( ( GetConfiguration & 2 ) != 0 ) custom file loaded.
+	*/
+	int GetConfiguration(const char* pszConfigFileName);
 };
 
 inline bool FNullEnt(CBaseEntity* ent) { return (ent == nullptr) || FNullEnt(ent->edict()); }
