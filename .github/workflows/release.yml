@@ -46,55 +46,71 @@ jobs:
         mod: ${{ env.mod }}
       run: python3 .github/workflows/release.py
 
-  linux:
-    needs: release
-    name: Linux-x86
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-        with:
-          submodules: recursive
+  # linux:
+  #   needs: release
+  #   name: Linux-x86
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - name: Checkout
+  #       uses: actions/checkout@v4
+  #       with:
+  #         submodules: recursive
 
-      - name: Pre-Release
-        if: success() && needs.release.outputs.generated
-        run: echo "Waiting for release task."
-          
-      - name: Install G++ Multilib & 32 bit OpenGL library
-        run: |
-          sudo dpkg --add-architecture i386
-          sudo add-apt-repository ppa:ubuntu-toolchain-r/test
-          sudo apt update
-          sudo apt install -y g++-11-multilib libgcc-s1:i386 libstdc++6:i386 libatomic1:i386 libgl1-mesa-dev:i386
-         
-      - uses: lukka/get-cmake@latest
-      
-      - name: setup vcpkg
-        uses: lukka/run-vcpkg@v10
-        with:
-          vcpkgDirectory: '${{env.vcpkg_root}}'
-          runVcpkgInstall: false
-          vcpkgJsonIgnores: "['**/vcpkg/**', '**/vcpkg_config/**', '**/utils/**']"
-         
-      - name: Configure
-        run: >
-          cmake -B ${{github.workspace}}/build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} -DCMAKE_INSTALL_PREFIX=${{env.game}}/${{env.mod}}
-          -DCMAKE_TOOLCHAIN_FILE=${{github.workspace}}/cmake/LinuxToolchain.cmake
-        
-      - name: Build
-        run: cmake --build ${{github.workspace}}/build --config ${{env.BUILD_TYPE}} -j3
-        
-      - name: Install
-        run: cmake --install ${{github.workspace}}/build --config ${{env.BUILD_TYPE}}
+  #     - name: Pre-Release
+  #       if: success() && needs.release.outputs.generated
+  #       run: echo "Waiting for release task."
 
-      - name: Zip Binaries
-        run: zip -r Linux-x86 ${{ env.game }}
+  #     - name: Set up Python
+  #       uses: actions/setup-python@v2
+  #       with:
+  #         python-version: '3.11.4'
 
-      - name: Release
-        uses: xresloader/upload-to-github-release@v1.6.0
-        with:
-          file: Linux-x86.zip
-          tag_name: ${{ env.version }}
+  #     - name: Install dependencies
+  #       run: |
+  #         python -m pip install --upgrade pip
+  #         pip install --no-cache-dir -r src/tools/forge_data/main.txt
+  #         pip install --upgrade pip
+
+  #     - name: Build FGD
+  #       run: |
+  #         cd src/tools/forge_data
+  #         python main.py
+
+  #     - name: Install G++ Multilib & 32 bit OpenGL library
+  #       run: |
+  #         sudo dpkg --add-architecture i386
+  #         sudo add-apt-repository ppa:ubuntu-toolchain-r/test
+  #         sudo apt update
+  #         sudo apt install -y g++-11-multilib libgcc-s1:i386 libstdc++6:i386 libatomic1:i386 libgl1-mesa-dev:i386
+
+  #     - uses: lukka/get-cmake@latest
+
+  #     - name: setup vcpkg
+  #       uses: lukka/run-vcpkg@v10
+  #       with:
+  #         vcpkgDirectory: '${{env.vcpkg_root}}'
+  #         runVcpkgInstall: false
+  #         vcpkgJsonIgnores: "['**/vcpkg/**', '**/vcpkg_config/**', '**/utils/**']"
+
+  #     - name: Configure
+  #       run: >
+  #         cmake -B ${{github.workspace}}/build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} -DCMAKE_INSTALL_PREFIX=${{env.game}}/${{env.mod}}
+  #         -DCMAKE_TOOLCHAIN_FILE=${{github.workspace}}/cmake/LinuxToolchain.cmake
+
+  #     - name: Build
+  #       run: cmake --build ${{github.workspace}}/build --config ${{env.BUILD_TYPE}} -j3
+
+  #     - name: Install
+  #       run: cmake --install ${{github.workspace}}/build --config ${{env.BUILD_TYPE}}
+
+  #     - name: Zip Binaries
+  #       run: zip -r Linux-x86 ${{ env.game }}
+
+  #     - name: Release
+  #       uses: xresloader/upload-to-github-release@v1.6.0
+  #       with:
+  #         file: Linux-x86.zip
+  #         tag_name: ${{ env.version }}
           token: ${{ secrets.TOKEN }}
           target_owner: ${{ env.user }}
           target_repo: ${{ env.repository }}
@@ -113,24 +129,40 @@ jobs:
       - name: Pre-Release
         if: success() && needs.release.outputs.generated
         run: echo "Waiting for release task."
-      
+
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.11.4'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install --no-cache-dir -r src/tools/forge_data/main.txt
+          pip install --upgrade pip
+
+      - name: Build FGD
+        run: |
+          cd src/tools/forge_data
+          python main.py
+
       - uses: lukka/get-cmake@latest
-      
+
       - name: setup vcpkg
         uses: lukka/run-vcpkg@v10
         with:
           vcpkgDirectory: '${{env.vcpkg_root}}'
           runVcpkgInstall: false
           vcpkgJsonIgnores: "['**/vcpkg/**', '**/vcpkg_config/**', '**/utils/**']"
-        
+
       - name: Configure
         run: >
           cmake -B ${{github.workspace}}/build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} -DCMAKE_INSTALL_PREFIX=${{env.game}}/${{env.mod}}
           -DCMAKE_TOOLCHAIN_FILE=${{github.workspace}}/cmake/WindowsToolchain.cmake -A Win32
-        
+
       - name: Build
         run: cmake --build ${{github.workspace}}/build --config ${{env.BUILD_TYPE}} -j3
-        
+
       - name: Install
         run: cmake --install ${{github.workspace}}/build --config ${{env.BUILD_TYPE}}
 
