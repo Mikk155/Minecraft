@@ -58,16 +58,6 @@ int CHalfLifeCoopplay::PlayerRelationship(CBasePlayer* pPlayer, CBaseEntity* pTa
 	return GR_TEAMMATE;
 }
 
-bool CHalfLifeCoopplay::ShouldAutoAim(CBasePlayer* pPlayer, CBaseEntity* target)
-{
-	if (target && target->IsPlayer())
-	{
-		return PlayerRelationship(pPlayer, target) != GR_TEAMMATE;
-	}
-
-	return true;
-}
-
 int CHalfLifeCoopplay::IPointsForKill(CBasePlayer* pAttacker, CBasePlayer* pKilled)
 {
 	if (!pKilled)

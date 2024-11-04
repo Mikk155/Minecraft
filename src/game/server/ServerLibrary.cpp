@@ -50,7 +50,6 @@
 #include "config/sections/HudColorSection.h"
 #include "config/sections/HudReplacementSection.h"
 #include "config/sections/SpawnInventorySection.h"
-#include "config/sections/SuitLightTypeSection.h"
 
 #include "entities/EntityClassificationSystem.h"
 
@@ -371,12 +370,6 @@ void ServerLibrary::PlayerActivating(CBasePlayer* player)
 		player->SetCrosshairColor(*m_MapState->m_CrosshairColor);
 	}
 
-	// Override the light type.
-	if (m_MapState->m_LightType)
-	{
-		player->SetSuitLightType(*m_MapState->m_LightType);
-	}
-
 	SendFogMessage(player);
 }
 
@@ -439,7 +432,6 @@ void ServerLibrary::CreateConfigDefinitions()
 			sections.push_back(std::make_unique<GlobalSentenceReplacementSection>());
 			sections.push_back(std::make_unique<GlobalSoundReplacementSection>());
 			sections.push_back(std::make_unique<HudColorSection>());
-			sections.push_back(std::make_unique<SuitLightTypeSection>());
 			sections.push_back(std::make_unique<SpawnInventorySection>());
 			sections.push_back(std::make_unique<EntityTemplatesSection>());
 			sections.push_back(std::make_unique<EntityClassificationsSection>());

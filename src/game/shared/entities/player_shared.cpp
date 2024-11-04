@@ -148,8 +148,6 @@ void CBasePlayer::SelectLastItem()
 
 void CBasePlayer::DeployWeapon(CBasePlayerWeapon* weapon)
 {
-	ResetAutoaim();
-
 	// FIX, this needs to queue them up and delay
 	if (m_pActiveWeapon)
 		m_pActiveWeapon->Holster();

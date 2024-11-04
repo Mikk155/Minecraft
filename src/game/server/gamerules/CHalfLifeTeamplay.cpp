@@ -375,18 +375,6 @@ int CHalfLifeTeamplay::PlayerRelationship(CBasePlayer* pPlayer, CBaseEntity* pTa
 	return GR_NOTTEAMMATE;
 }
 
-bool CHalfLifeTeamplay::ShouldAutoAim(CBasePlayer* pPlayer, CBaseEntity* target)
-{
-	// always autoaim, unless target is a teammate
-	if (target && target->IsPlayer())
-	{
-		if (PlayerRelationship(pPlayer, target) == GR_TEAMMATE)
-			return false; // don't autoaim at teammates
-	}
-
-	return CHalfLifeMultiplay::ShouldAutoAim(pPlayer, target);
-}
-
 int CHalfLifeTeamplay::IPointsForKill(CBasePlayer* pAttacker, CBasePlayer* pKilled)
 {
 	if (!pKilled)

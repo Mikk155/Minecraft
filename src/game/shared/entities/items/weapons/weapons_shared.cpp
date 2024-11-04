@@ -396,7 +396,7 @@ void CBasePlayerWeapon::ItemPostFrame()
 		{
 #ifndef CLIENT_DLL
 			// weapon isn't useable, switch.
-			if ((iFlags() & ITEM_FLAG_NOAUTOSWITCHEMPTY) == 0 && g_pGameRules->GetNextBestWeapon(m_pPlayer, this))
+			if ((iFlags() & ITEM_FLAG_NOAUTOSWITCHEMPTY) == 0 )
 			{
 				m_flNextPrimaryAttack = (UseDecrement() ? 0.0 : gpGlobals->time) + 0.3;
 				return;

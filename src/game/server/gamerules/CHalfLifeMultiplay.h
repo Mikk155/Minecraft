@@ -33,8 +33,6 @@ public:
 	void Think() override;
 	bool IsAllowedToSpawn(CBaseEntity* pEntity) override;
 
-	bool FShouldSwitchWeapon(CBasePlayer* pPlayer, CBasePlayerWeapon* pWeapon) override;
-
 	bool IsMultiplayer() override { return true; }
 	bool IsDeathmatch() override { return true; }
 	bool IsCoOp() override { return false; }
@@ -52,8 +50,6 @@ public:
 	bool FPlayerCanRespawn(CBasePlayer* pPlayer) override;
 	float FlPlayerSpawnTime(CBasePlayer* pPlayer) override;
 	CBaseEntity* GetPlayerSpawnSpot(CBasePlayer* pPlayer) override;
-
-	bool AllowAutoTargetCrosshair() override;
 
 	int IPointsForKill(CBasePlayer* pAttacker, CBasePlayer* pKilled) override;
 	void PlayerKilled(CBasePlayer* pVictim, CBaseEntity* pKiller, CBaseEntity* inflictor) override;

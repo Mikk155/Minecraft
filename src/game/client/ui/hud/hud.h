@@ -346,59 +346,6 @@ private:
 //
 //-----------------------------------------------------
 //
-class CHudFlashlight : public CHudBase
-{
-private:
-	struct LightData
-	{
-		HSPRITE m_hSprite1 = 0;
-		HSPRITE m_hSprite2 = 0;
-		HSPRITE m_hBeam = 0;
-		const Rect* m_prc1 = nullptr;
-		const Rect* m_prc2 = nullptr;
-		const Rect* m_prcBeam = nullptr;
-		int m_iWidth = 0; // width of the battery innards
-	};
-
-public:
-	bool Init() override;
-	bool VidInit() override;
-	bool Draw(float flTime) override;
-	void Reset() override;
-	void MsgFunc_Flashlight(const char* pszName, BufferReader& reader);
-	void MsgFunc_FlashBat(const char* pszName, BufferReader& reader);
-
-private:
-	LightData* GetLightData()
-	{
-		switch (m_SuitLightType)
-		{
-		default:
-		case SuitLightType::Flashlight:
-			return &m_Flashlight;
-		case SuitLightType::Nightvision:
-			return &m_Nightvision;
-		}
-	}
-
-	void DrawNightVision();
-
-private:
-	LightData m_Flashlight;
-	LightData m_Nightvision;
-
-	HSPRITE m_nvSprite;
-
-	SuitLightType m_SuitLightType = SuitLightType::Flashlight;
-	float m_flBat;
-	int m_iBat;
-	bool m_fOn;
-	float m_fFade;
-};
-
-//
-//-----------------------------------------------------
-//
 const int maxHUDMessages = 16;
 struct message_parms_t
 {
@@ -818,7 +765,6 @@ public:
 	CHudSpectator m_Spectator;
 	CHudGeiger m_Geiger;
 	CHudTrain m_Train;
-	CHudFlashlight m_Flash;
 	CHudMessage m_Message;
 	CHudScoreboard m_Scoreboard;
 	CHudStatusBar m_StatusBar;

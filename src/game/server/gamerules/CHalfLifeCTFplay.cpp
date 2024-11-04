@@ -798,16 +798,6 @@ bool CHalfLifeCTFplay::FPlayerCanTakeDamage(CBasePlayer* pPlayer, CBaseEntity* p
 	return CHalfLifeMultiplay::FPlayerCanTakeDamage(pPlayer, pAttacker);
 }
 
-bool CHalfLifeCTFplay::ShouldAutoAim(CBasePlayer* pPlayer, CBaseEntity* target)
-{
-	if (target && target->IsPlayer())
-	{
-		return PlayerRelationship(pPlayer, target) != GR_TEAMMATE;
-	}
-
-	return true;
-}
-
 void CHalfLifeCTFplay::PlayerSpawn(CBasePlayer* pPlayer)
 {
 	if (pPlayer->m_iTeamNum != CTFTeam::None)

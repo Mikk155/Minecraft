@@ -76,7 +76,6 @@ target_sources(server PRIVATE
 	config/sections/HudColorSection.h
 	config/sections/HudReplacementSection.h
 	config/sections/SpawnInventorySection.h
-	config/sections/SuitLightTypeSection.h
 	
 	entities/animating.cpp
 	entities/animation.cpp
@@ -157,7 +156,6 @@ target_sources(server PRIVATE
 	entities/items/CWeaponBox.cpp
 	entities/items/CWeaponBox.h
 	entities/items/ggrenade.cpp
-	entities/items/chargers.cpp
 	entities/items/item_generic.cpp
 	entities/items/items.cpp
 	entities/items/items.h

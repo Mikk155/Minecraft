@@ -40,7 +40,6 @@ public:
 
 	std::optional<RGB24> m_HudColor;
 	std::optional<RGB24> m_CrosshairColor;
-	std::optional<SuitLightType> m_LightType;
 
 	// Initialized during config load.
 	std::unique_ptr<const ReplacementMap> m_GlobalModelReplacement;
