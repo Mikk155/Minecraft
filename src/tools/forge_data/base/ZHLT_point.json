@@ -1,0 +1,39 @@
+{
+	"$schema": "../schema.json",
+    "Class": "Base",
+    "data":
+    {
+        "_fade":
+        {
+            "variable": "float",
+            "value": 1.0,
+            "title": "ZHLT Fade",
+            "description": ""
+        },
+        "_falloff":
+        {
+            "variable": "choices",
+            "value": 0,
+            "choices":
+            {
+                "0":
+                {
+                    "title": "Default",
+                    "description": ""
+                },
+                "1":
+                {
+                    "title": "Inverse Linear",
+                    "description": ""
+                },
+                "2":
+                {
+                    "title": "Inverse Square",
+                    "description": ""
+                }
+            },
+            "title": "ZHLT Falloff",
+            "description": ""
+        }
+    }
+}

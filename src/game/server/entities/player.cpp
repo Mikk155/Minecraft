@@ -1379,7 +1379,7 @@ void CBasePlayer::StartObserver(Vector vecPosition, Vector vecViewAngle)
 void CBasePlayer::PlayerUse()
 {
     // Was use pressed or released?
-    if (((m_afButtonPressed) & IN_USE) == 0)
+	if( IsObserver() || ( ( pev->button | m_afButtonPressed | m_afButtonReleased) & IN_USE) == 0 )
         return;
 
 	m_fOnInventory = !m_fOnInventory;
@@ -1387,7 +1387,6 @@ void CBasePlayer::PlayerUse()
 	MESSAGE_BEGIN(MSG_ONE, gmsgInventory, nullptr, this);
 	WRITE_BYTE((int)m_fOnInventory);
 	MESSAGE_END();
-
 
 	/*
 	minecraft::inventory* item;

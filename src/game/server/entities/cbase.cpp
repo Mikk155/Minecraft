@@ -550,49 +550,11 @@ static void LoadSentenceReplacementMap(const ReplacementMap*& destination, strin
 
 bool CBaseEntity::RequiredKeyValue(KeyValueData* pkvd)
 {
-	// Replacement maps can be changed at runtime using trigger_changekeyvalue.
-	// Note that this may cause host_error or sys_error if files aren't precached.
-	if (FStrEq(pkvd->szKeyName, "model_replacement_filename"))
+	if( FStrEq( pkvd->szKeyName, "config" ) )
 	{
-		m_ModelReplacementFileName = ALLOC_STRING(pkvd->szValue);
-		LoadFileNameReplacementMap(m_ModelReplacement, m_ModelReplacementFileName);
-	}
-	else if (FStrEq(pkvd->szKeyName, "sound_replacement_filename"))
-	{
-		m_SoundReplacementFileName = ALLOC_STRING(pkvd->szValue);
-		LoadFileNameReplacementMap(m_SoundReplacement, m_SoundReplacementFileName);
-	}
-	else if (FStrEq(pkvd->szKeyName, "sentence_replacement_filename"))
-	{
-		m_SentenceReplacementFileName = ALLOC_STRING(pkvd->szValue);
-		LoadSentenceReplacementMap(m_SentenceReplacement, m_SentenceReplacementFileName);
-	}
-	// Note: while this code does fix backwards bounds here it will not apply to partial hulls mixing with hard-coded ones.
-	else if (FStrEq(pkvd->szKeyName, "custom_hull_min"))
-	{
-		UTIL_StringToVector(m_CustomHullMin, pkvd->szValue);
-		m_HasCustomHullMin = true;
-
-		if (m_HasCustomHullMax)
-		{
-			CheckForBackwardsBounds(this);
-		}
-
+		m_CustomConfig = pkvd->szValue;
 		return true;
 	}
-	else if (FStrEq(pkvd->szKeyName, "custom_hull_max"))
-	{
-		UTIL_StringToVector(m_CustomHullMax, pkvd->szValue);
-		m_HasCustomHullMax = true;
-
-		if (m_HasCustomHullMin)
-		{
-			CheckForBackwardsBounds(this);
-		}
-
-		return true;
-	}
-
 	return false;
 }
 
@@ -1146,5 +1108,51 @@ void CBaseEntity::effect_fire(int level, CBaseEntity* inflictor, CBaseEntity* at
 void CBaseEntity::DestroyItem()
 {
 	// -MC Play break sound
-	// -MC Remove item from inventory
+	UTIL_Remove(this);
+}
+
+int CBaseEntity::GetConfiguration(const char* pszConfigFileName)
+{
+	int iReturnCode = 0;
+
+	const char* szPath = fmt::format( "cfg/entity_config/{}.json", pszConfigFileName ).c_str();
+
+    std::optional<json> m_Configuration = g_JSON.LoadJSONFile( szPath );
+
+    if( m_Configuration.has_value() )
+	{
+        m_config = std::make_unique<json>( m_Configuration.value() );
+		iReturnCode |= 1;
+    }
+	else
+	{
+		m_config = std::make_unique<json>();
+		Logger->error( "{}:{} failed to load \"{}\".", GetClassname(), entindex(), szPath );
+    }
+
+	if( m_CustomConfig != nullptr )
+	{
+		const char* szCustomPath = fmt::format( "cfg/maps/{}.json", m_CustomConfig ).c_str();
+
+		m_Configuration = g_JSON.LoadJSONFile( szCustomPath );
+
+		if( m_Configuration.has_value() )
+		{
+    		std::unique_ptr<json> customConfig = std::make_unique<json>( m_Configuration.value() );
+
+			for( auto it = customConfig->begin(); it != customConfig->end(); ++it )
+			{
+		        (*m_config)[ it.key() ] = it.value();
+			}
+			iReturnCode |= 2;
+		}
+		else
+		{
+			Logger->error( "{}:{} failed to load \"{}\".", GetClassname(), entindex(), szCustomPath );
+		}
+		// No more use, free
+		m_CustomConfig = nullptr;
+	}
+
+	return iReturnCode;
 }

@@ -195,6 +195,7 @@ target_sources(client PRIVATE
 	ui/hud/hud_update.cpp
 	ui/hud/HudSpriteConfigSystem.cpp
 	ui/hud/HudSpriteConfigSystem.h
+	ui/hud/inventory.cpp
 	ui/hud/menu.cpp
 	ui/hud/message.cpp
 	ui/hud/saytext.cpp
@@ -212,6 +213,8 @@ target_sources(client PRIVATE
 	ui/vgui/vgui_CustomObjects.cpp
 	ui/vgui/vgui_int.cpp
 	ui/vgui/vgui_int.h
+	ui/vgui/vgui_InventoryMenuPanel.cpp
+	ui/vgui/vgui_InventoryMenuPanel.h
 	ui/vgui/vgui_MOTDWindow.cpp
 	ui/vgui/vgui_SchemeManager.cpp
 	ui/vgui/vgui_SchemeManager.h
@@ -302,7 +305,7 @@ target_sources(client PRIVATE
 	../../public/keydefs.h
 	../../public/cl_dll/IGameClientExports.h
 	../../public/steam/steamtypes.h
- "ui/hud/inventory.cpp" "ui/vgui/vgui_InventoryMenuPanel.cpp" "ui/vgui/vgui_InventoryMenuPanel.h")
+)
 
 add_game_shared_sources(client)
 

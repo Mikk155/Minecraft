@@ -303,6 +303,12 @@ void CLogicCampaignSelect::Use(CBaseEntity* pActivator, CBaseEntity* pCaller, US
 {
 	if (auto player = ToBasePlayer(pActivator); player)
 	{
+		player->pev->flags |= FL_FROZEN;
+		player->pev->effects |= EF_NODRAW;
+
+		// -MC Maybe make it dynamically "look around"
+		SET_VIEW( player->edict(), edict() );
+
 		MESSAGE_BEGIN(MSG_ONE, gmsgCampaignSelect, nullptr, player);
 		MESSAGE_END();
 	}

@@ -1,0 +1,24 @@
+{
+    "$schema": "../schema.json",
+	"Class": "Base",
+	"data":
+	{
+		"spawnflags":
+		{ 
+			"choices":
+			{
+				"2048":
+				{
+					"title": "Only in SinglePlayer",
+					"description": ""
+				}
+			}
+		},
+		"targetname":
+		{
+			"variable": "target_source",
+			"title": "Name",
+			"description": ""
+		}
+	}
+}
