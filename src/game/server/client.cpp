@@ -39,6 +39,7 @@
 #include "UserMessages.h"
 #include "ClientCommandRegistry.h"
 #include "ServerLibrary.h"
+#include "minecraft.h"
 
 #include "ctf/ctf_goals.h"
 
@@ -656,16 +657,12 @@ void SV_CreateClientCommands()
 	g_ClientCommands.Create("use", [](CBasePlayer* player, const auto& args)
 		{ player->SelectItem(args.Argument(1)); });
 
-	g_ClientCommands.Create("selectweapon", [](CBasePlayer* player, const auto& args)
+	g_ClientCommands.Create("slot", [](CBasePlayer* player, const auto& args)
+	{
+		if( args.Count() > 1 )
 		{
-			if (args.Count() > 1)
-			{
-				player->SelectItem(args.Argument(1));
-			}
-			else
-			{
-				UTIL_ConsolePrint(player, "usage: selectweapon <weapon name>\n");
-			} });
+			player->inventory_active_item = std::clamp( atoi( args.Argument(1) ), minecraft::slot::SLOT1, minecraft::slot::SLOT9 );
+	} } );
 
 	g_ClientCommands.Create("lastinv", [](CBasePlayer* player, const auto& args)
 		{ player->SelectLastItem(); });
