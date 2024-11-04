@@ -6,10 +6,11 @@ on:
       - main
     paths:
       - 'docs/*.md'
+      - '.github/workflows/wiki.*'
 
 env:
   USER: ${{github.repository_owner}}
-  REPOSITORY: Minecraft
+  REPOSITORY: ${{ github.repository.split('/')[-1] }}
 
 jobs:
   wiki_update:
