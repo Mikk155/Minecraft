@@ -163,16 +163,7 @@ target_sources(server PRIVATE
 	entities/items/items.h
 	entities/items/nuclearbomb.cpp
 	entities/items/weapons/weapons.cpp
-	
-	entities/rope/CElectrifiedWire.cpp
-	entities/rope/CElectrifiedWire.h
-	entities/rope/CRope.cpp
-	entities/rope/CRope.h
-	entities/rope/CRopeSample.cpp
-	entities/rope/CRopeSample.h
-	entities/rope/CRopeSegment.cpp
-	entities/rope/CRopeSegment.h
-	
+
 	entities/NPCs/basemonster.h
 	entities/NPCs/combat.cpp
 	entities/NPCs/defaultai.cpp

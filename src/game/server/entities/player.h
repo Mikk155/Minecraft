@@ -29,7 +29,6 @@
 #include "sound/MaterialSystem.h"
 
 class CBaseItem;
-class CRope;
 class CTFGoalFlag;
 
 #define PLAYER_FATAL_FALL_SPEED 1024															  // approx 60 feet
@@ -52,7 +51,6 @@ class CTFGoalFlag;
 #define PFLAG_DUCKING (1 << 3)	// In the process of ducking, but totally squatted yet
 #define PFLAG_USING (1 << 4)	// Using a continuous entity
 #define PFLAG_OBSERVER (1 << 5) // player is locked in stationary cam mode. Spectators can move, observers can't.
-#define PFLAG_ONROPE (1 << 6)
 
 //
 // generic player
@@ -593,33 +591,7 @@ public:
 	// Whether to fire game_playerspawn next time we check for updates.
 	bool m_FireSpawnTarget = false;
 
-	bool IsOnRope() const { return (m_afPhysicsFlags & PFLAG_ONROPE) != 0; }
-
-	void SetOnRopeState(bool bOnRope)
-	{
-		if (bOnRope)
-			m_afPhysicsFlags |= PFLAG_ONROPE;
-		else
-			m_afPhysicsFlags &= ~PFLAG_ONROPE;
-	}
-
-	CRope* GetRope() { return m_pRope; }
-
-	void SetRope(CRope* pRope)
-	{
-		m_pRope = pRope;
-	}
-
-	void SetIsClimbing(const bool bIsClimbing)
-	{
-		m_bIsClimbing = bIsClimbing;
-	}
-
 private:
-	CRope* m_pRope;
-	float m_flLastClimbTime = 0;
-	bool m_bIsClimbing = false;
-
 	// For saving and level changes.
 	int m_HudColor = RGB_HUD_COLOR.ToInteger();
 	int m_CrosshairColor = RGB_CROSSHAIR_COLOR.ToInteger();
