@@ -81,7 +81,6 @@ target_sources(server PRIVATE
 	entities/animating.cpp
 	entities/animation.cpp
 	entities/animation.h
-	entities/blowercannon.cpp
 	entities/bmodels.cpp
 	entities/buttons.cpp
 	entities/cbase.cpp
@@ -163,22 +162,6 @@ target_sources(server PRIVATE
 	entities/items/items.cpp
 	entities/items/items.h
 	entities/items/nuclearbomb.cpp
-	entities/items/weapons/CDisplacerBall.cpp
-	entities/items/weapons/CDisplacerBall.h
-	entities/items/weapons/CEagleLaser.cpp
-	entities/items/weapons/CEagleLaser.h
-	entities/items/weapons/CGrappleTip.cpp
-	entities/items/weapons/CGrappleTip.h
-	entities/items/weapons/CLaserSpot.cpp
-	entities/items/weapons/CLaserSpot.h
-	entities/items/weapons/CRpgRocket.cpp
-	entities/items/weapons/CRpgRocket.h
-	entities/items/weapons/CSatchelCharge.cpp
-	entities/items/weapons/CSatchelCharge.h
-	entities/items/weapons/CShockBeam.cpp
-	entities/items/weapons/CShockBeam.h
-	entities/items/weapons/CSpore.cpp
-	entities/items/weapons/CSpore.h
 	entities/items/weapons/weapons.cpp
 	
 	entities/rope/CElectrifiedWire.cpp
@@ -268,16 +251,7 @@ target_sources(server PRIVATE
 	entities/NPCs/other/rat.cpp
 	entities/NPCs/other/roach.cpp
 	entities/NPCs/other/skeleton.cpp
-	
-	entities/NPCs/racex/baby_voltigore.cpp
-	entities/NPCs/racex/geneworm.cpp
-	entities/NPCs/racex/pitdrone.cpp
-	entities/NPCs/racex/pitworm_up.cpp
-	entities/NPCs/racex/shockroach.cpp
-	entities/NPCs/racex/shocktrooper.cpp
-	entities/NPCs/racex/voltigore.cpp
-	entities/NPCs/racex/voltigore.h
-	
+
 	entities/NPCs/zombies/gonome.cpp
 	entities/NPCs/zombies/zombie.cpp
 	entities/NPCs/zombies/zombie.h

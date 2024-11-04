@@ -637,6 +637,7 @@ public:
 
 	// Player inventory
 	std::vector<minecraft::inventory> inventory;
+	int inventory_active_item = minecraft::slot::SLOT1;
 	CBaseEntity() : inventory( minecraft::slot::LAST_SLOT ) {}
 	CBaseEntity* FindInventoryItem(const char* pszItemName = nullptr, const int iInventoryIndex = -1 );
 

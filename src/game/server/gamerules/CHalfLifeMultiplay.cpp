@@ -25,7 +25,6 @@
 #include "MapCycleSystem.h"
 #include "PlayerInventory.h"
 #include "items/CBaseItem.h"
-#include "items/weapons/CSatchelCharge.h"
 
 CVoiceGameMgr g_VoiceGameMgr;
 
@@ -493,11 +492,6 @@ void CHalfLifeMultiplay::PlayerKilled(CBasePlayer* pVictim, CBaseEntity* pKiller
 
 		// let the killer paint another decal as soon as he'd like.
 		peKiller->m_flNextDecalTime = gpGlobals->time;
-	}
-
-	if (pVictim->HasNamedPlayerWeapon("weapon_satchel"))
-	{
-		DeactivateSatchels(pVictim);
 	}
 
 	if (pVictim->IsPlayer() && !g_fGameOver && (pVictim->m_iItems & CTFItem::ItemsMask) != 0)

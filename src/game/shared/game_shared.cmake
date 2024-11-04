@@ -25,54 +25,6 @@ function(add_game_shared_sources target)
 			
 			${CMAKE_CURRENT_FUNCTION_LIST_DIR}/entities/items/weapons/AmmoTypeSystem.cpp
 			${CMAKE_CURRENT_FUNCTION_LIST_DIR}/entities/items/weapons/AmmoTypeSystem.h
-			${CMAKE_CURRENT_FUNCTION_LIST_DIR}/entities/items/weapons/CCrossbow.cpp
-			${CMAKE_CURRENT_FUNCTION_LIST_DIR}/entities/items/weapons/CCrossbow.h
-			${CMAKE_CURRENT_FUNCTION_LIST_DIR}/entities/items/weapons/CCrowbar.cpp
-			${CMAKE_CURRENT_FUNCTION_LIST_DIR}/entities/items/weapons/CCrowbar.h
-			${CMAKE_CURRENT_FUNCTION_LIST_DIR}/entities/items/weapons/CDisplacer.cpp
-			${CMAKE_CURRENT_FUNCTION_LIST_DIR}/entities/items/weapons/CDisplacer.h
-			${CMAKE_CURRENT_FUNCTION_LIST_DIR}/entities/items/weapons/CEagle.cpp
-			${CMAKE_CURRENT_FUNCTION_LIST_DIR}/entities/items/weapons/CEagle.h
-			${CMAKE_CURRENT_FUNCTION_LIST_DIR}/entities/items/weapons/CEgon.cpp
-			${CMAKE_CURRENT_FUNCTION_LIST_DIR}/entities/items/weapons/CEgon.h
-			${CMAKE_CURRENT_FUNCTION_LIST_DIR}/entities/items/weapons/CGauss.cpp
-			${CMAKE_CURRENT_FUNCTION_LIST_DIR}/entities/items/weapons/CGauss.h
-			${CMAKE_CURRENT_FUNCTION_LIST_DIR}/entities/items/weapons/CGlock.cpp
-			${CMAKE_CURRENT_FUNCTION_LIST_DIR}/entities/items/weapons/CGlock.h
-			${CMAKE_CURRENT_FUNCTION_LIST_DIR}/entities/items/weapons/CGrapple.cpp
-			${CMAKE_CURRENT_FUNCTION_LIST_DIR}/entities/items/weapons/CGrapple.h
-			${CMAKE_CURRENT_FUNCTION_LIST_DIR}/entities/items/weapons/CHandGrenade.cpp
-			${CMAKE_CURRENT_FUNCTION_LIST_DIR}/entities/items/weapons/CHandGrenade.h
-			${CMAKE_CURRENT_FUNCTION_LIST_DIR}/entities/items/weapons/CHgun.cpp
-			${CMAKE_CURRENT_FUNCTION_LIST_DIR}/entities/items/weapons/CHgun.h
-			${CMAKE_CURRENT_FUNCTION_LIST_DIR}/entities/items/weapons/CKnife.cpp
-			${CMAKE_CURRENT_FUNCTION_LIST_DIR}/entities/items/weapons/CKnife.h
-			${CMAKE_CURRENT_FUNCTION_LIST_DIR}/entities/items/weapons/CM249.cpp
-			${CMAKE_CURRENT_FUNCTION_LIST_DIR}/entities/items/weapons/CM249.h
-			${CMAKE_CURRENT_FUNCTION_LIST_DIR}/entities/items/weapons/CMP5.cpp
-			${CMAKE_CURRENT_FUNCTION_LIST_DIR}/entities/items/weapons/CMP5.h
-			${CMAKE_CURRENT_FUNCTION_LIST_DIR}/entities/items/weapons/CPenguin.cpp
-			${CMAKE_CURRENT_FUNCTION_LIST_DIR}/entities/items/weapons/CPenguin.h
-			${CMAKE_CURRENT_FUNCTION_LIST_DIR}/entities/items/weapons/CPipewrench.cpp
-			${CMAKE_CURRENT_FUNCTION_LIST_DIR}/entities/items/weapons/CPipewrench.h
-			${CMAKE_CURRENT_FUNCTION_LIST_DIR}/entities/items/weapons/CPython.cpp
-			${CMAKE_CURRENT_FUNCTION_LIST_DIR}/entities/items/weapons/CPython.h
-			${CMAKE_CURRENT_FUNCTION_LIST_DIR}/entities/items/weapons/CRpg.cpp
-			${CMAKE_CURRENT_FUNCTION_LIST_DIR}/entities/items/weapons/CRpg.h
-			${CMAKE_CURRENT_FUNCTION_LIST_DIR}/entities/items/weapons/CSatchel.cpp
-			${CMAKE_CURRENT_FUNCTION_LIST_DIR}/entities/items/weapons/CSatchel.h
-			${CMAKE_CURRENT_FUNCTION_LIST_DIR}/entities/items/weapons/CShockRifle.cpp
-			${CMAKE_CURRENT_FUNCTION_LIST_DIR}/entities/items/weapons/CShockRifle.h
-			${CMAKE_CURRENT_FUNCTION_LIST_DIR}/entities/items/weapons/CShotgun.cpp
-			${CMAKE_CURRENT_FUNCTION_LIST_DIR}/entities/items/weapons/CShotgun.h
-			${CMAKE_CURRENT_FUNCTION_LIST_DIR}/entities/items/weapons/CSniperRifle.cpp
-			${CMAKE_CURRENT_FUNCTION_LIST_DIR}/entities/items/weapons/CSniperRifle.h
-			${CMAKE_CURRENT_FUNCTION_LIST_DIR}/entities/items/weapons/CSporeLauncher.cpp
-			${CMAKE_CURRENT_FUNCTION_LIST_DIR}/entities/items/weapons/CSporeLauncher.h
-			${CMAKE_CURRENT_FUNCTION_LIST_DIR}/entities/items/weapons/CSqueak.cpp
-			${CMAKE_CURRENT_FUNCTION_LIST_DIR}/entities/items/weapons/CSqueak.h
-			${CMAKE_CURRENT_FUNCTION_LIST_DIR}/entities/items/weapons/CTripmine.cpp
-			${CMAKE_CURRENT_FUNCTION_LIST_DIR}/entities/items/weapons/CTripmine.h
 			${CMAKE_CURRENT_FUNCTION_LIST_DIR}/entities/items/weapons/weapons_shared.cpp
 			${CMAKE_CURRENT_FUNCTION_LIST_DIR}/entities/items/weapons/weapons.h
 			${CMAKE_CURRENT_FUNCTION_LIST_DIR}/entities/items/weapons/WeaponDataSystem.cpp

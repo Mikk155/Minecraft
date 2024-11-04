@@ -2669,6 +2669,7 @@ void CBasePlayer::Spawn()
 	m_afPhysicsFlags = 0;
 	SetHasLongJump(false); // no longjump module.
 	SetHasJetpack(false);
+	SetHasSuit(true);
 
 	g_engfuncs.pfnSetPhysicsKeyValue(edict(), "hl", "1");
 	g_engfuncs.pfnSetPhysicsKeyValue(edict(), "bj", UTIL_ToString(sv_allowbunnyhopping.value != 0 ? 1 : 0).c_str());
@@ -2776,6 +2777,9 @@ void CBasePlayer::Spawn()
 		if (g_pGameRules->IsCTF())
 			Player_Menu();
 	}
+
+	if( !HasWeapons() )
+		GiveNamedItem( "minecraft_weapon_item"sv );
 }
 
 void CBasePlayer::Precache()

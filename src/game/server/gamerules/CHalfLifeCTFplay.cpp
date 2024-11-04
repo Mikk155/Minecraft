@@ -25,7 +25,6 @@
 #include "CHalfLifeCTFplay.h"
 #include "ctf/ctf_goals.h"
 #include "ctf/ctf_items.h"
-#include "items/weapons/CSatchelCharge.h"
 
 #include "pm_shared.h"
 
@@ -1324,9 +1323,6 @@ void CHalfLifeCTFplay::ChangePlayerTeam(CBasePlayer* pPlayer, const char* pCharN
 		pPlayer->pev->flags &= ~FL_DUCKING;
 		pPlayer->Observer_SetMode(OBS_CHASE_FREE);
 		pPlayer->pev->deadflag = DEAD_RESPAWNABLE;
-
-		if (pPlayer->HasNamedPlayerWeapon("weapon_satchel"))
-			DeactivateSatchels(pPlayer);
 
 		pPlayer->RemoveAllItems(false);
 
