@@ -712,10 +712,14 @@ public:
 	void MsgFunc_Inventory(const char* pszName, BufferReader& reader);
 
 private:
-	HSPRITE m_hsprCursor;
-	HSPRITE m_hudSprite;
+	int m_HUD_inventory;
 	bool m_fOn;
 };
+
+//
+//-----------------------------------------------------
+//
+//#include "vgui/vgui_InventoryMenuPanel.h"
 
 struct HudSprite
 {

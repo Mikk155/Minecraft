@@ -16,8 +16,6 @@
 // inventory.cpp
 //
 
-#include <string>
-
 #include "hud.h"
 
 #include "vgui_TeamFortressViewport.h"
@@ -44,14 +42,7 @@ void CHudInventory::Reset()
 
 bool CHudInventory::VidInit()
 {
-	const int HUD_inventory = gHUD.GetSpriteIndex("inventory");
-
-	if (HUD_inventory != -1)
-		m_hudSprite = gHUD.GetSprite(HUD_inventory);
-	else
-		m_hudSprite = SPR_Load("sprites/gui/inventory.spr");
-
-	m_hsprCursor = 0;
+	m_HUD_inventory = gHUD.GetSpriteIndex("inventory");
 
 	return true;
 }
@@ -66,21 +57,12 @@ bool CHudInventory::Draw(float flTime)
 	if (!m_fOn)
 		return true;
 
-	const auto width = gEngfuncs.pfnSPR_Width(m_hudSprite, 0);
-	const auto height = gEngfuncs.pfnSPR_Height(m_hudSprite, 0);
-
 	//gEngfuncs.pfnSPR_Set(m_hudSprite, 255, 255, 255);
-	SPR_Set(m_hudSprite, RGB_WHITE);
+	SPR_Set(gHUD.GetSprite(m_HUD_inventory), RGB_WHITE);
 
-	Rect drawingRect;
-	drawingRect.left = 0;
-	drawingRect.right = width;
-	drawingRect.top = 0;
-	drawingRect.bottom = height;
-
+	Rect rect = gHUD.GetSpriteRect(m_HUD_inventory);
 	//gEngfuncs.pfnSPR_DrawAdditive(0, (ScreenWidth / 2) - width / 2, (ScreenHeight / 2) - height / 2, &drawingRect);
-	SPR_Draw(0, (ScreenWidth / 2) - width / 2, (ScreenHeight / 2) - height / 2, &drawingRect);
-
+	SPR_Draw(0, (ScreenWidth / 2) - rect.right / 2, (ScreenHeight / 2) - rect.bottom / 2, &rect);
 	return true;
 }
 

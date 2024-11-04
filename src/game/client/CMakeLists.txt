@@ -302,7 +302,7 @@ target_sources(client PRIVATE
 	../../public/keydefs.h
 	../../public/cl_dll/IGameClientExports.h
 	../../public/steam/steamtypes.h
- "ui/hud/inventory.cpp")
+ "ui/hud/inventory.cpp" "ui/vgui/vgui_InventoryMenuPanel.cpp" "ui/vgui/vgui_InventoryMenuPanel.h")
 
 add_game_shared_sources(client)
 
