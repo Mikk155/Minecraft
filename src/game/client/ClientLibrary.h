@@ -73,6 +73,7 @@ private:
 	SDL_Window* FindWindow();
 
 	void AddCheatCommands();
+	void LoadBackgroundMap();
 
 private:
 	bool m_IsConnected = false;

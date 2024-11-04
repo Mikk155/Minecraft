@@ -55,6 +55,7 @@ bool ClientLibrary::Initialize()
 	g_UILogger = g_Logging.CreateLogger("ui");
 
 	AddCheatCommands();
+	LoadBackgroundMap();
 
 	TempEntity_Initialize();
 	ClientGibs_Initialize();
@@ -296,4 +297,40 @@ void ClientLibrary::AddCheatCommands()
 	AddForwardedCommand("cheat_infinitearmor");
 	AddForwardedCommand("cheat_givemagazine");
 	AddForwardedCommand("cheat_jetpack");
+}
+
+void ClientLibrary::LoadBackgroundMap()
+{
+#ifdef DEBUG
+	return;
+#endif
+
+	std::optional<json> m_Configuration = g_JSON.LoadJSONFile( "cfg/client/background_maps.json" );
+
+	if( !m_Configuration.has_value() )
+		return;
+
+	json maps = m_Configuration.value();
+
+	if( maps.empty() )
+		return;
+
+	gEngfuncs.pfnClientCmd( "maxplayers 1\n" );
+	gEngfuncs.pfnClientCmd( "deathmatch 0\n" );
+
+	int map_index = RANDOM_LONG( 0, maps.size() - 1 );
+
+	std::string selectedMap = maps[ map_index ];
+
+#if 0
+	if( !IS_MAP_VALID( selectedMap.c_str() ) )
+	{
+		ConsolePrint( fmt::format( "Invalid map entry \"{}\" at \"cfg/client/background_maps.json\"\n", selectedMap ).c_str() );
+		return;
+	}
+#endif
+
+	std::string command = "map " + selectedMap + "\n";
+
+	gEngfuncs.pfnClientCmd( command.c_str() );
 }
