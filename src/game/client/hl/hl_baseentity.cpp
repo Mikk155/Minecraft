@@ -268,9 +268,6 @@ void CBasePlayer::RenewItems() {}
 void CBasePlayer::SelectNextItem(int iItem) {}
 bool CBasePlayer::HasWeapons() { return false; }
 void CBasePlayer::SelectPrevItem(int iItem) {}
-bool CBasePlayer::FlashlightIsOn() { return false; }
-void CBasePlayer::FlashlightTurnOn() {}
-void CBasePlayer::FlashlightTurnOff() {}
 void CBasePlayer::ForceClientDllUpdate() {}
 void CBasePlayer::ImpulseCommands() {}
 void CBasePlayer::CheatImpulseCommands(int iImpulse) {}
@@ -286,11 +283,8 @@ void CBasePlayer::BarnacleVictimReleased() {}
 int CBasePlayer::Illumination() { return 0; }
 void CBasePlayer::EnableControl(bool fControl) {}
 Vector CBasePlayer::GetAutoaimVector(float flDelta) { return g_vecZero; }
-Vector CBasePlayer::AutoaimDeflection(const Vector& vecSrc, float flDist, float flDelta) { return g_vecZero; }
-void CBasePlayer::ResetAutoaim() {}
 void CBasePlayer::SetCustomDecalFrames(int nFrames) {}
 int CBasePlayer::GetCustomDecalFrames() { return -1; }
-void CBasePlayer::DropPlayerWeapon(const char* pszItemName) {}
 bool CBasePlayer::HasPlayerWeapon(CBasePlayerWeapon* weapon) { return false; }
 bool CBasePlayer::SwitchWeapon(CBasePlayerWeapon* weapon) { return false; }
 Vector CBasePlayer::GetGunPosition() { return g_vecZero; }

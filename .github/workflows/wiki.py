@@ -13,6 +13,12 @@ if not os.path.exists( clone_dir ):
 
 repo = Repo.clone_from( repo_url, clone_dir );
 
+for file in os.listdir( clone_dir ):
+
+    if not os.path.exists( 'docs/{}'.format( file ) ):
+
+        os.remove( '{}/{}'.format( clone_dir, file ) );
+
 shutil.copytree( "docs/", clone_dir, dirs_exist_ok=True );
 
 repo.git.add( all=True );

@@ -16,7 +16,6 @@
 #include "cbase.h"
 #include "squadmonster.h"
 #include "plane.h"
-#include "military/hgrunt.h"
 
 BEGIN_DATAMAP(CSquadMonster)
 DEFINE_FIELD(m_hSquadLeader, FIELD_EHANDLE),
@@ -350,12 +349,6 @@ void CSquadMonster::StartMonster()
 		if (0 != iSquadSize)
 		{
 			AILogger->debug("Squad of {} {} formed", iSquadSize, STRING(pev->classname));
-		}
-
-		if (IsLeader() && ClassnameIs("monster_human_grunt"))
-		{
-			SetBodygroup(HGruntBodyGroup::Head, HGruntHead::Commander); // UNDONE: truly ugly hack
-			pev->skin = 0;
 		}
 	}
 }

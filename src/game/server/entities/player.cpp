@@ -30,7 +30,6 @@
 #include "talkmonster.h"
 #include "squadmonster.h"
 #include "items/CWeaponBox.h"
-#include "military/COFSquadTalkMonster.h"
 #include "shake.h"
 #include "spawnpoints.h"
 #include "CHalfLifeCTFplay.h"
@@ -42,7 +41,6 @@
 #include "ServerLibrary.h"
 
 #include "ctf/ctf_goals.h"
-#include "rope/CRope.h"
 
 // #define DUCKFIX
 
@@ -55,15 +53,7 @@
 #define TRAIN_FAST 0x04
 #define TRAIN_BACK 0x05
 
-#define FLASH_DRAIN_TIME 1.2  // 100 units/3 minutes
-#define FLASH_CHARGE_TIME 0.2 // 100 units/20 seconds  (seconds per unit)
-
 BEGIN_DATAMAP(CBasePlayer)
-DEFINE_FIELD(m_SuitLightType, FIELD_INTEGER),
-
-	DEFINE_FIELD(m_flFlashLightTime, FIELD_TIME),
-	DEFINE_FIELD(m_iFlashBattery, FIELD_INTEGER),
-
 	DEFINE_FIELD(m_afButtonLast, FIELD_INTEGER),
 	DEFINE_FIELD(m_afButtonPressed, FIELD_INTEGER),
 	DEFINE_FIELD(m_afButtonReleased, FIELD_INTEGER),
@@ -117,10 +107,6 @@ DEFINE_FIELD(m_SuitLightType, FIELD_INTEGER),
 	// DEFINE_FIELD(m_flSndRange, FIELD_FLOAT),
 
 	DEFINE_FIELD(m_flStartCharge, FIELD_TIME),
-
-	DEFINE_FIELD(m_pRope, FIELD_CLASSPTR),
-	DEFINE_FIELD(m_flLastClimbTime, FIELD_TIME),
-	DEFINE_FIELD(m_bIsClimbing, FIELD_BOOLEAN),
 
 	// Vanilla Op4 doesn't restore this. Not a big deal but it can cause you to teleport to the wrong area after a restore
 	DEFINE_FIELD(m_DisplacerReturn, FIELD_POSITION_VECTOR),
@@ -296,12 +282,6 @@ void CBasePlayer::TraceAttack(CBaseEntity* attacker, float flDamage, Vector vecD
 
 #define ARMOR_RATIO 0.2 // Armor Takes 80% of the damage
 #define ARMOR_BONUS 0.5 // Each Point of Armor is work 1/x points of health
-
-static const char* m_szSquadClasses[] =
-	{
-		"monster_human_grunt_ally",
-		"monster_human_medic_ally",
-		"monster_human_torch_ally"};
 
 bool CBasePlayer::TakeDamage(CBaseEntity* inflictor, CBaseEntity* attacker, float flDamage, int bitsDamageType)
 {
@@ -549,30 +529,6 @@ bool CBasePlayer::TakeDamage(CBaseEntity* inflictor, CBaseEntity* attacker, floa
 			SetSuitUpdate("!HEV_HLTH1", SUIT_NEXT_IN_10MIN); // health dropping
 	}
 
-	// Make all grunts following me attack the NPC that attacked me
-	if (pAttacker)
-	{
-		auto enemy = pAttacker->MyMonsterPointer();
-
-		if (!enemy || enemy->IRelationship(this) == Relationship::Ally)
-		{
-			return fTookDamage;
-		}
-
-		for (std::size_t i = 0; i < std::size(m_szSquadClasses); ++i)
-		{
-			for (auto ally : UTIL_FindEntitiesByClassname<CBaseEntity>(m_szSquadClasses[i]))
-			{
-				auto squadAlly = ally->MySquadTalkMonsterPointer();
-
-				if (squadAlly && squadAlly->m_hTargetEnt && squadAlly->m_hTargetEnt->IsPlayer())
-				{
-					squadAlly->SquadMakeEnemy(enemy);
-				}
-			}
-		}
-	}
-
 	return fTookDamage;
 }
 
@@ -705,7 +661,6 @@ void CBasePlayer::RemoveAllItems(bool removeSuit)
 {
 	if (m_pActiveWeapon)
 	{
-		ResetAutoaim();
 		m_pActiveWeapon->Holster();
 		m_pActiveWeapon = nullptr;
 	}
@@ -1735,11 +1690,6 @@ void CBasePlayer::PreThink()
 	ItemPreFrame();
 	WaterMove();
 
-	if (g_pGameRules && g_pGameRules->FAllowFlashlight())
-		m_iHideHUD &= ~HIDEHUD_FLASHLIGHT;
-	else
-		m_iHideHUD |= HIDEHUD_FLASHLIGHT;
-
 	if (m_bResetViewEntity)
 	{
 		m_bResetViewEntity = false;
@@ -1797,136 +1747,6 @@ void CBasePlayer::PreThink()
 		pev->flags |= FL_ONTRAIN;
 	else
 		pev->flags &= ~FL_ONTRAIN;
-
-	// We're on a rope.
-	if ((m_afPhysicsFlags & PFLAG_ONROPE) != 0 && m_pRope)
-	{
-		pev->velocity = g_vecZero;
-
-		const Vector vecAttachPos = m_pRope->GetAttachedObjectsPosition();
-
-		pev->origin = vecAttachPos;
-
-		Vector vecForce;
-
-		if ((pev->button & IN_MOVERIGHT) != 0)
-		{
-			vecForce.x = gpGlobals->v_right.x;
-			vecForce.y = gpGlobals->v_right.y;
-			vecForce.z = 0;
-
-			m_pRope->ApplyForceFromPlayer(vecForce);
-		}
-
-		if ((pev->button & IN_MOVELEFT) != 0)
-		{
-			vecForce.x = -gpGlobals->v_right.x;
-			vecForce.y = -gpGlobals->v_right.y;
-			vecForce.z = 0;
-			m_pRope->ApplyForceFromPlayer(vecForce);
-		}
-
-		// Determine if any force should be applied to the rope, or if we should move around.
-		if ((pev->button & (IN_BACK | IN_FORWARD)) != 0)
-		{
-			if ((gpGlobals->v_forward.x * gpGlobals->v_forward.x +
-					gpGlobals->v_forward.y * gpGlobals->v_forward.y -
-					gpGlobals->v_forward.z * gpGlobals->v_forward.z) <= 0)
-			{
-				if (m_bIsClimbing)
-				{
-					const float flDelta = gpGlobals->time - m_flLastClimbTime;
-					m_flLastClimbTime = gpGlobals->time;
-
-					if ((pev->button & IN_FORWARD) != 0)
-					{
-						if (gpGlobals->v_forward.z < 0.0)
-						{
-							if (!m_pRope->MoveDown(flDelta))
-							{
-								// Let go of the rope, detach.
-								pev->movetype = MOVETYPE_WALK;
-								pev->solid = SOLID_SLIDEBOX;
-
-								m_afPhysicsFlags &= ~PFLAG_ONROPE;
-								m_pRope->DetachObject();
-								m_pRope = nullptr;
-								m_bIsClimbing = false;
-							}
-						}
-						else
-						{
-							m_pRope->MoveUp(flDelta);
-						}
-					}
-					if ((pev->button & IN_BACK) != 0)
-					{
-						if (gpGlobals->v_forward.z < 0.0)
-						{
-							m_pRope->MoveUp(flDelta);
-						}
-						else if (!m_pRope->MoveDown(flDelta))
-						{
-							// Let go of the rope, detach.
-							pev->movetype = MOVETYPE_WALK;
-							pev->solid = SOLID_SLIDEBOX;
-							m_afPhysicsFlags &= ~PFLAG_ONROPE;
-							m_pRope->DetachObject();
-							m_pRope = nullptr;
-							m_bIsClimbing = false;
-						}
-					}
-				}
-				else
-				{
-					m_bIsClimbing = true;
-					m_flLastClimbTime = gpGlobals->time;
-				}
-			}
-			else
-			{
-				vecForce.x = gpGlobals->v_forward.x;
-				vecForce.y = gpGlobals->v_forward.y;
-				vecForce.z = 0.0;
-				if ((pev->button & IN_BACK) != 0)
-				{
-					vecForce.x = -gpGlobals->v_forward.x;
-					vecForce.y = -gpGlobals->v_forward.y;
-					vecForce.z = 0;
-				}
-				m_pRope->ApplyForceFromPlayer(vecForce);
-				m_bIsClimbing = false;
-			}
-		}
-		else
-		{
-			m_bIsClimbing = false;
-		}
-
-		if ((m_afButtonPressed & IN_JUMP) != 0)
-		{
-			// We've jumped off the rope, give us some momentum
-			pev->movetype = MOVETYPE_WALK;
-			pev->solid = SOLID_SLIDEBOX;
-			m_afPhysicsFlags &= ~PFLAG_ONROPE;
-
-			Vector vecDir = gpGlobals->v_up * 165.0 + gpGlobals->v_forward * 150.0;
-
-			Vector vecVelocity = m_pRope->GetAttachedObjectsVelocity() * 2;
-
-			vecVelocity = vecVelocity.Normalize();
-
-			vecVelocity = vecVelocity * 200;
-
-			pev->velocity = vecVelocity + vecDir;
-
-			m_pRope->DetachObject();
-			m_pRope = nullptr;
-			m_bIsClimbing = false;
-		}
-
-		return;
-	}
 
 	// Train speed control
 	if ((m_afPhysicsFlags & PFLAG_ONTRAIN) != 0)
@@ -2528,7 +2348,8 @@ void CBasePlayer::PostThink()
 		else if (m_flFallVelocity > PLAYER_MAX_SAFE_FALL_SPEED)
 		{ // after this point, we start doing damage
 
-			float flFallDamage = g_pGameRules->FlPlayerFallDamage(this);
+			m_flFallVelocity -= PLAYER_MAX_SAFE_FALL_SPEED;
+			float flFallDamage = m_flFallVelocity * DAMAGE_FOR_FALL_SPEED;
 
 			if (flFallDamage > pev->health)
 			{ // splat
@@ -2672,6 +2493,7 @@ void CBasePlayer::Spawn()
 	m_afPhysicsFlags = 0;
 	SetHasLongJump(false); // no longjump module.
 	SetHasJetpack(false);
+	SetHasSuit(true);
 
 	g_engfuncs.pfnSetPhysicsKeyValue(edict(), "hl", "1");
 	g_engfuncs.pfnSetPhysicsKeyValue(edict(), "bj", UTIL_ToString(sv_allowbunnyhopping.value != 0 ? 1 : 0).c_str());
@@ -2693,9 +2515,6 @@ void CBasePlayer::Spawn()
 
 	m_bloodColor = BLOOD_COLOR_RED;
 	m_flNextAttack = UTIL_WeaponTimeBase();
-
-	m_iFlashBattery = 99;
-	m_flFlashLightTime = 1; // force first message
 
 	// dont let uninitialized value here hurt the player
 	m_flFallVelocity = 0;
@@ -2745,7 +2564,6 @@ void CBasePlayer::Spawn()
 
 	m_lastx = m_lasty = 0;
 	m_iLastDamage = 0;
-	m_bIsClimbing = false;
 	m_flLastDamageTime = 0;
 
 	m_flNextChatTime = gpGlobals->time;
@@ -2779,6 +2597,9 @@ void CBasePlayer::Spawn()
 		if (g_pGameRules->IsCTF())
 			Player_Menu();
 	}
+
+	if( !HasWeapons() )
+		GiveNamedItem( "minecraft_weapon_item"sv );
 }
 
 void CBasePlayer::Precache()
@@ -2911,8 +2732,6 @@ void CBasePlayer::SelectNextItem(int iItem)
 		m_pActiveWeapon->m_pNext = nullptr;
 		m_rgpPlayerWeapons[iItem] = weapon;
 	}
-
-	ResetAutoaim();
 
 	// FIX, this needs to queue them up and delay
 	if (m_pActiveWeapon)
@@ -3079,105 +2898,6 @@ CBaseItem* CBasePlayer::GiveNamedItem(std::string_view className, std::optional<
 	return entity;
 }
 
-int CBasePlayer::GetFlashlightFlag() const
-{
-	switch (m_SuitLightType)
-	{
-	default:
-	case SuitLightType::Flashlight:
-		return EF_DIMLIGHT;
-
-	case SuitLightType::Nightvision:
-		return EF_BRIGHTLIGHT;
-	}
-}
-
-bool CBasePlayer::FlashlightIsOn()
-{
-	return FBitSet(pev->effects, GetFlashlightFlag());
-}
-
-static void UpdateFlashlight(CBasePlayer* player, bool isOn)
-{
-	MESSAGE_BEGIN(MSG_ONE, gmsgFlashlight, nullptr, player);
-	WRITE_BYTE(static_cast<int>(player->m_SuitLightType));
-	WRITE_BYTE(isOn ? 1 : 0);
-	WRITE_BYTE(player->m_iFlashBattery);
-	MESSAGE_END();
-}
-
-void CBasePlayer::FlashlightTurnOn()
-{
-	if (!g_pGameRules->FAllowFlashlight())
-	{
-		return;
-	}
-
-	if (HasSuit())
-	{
-		auto onSound = [this]()
-		{
-			switch (m_SuitLightType)
-			{
-			default:
-			case SuitLightType::Flashlight:
-				return SOUND_FLASHLIGHT_ON;
-			case SuitLightType::Nightvision:
-				return SOUND_NIGHTVISION_ON;
-			}
-		}();
-
-		EmitSound(CHAN_WEAPON, onSound, 1.0, ATTN_NORM);
-
-		SetBits(pev->effects, GetFlashlightFlag());
-		UpdateFlashlight(this, true);
-
-		m_flFlashLightTime = FLASH_DRAIN_TIME + gpGlobals->time;
-	}
-}
-
-void CBasePlayer::FlashlightTurnOff()
-{
-	auto offSound = [this]()
-	{
-		switch (m_SuitLightType)
-		{
-		default:
-		case SuitLightType::Flashlight:
-			return SOUND_FLASHLIGHT_OFF;
-		case SuitLightType::Nightvision:
-			return SOUND_NIGHTVISION_OFF;
-		}
-	}();
-
-	EmitSound(CHAN_WEAPON, offSound, 1.0, ATTN_NORM);
-
-	ClearBits(pev->effects, GetFlashlightFlag());
-	UpdateFlashlight(this, false);
-
-	m_flFlashLightTime = FLASH_CHARGE_TIME + gpGlobals->time;
-}
-
-void CBasePlayer::SetSuitLightType(SuitLightType type)
-{
-	if (m_SuitLightType == type)
-	{
-		return;
-	}
-
-	const bool isOn = FlashlightIsOn();
-
-	ClearBits(pev->effects, GetFlashlightFlag());
-
-	m_SuitLightType = type;
-
-	if (isOn)
-	{
-		SetBits(pev->effects, GetFlashlightFlag());
-	}
-
-	UpdateFlashlight(this, isOn);
-}
 
 void CBasePlayer::ForceClientDllUpdate()
 {
@@ -3234,18 +2954,6 @@ void CBasePlayer::ImpulseCommands()
 			gmsgLogo = 0;
 		break;
 	}
-	case 100:
-		// temporary flashlight for level designers
-		if (FlashlightIsOn())
-		{
-			FlashlightTurnOff();
-		}
-		else
-		{
-			FlashlightTurnOn();
-		}
-		break;
-
 	case 201: // paint decal
 
 		if (gpGlobals->time < m_flNextDecalTime)
@@ -3290,22 +2998,6 @@ void CBasePlayer::CheatImpulseCommands(int iImpulse)
 
 	switch (iImpulse)
 	{
-	case 76:
-	{
-		if (!giPrecacheGrunt)
-		{
-			giPrecacheGrunt = true;
-			Con_DPrintf("You must now restart to use Grunt-o-matic.\n");
-		}
-		else
-		{
-			UTIL_MakeVectors(Vector(0, pev->v_angle.y, 0));
-			Create("monster_human_grunt", pev->origin + gpGlobals->v_forward * 128, pev->angles);
-		}
-		break;
-	}
-
-
 	case 101:
 	{
 		const bool hasActiveWeapon = m_pActiveWeapon != nullptr;
@@ -3519,12 +3211,6 @@ ItemAddResult CBasePlayer::AddPlayerWeapon(CBasePlayerWeapon* weapon)
 			MESSAGE_END();
 		}
 
-		// should we switch to this item?
-		if (g_pGameRules->FShouldSwitchWeapon(this, weapon))
-		{
-			SwitchWeapon(weapon);
-		}
-
 		return ItemAddResult::Added;
 	}
 
@@ -3535,7 +3221,6 @@ bool CBasePlayer::RemovePlayerWeapon(CBasePlayerWeapon* weapon)
 {
 	if (m_pActiveWeapon == weapon)
 	{
-		ResetAutoaim();
 		weapon->Holster();
 		weapon->pev->nextthink = 0; // crowbar may be trying to swing again, etc.
 		weapon->SetThink(nullptr);
@@ -3907,54 +3592,12 @@ void CBasePlayer::UpdateClientData()
 		m_bitsDamageType &= DMG_TIMEBASED;
 	}
 
-	if (fullHUDInitRequired || m_bRestored)
-	{
-		// Always tell client about battery state
-		MESSAGE_BEGIN(MSG_ONE, gmsgFlashBattery, nullptr, this);
-		WRITE_BYTE(m_iFlashBattery);
-		MESSAGE_END();
-
-		// Sync up client flashlight state.
-		UpdateFlashlight(this, FlashlightIsOn());
-	}
-
 	if (m_bRestored)
 	{
 		// Reinitialize hud color to saved off value.
 		SetHudColor(RGB24::FromInteger(m_HudColor));
 		SetCrosshairColor(RGB24::FromInteger(m_CrosshairColor));
 	}
-
-	// Update Flashlight
-	if ((0 != m_flFlashLightTime) && (m_flFlashLightTime <= gpGlobals->time))
-	{
-		if (FlashlightIsOn())
-		{
-			if (0 != m_iFlashBattery)
-			{
-				m_flFlashLightTime = FLASH_DRAIN_TIME + gpGlobals->time;
-				m_iFlashBattery--;
-
-				if (0 == m_iFlashBattery)
-					FlashlightTurnOff();
-			}
-		}
-		else
-		{
-			if (m_iFlashBattery < 100)
-			{
-				m_flFlashLightTime = FLASH_CHARGE_TIME + gpGlobals->time;
-				m_iFlashBattery++;
-			}
-			else
-				m_flFlashLightTime = 0;
-		}
-
-		MESSAGE_BEGIN(MSG_ONE, gmsgFlashBattery, nullptr, this);
-		WRITE_BYTE(m_iFlashBattery);
-		MESSAGE_END();
-	}
-
 
 	if ((m_iTrain & TRAIN_NEW) != 0)
 	{
@@ -4173,223 +3816,8 @@ void CBasePlayer::EnableControl(bool fControl)
 
 Vector CBasePlayer::GetAutoaimVector(float flDelta)
 {
-	return GetAutoaimVectorFromPoint(GetGunPosition(), flDelta);
-}
-
-Vector CBasePlayer::GetAutoaimVectorFromPoint(const Vector& vecSrc, float flDelta)
-{
-	if (g_Skill.GetSkillLevel() == SkillLevel::Hard)
-	{
-		UTIL_MakeVectors(pev->v_angle + pev->punchangle);
-		return gpGlobals->v_forward;
-	}
-
-	float flDist = 8192;
-
-	// always use non-sticky autoaim
-	// UNDONE: use sever variable to chose!
-	if (true /*|| g_Skill.GetSkillLevel() == SkillLevel::Medium*/)
-	{
-		m_vecAutoAim = Vector(0, 0, 0);
-		// flDelta *= 0.5;
-	}
-
-	bool m_fOldTargeting = m_fOnTarget;
-	Vector angles = AutoaimDeflection(vecSrc, flDist, flDelta);
-
-	// update ontarget if changed
-	if (!g_pGameRules->AllowAutoTargetCrosshair())
-		m_fOnTarget = false;
-	else if (m_fOldTargeting != m_fOnTarget)
-	{
-		m_pActiveWeapon->UpdateItemInfo();
-	}
-
-	if (angles.x > 180)
-		angles.x -= 360;
-	if (angles.x < -180)
-		angles.x += 360;
-	if (angles.y > 180)
-		angles.y -= 360;
-	if (angles.y < -180)
-		angles.y += 360;
-
-	if (angles.x > 25)
-		angles.x = 25;
-	if (angles.x < -25)
-		angles.x = -25;
-	if (angles.y > 12)
-		angles.y = 12;
-	if (angles.y < -12)
-		angles.y = -12;
-
-
-	// always use non-sticky autoaim
-	// UNDONE: use sever variable to chose!
-	if (false || g_Skill.GetSkillLevel() == SkillLevel::Easy)
-	{
-		m_vecAutoAim = m_vecAutoAim * 0.67 + angles * 0.33;
-	}
-	else
-	{
-		m_vecAutoAim = angles * 0.9;
-	}
-
-	// m_vecAutoAim = m_vecAutoAim * 0.99;
-
-	// Don't send across network if sv_aim is 0
-	if (g_psv_aim->value != 0)
-	{
-		if (m_vecAutoAim.x != m_lastx ||
-			m_vecAutoAim.y != m_lasty)
-		{
-			SET_CROSSHAIRANGLE(edict(), -m_vecAutoAim.x, m_vecAutoAim.y);
-
-			m_lastx = m_vecAutoAim.x;
-			m_lasty = m_vecAutoAim.y;
-		}
-	}
-	else
-	{
-		ResetAutoaim();
-	}
-
-	// Logger->debug("{} {}", angles.x, angles.y);
-
-	UTIL_MakeVectors(pev->v_angle + pev->punchangle + m_vecAutoAim);
+	UTIL_MakeVectors(pev->v_angle + pev->punchangle);
 	return gpGlobals->v_forward;
-}
-
-Vector CBasePlayer::AutoaimDeflection(const Vector& vecSrc, float flDist, float flDelta)
-{
-	edict_t* pEdict = UTIL_GetEntityList() + 1;
-	CBaseEntity* pEntity;
-	float bestdot;
-	Vector bestdir;
-	edict_t* bestent;
-	TraceResult tr;
-
-	if (g_psv_aim->value == 0)
-	{
-		m_fOnTarget = false;
-		return g_vecZero;
-	}
-
-	UTIL_MakeVectors(pev->v_angle + pev->punchangle + m_vecAutoAim);
-
-	// try all possible entities
-	bestdir = gpGlobals->v_forward;
-	bestdot = flDelta; // +- 10 degrees
-	bestent = nullptr;
-
-	m_fOnTarget = false;
-
-	UTIL_TraceLine(vecSrc, vecSrc + bestdir * flDist, dont_ignore_monsters, edict(), &tr);
-
-
-	if (tr.pHit && tr.pHit->v.takedamage != DAMAGE_NO)
-	{
-		// don't look through water
-		if (!((pev->waterlevel != WaterLevel::Head && tr.pHit->v.waterlevel == WaterLevel::Head) || (pev->waterlevel == WaterLevel::Head && tr.pHit->v.waterlevel == WaterLevel::Dry)))
-		{
-			if (tr.pHit->v.takedamage == DAMAGE_AIM)
-				m_fOnTarget = true;
-
-			return m_vecAutoAim;
-		}
-	}
-
-	for (int i = 1; i < gpGlobals->maxEntities; i++, pEdict++)
-	{
-		Vector center;
-		Vector dir;
-		float dot;
-
-		if (0 != pEdict->free) // Not in use
-			continue;
-
-		if (pEdict->v.takedamage != DAMAGE_AIM)
-			continue;
-		if (pEdict == edict())
-			continue;
-
-		pEntity = Instance(pEdict);
-
-		if (pEntity == nullptr)
-			continue;
-
-		//		if (pev->team > 0 && pEdict->v.team == pev->team)
-		//			continue;	// don't aim at teammate
-		if (!g_pGameRules->ShouldAutoAim(this, pEntity))
-			continue;
-
-		if (!pEntity->IsAlive())
-			continue;
-
-		// don't look through water
-		if ((pev->waterlevel != WaterLevel::Head && pEntity->pev->waterlevel == WaterLevel::Head) || (pev->waterlevel == WaterLevel::Head && pEntity->pev->waterlevel == WaterLevel::Dry))
-			continue;
-
-		center = pEntity->BodyTarget(vecSrc);
-
-		dir = (center - vecSrc).Normalize();
-
-		// make sure it's in front of the player
-		if (DotProduct(dir, gpGlobals->v_forward) < 0)
-			continue;
-
-		dot = fabs(DotProduct(dir, gpGlobals->v_right)) + fabs(DotProduct(dir, gpGlobals->v_up)) * 0.5;
-
-		// tweek for distance
-		dot *= 1.0 + 0.2 * ((center - vecSrc).Length() / flDist);
-
-		if (dot > bestdot)
-			continue; // to far to turn
-
-		UTIL_TraceLine(vecSrc, center, dont_ignore_monsters, edict(), &tr);
-		if (tr.flFraction != 1.0 && tr.pHit != pEdict)
-		{
-			// Logger->debug("hit {}, can't see {}", STRING(tr.pHit->v.classname), STRING(pEdict->v.classname));
-			continue;
-		}
-
-		// don't shoot at friends
-		if (IRelationship(pEntity) < Relationship::None)
-		{
-			if (!pEntity->IsPlayer() && !g_pGameRules->IsMultiplayer())
-				// Logger->debug("friend");
-				continue;
-		}
-
-		// can shoot at this one
-		bestdot = dot;
-		bestent = pEdict;
-		bestdir = dir;
-	}
-
-	if (bestent)
-	{
-		bestdir = UTIL_VecToAngles(bestdir);
-		bestdir.x = -bestdir.x;
-		bestdir = bestdir - pev->v_angle - pev->punchangle;
-
-		if (bestent->v.takedamage == DAMAGE_AIM)
-			m_fOnTarget = true;
-
-		return bestdir;
-	}
-
-	return Vector(0, 0, 0);
-}
-
-void CBasePlayer::ResetAutoaim()
-{
-	if (m_vecAutoAim.x != 0 || m_vecAutoAim.y != 0)
-	{
-		m_vecAutoAim = Vector(0, 0, 0);
-		SET_CROSSHAIRANGLE(edict(), 0, 0);
-	}
-	m_fOnTarget = false;
 }
 
 void CBasePlayer::SetCustomDecalFrames(int nFrames)
@@ -4404,97 +3832,6 @@ void CBasePlayer::SetCustomDecalFrames(int nFrames)
 int CBasePlayer::GetCustomDecalFrames()
 {
 	return m_nCustomSprayFrames;
-}
-
-void CBasePlayer::DropPlayerWeapon(const char* pszItemName)
-{
-	if (g_Skill.GetValue("allow_player_weapon_dropping", 0) == 0)
-	{
-		return;
-	}
-
-	if (0 == strlen(pszItemName))
-	{
-		// if this string has no length, the client didn't type a name!
-		// assume player wants to drop the active item.
-		// make the string null to make future operations in this function easier
-		pszItemName = nullptr;
-	}
-
-	CBasePlayerWeapon* weapon;
-	int i;
-
-	for (i = 0; i < MAX_WEAPON_SLOTS; i++)
-	{
-		weapon = m_rgpPlayerWeapons[i];
-
-		while (weapon)
-		{
-			if (pszItemName)
-			{
-				// try to match by name.
-				if (0 == strcmp(pszItemName, STRING(weapon->pev->classname)))
-				{
-					// match!
-					break;
-				}
-			}
-			else
-			{
-				// trying to drop active item
-				if (weapon == m_pActiveWeapon)
-				{
-					// active item!
-					break;
-				}
-			}
-
-			weapon = weapon->m_pNext;
-		}
-
-
-		// if we land here with a valid pWeapon pointer, that's because we found the
-		// item we want to drop and hit a BREAK;  pWeapon is the item.
-		if (weapon)
-		{
-			if (!g_pGameRules->GetNextBestWeapon(this, weapon))
-				return; // can't drop the item they asked for, may be our last item or something we can't holster
-
-			UTIL_MakeVectors(pev->angles);
-
-			ClearWeaponBit(weapon->m_iId); // take item off hud
-
-			CWeaponBox* pWeaponBox = (CWeaponBox*)CBaseEntity::Create("weaponbox", pev->origin + gpGlobals->v_forward * 10, pev->angles, this);
-			pWeaponBox->pev->angles.x = 0;
-			pWeaponBox->pev->angles.z = 0;
-			pWeaponBox->PackWeapon(weapon);
-			pWeaponBox->pev->velocity = gpGlobals->v_forward * 300 + gpGlobals->v_forward * 100;
-
-			// drop half of the ammo for this weapon.
-			int iAmmoIndex;
-
-			iAmmoIndex = GetAmmoIndex(weapon->pszAmmo1()); // ???
-
-			if (iAmmoIndex != -1)
-			{
-				// this weapon weapon uses ammo, so pack an appropriate amount.
-				if ((weapon->iFlags() & ITEM_FLAG_EXHAUSTIBLE) != 0)
-				{
-					// pack up all the ammo, this weapon is its own ammo type
-					pWeaponBox->PackAmmo(MAKE_STRING(weapon->pszAmmo1()), m_rgAmmo[iAmmoIndex]);
-					m_rgAmmo[iAmmoIndex] = 0;
-				}
-				else
-				{
-					// pack half of the ammo
-					pWeaponBox->PackAmmo(MAKE_STRING(weapon->pszAmmo1()), m_rgAmmo[iAmmoIndex] / 2);
-					m_rgAmmo[iAmmoIndex] /= 2;
-				}
-			}
-
-			return; // we're done, so stop searching with the FOR loop.
-		}
-	}
 }
 
 bool CBasePlayer::HasPlayerWeapon(CBasePlayerWeapon* checkWeapon)
@@ -4541,8 +3878,6 @@ bool CBasePlayer::SwitchWeapon(CBasePlayerWeapon* weapon)
 	{
 		return false;
 	}
-
-	ResetAutoaim();
 
 	if (m_pActiveWeapon)
 	{
@@ -4820,9 +4155,6 @@ void CBasePlayer::EquipWeapon()
 			}
 		}
 	}
-
-	// No weapon equipped or couldn't deploy it, find a suitable alternative.
-	g_pGameRules->GetNextBestWeapon(this, m_pActiveWeapon, true);
 }
 
 void CBasePlayer::SetPrefsFromUserinfo(char* infobuffer)

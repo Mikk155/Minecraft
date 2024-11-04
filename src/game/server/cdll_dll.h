@@ -55,7 +55,6 @@ static_assert(MAX_WEAPON_SLOTS >= MAX_ALWAYS_VISIBLE_WEAPON_SLOTS);
 static_assert(MAX_WEAPON_SLOTS <= 10);
 
 #define HIDEHUD_WEAPONS (1 << 0)
-#define HIDEHUD_FLASHLIGHT (1 << 1)
 #define HIDEHUD_ALL (1 << 2)
 #define HIDEHUD_HEALTH (1 << 3)
 
@@ -128,37 +127,6 @@ enum HudFlag
  *	@brief Indicates that a weapon does not use magazines.
  */
 constexpr int WEAPON_NOCLIP = -1;
-
-enum class SuitLightType
-{
-	Flashlight = 0,
-	Nightvision
-};
-
-struct SuitLightTypeInfo
-{
-	const std::string_view Name;
-};
-
-constexpr SuitLightTypeInfo SuitLightTypes[] =
-	{
-		{"flashlight"},
-		{"nightvision"}};
-
-constexpr std::optional<SuitLightType> SuitLightTypeFromString(std::string_view value)
-{
-	for (int i = 0; const auto& type : SuitLightTypes)
-	{
-		if (type.Name == value)
-		{
-			return static_cast<SuitLightType>(i);
-		}
-
-		++i;
-	}
-
-	return {};
-}
 
 // used by suit voice to indicate damage sustained and repaired type to player
 

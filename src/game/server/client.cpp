@@ -39,6 +39,7 @@
 #include "UserMessages.h"
 #include "ClientCommandRegistry.h"
 #include "ServerLibrary.h"
+#include "minecraft.h"
 
 #include "ctf/ctf_goals.h"
 
@@ -586,11 +587,6 @@ void SV_CreateClientCommands()
 			player->GiveNamedItem(STRING(iszItem)); },
 		{.Flags = ClientCommandFlag::Cheat});
 
-	g_ClientCommands.Create("drop", [](CBasePlayer* player, const auto& args)
-		{
-			// player is dropping an item.
-			player->DropPlayerWeapon(args.Argument(1)); });
-
 	g_ClientCommands.Create("fov", [](CBasePlayer* player, const auto& args)
 		{
 			if (0 != g_psv_cheats->value && args.Count() > 1)
@@ -636,36 +632,20 @@ void SV_CreateClientCommands()
 			} },
 		{.Flags = ClientCommandFlag::Cheat});
 
-	g_ClientCommands.Create("set_suit_light_type", [](CBasePlayer* player, const auto& args)
-		{
-			if (args.Count() > 1)
-			{
-				const auto type = SuitLightTypeFromString(args.Argument(1));
-
-				if (type.has_value())
-				{
-					player->SetSuitLightType(type.value());
-				}
-				else
-				{
-					UTIL_ConsolePrint(player, "Unknown suit light type \"{}\"\n", args.Argument(1));
-				}
-			} },
-		{.Flags = ClientCommandFlag::Cheat});
-
 	g_ClientCommands.Create("use", [](CBasePlayer* player, const auto& args)
 		{ player->SelectItem(args.Argument(1)); });
 
-	g_ClientCommands.Create("selectweapon", [](CBasePlayer* player, const auto& args)
+	g_ClientCommands.Create("slot", [](CBasePlayer* player, const auto& args)
+	{
+		if( args.Count() > 1 )
 		{
-			if (args.Count() > 1)
-			{
-				player->SelectItem(args.Argument(1));
-			}
-			else
-			{
-				UTIL_ConsolePrint(player, "usage: selectweapon <weapon name>\n");
-			} });
+			player->inventory_active_item = std::clamp( atoi( args.Argument(1) ), minecraft::slot::SLOT1, minecraft::slot::SLOT9 );
+	} } );
+
+	g_ClientCommands.Create("drop", [](CBasePlayer* player, const auto& args)
+	{
+		// -MC drop current item in slot
+	} );
 
 	g_ClientCommands.Create("lastinv", [](CBasePlayer* player, const auto& args)
 		{ player->SelectLastItem(); });
@@ -1286,12 +1266,6 @@ void ClientPrecache()
 	UTIL_PrecacheSound("debris/glass2.wav");
 	UTIL_PrecacheSound("debris/glass3.wav");
 
-	UTIL_PrecacheSound(SOUND_FLASHLIGHT_ON);
-	UTIL_PrecacheSound(SOUND_FLASHLIGHT_OFF);
-
-	UTIL_PrecacheSound(SOUND_NIGHTVISION_ON);
-	UTIL_PrecacheSound(SOUND_NIGHTVISION_OFF);
-
 	// player gib sounds
 	UTIL_PrecacheSound("common/bodysplat.wav");
 
@@ -1326,9 +1300,6 @@ void ClientPrecache()
 
 	// for cheat_givemagazine
 	UTIL_PrecacheSound(DefaultItemPickupSound);
-
-	if (giPrecacheGrunt)
-		UTIL_PrecacheOther("monster_human_grunt");
 }
 
 /**

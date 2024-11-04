@@ -29,7 +29,6 @@
 #include "sound/MaterialSystem.h"
 
 class CBaseItem;
-class CRope;
 class CTFGoalFlag;
 
 #define PLAYER_FATAL_FALL_SPEED 1024															  // approx 60 feet
@@ -52,7 +51,6 @@ class CTFGoalFlag;
 #define PFLAG_DUCKING (1 << 3)	// In the process of ducking, but totally squatted yet
 #define PFLAG_USING (1 << 4)	// Using a continuous entity
 #define PFLAG_OBSERVER (1 << 5) // player is locked in stationary cam mode. Spectators can move, observers can't.
-#define PFLAG_ONROPE (1 << 6)
 
 //
 // generic player
@@ -75,12 +73,6 @@ constexpr int MAX_ITEMS = ITEM_ANTIDOTE + 1; // hard coded item types
 #define SUIT_NEXT_IN_1HOUR 3600
 
 #define CSUITNOREPEAT 32
-
-#define SOUND_FLASHLIGHT_ON "items/flashlight1.wav"
-#define SOUND_FLASHLIGHT_OFF "items/flashlight1.wav"
-
-#define SOUND_NIGHTVISION_ON "items/nightvision1.wav"
-#define SOUND_NIGHTVISION_OFF "items/nightvision2.wav"
 
 #define TEAM_NAME_LENGTH 16
 
@@ -165,15 +157,6 @@ public:
 	int m_iExtraSoundTypes; // additional classification for this weapon's sound
 	int m_iWeaponFlash;		// brightness of the weapon flash
 	float m_flStopExtraSoundTime;
-
-	/**
-	 *	@brief What type of suit light the player can use
-	 *	@details The initial value here is the default
-	 *	To change this setting at runtime call @see SetSuitLightType so that player state is updated properly
-	 */
-	SuitLightType m_SuitLightType = SuitLightType::Flashlight;
-	float m_flFlashLightTime; // Time until next battery draw/Recharge
-	int m_iFlashBattery;	  // Flashlight Battery Draw
 
 	int m_afButtonLast;
 	int m_afButtonPressed;
@@ -394,14 +377,6 @@ public:
 	void Precache() override;
 	bool IsOnLadder();
 
-	int GetFlashlightFlag() const;
-
-	bool FlashlightIsOn();
-	void FlashlightTurnOn();
-	void FlashlightTurnOff();
-
-	void SetSuitLightType(SuitLightType type);
-
 	/**
 	 *	@brief updates the position of the player's reserved sound slot in the sound list.
 	 */
@@ -433,11 +408,6 @@ public:
 	ItemAddResult AddPlayerWeapon(CBasePlayerWeapon* weapon);
 
 	bool RemovePlayerWeapon(CBasePlayerWeapon* weapon);
-
-	/**
-	 *	@brief drop the named item, or if no name, the active item.
-	 */
-	void DropPlayerWeapon(const char* pszItemName);
 
 	bool HasPlayerWeapon(CBasePlayerWeapon* checkWeapon);
 	bool HasNamedPlayerWeapon(const char* pszItemName);
@@ -517,15 +487,10 @@ public:
 	 */
 	int Illumination() override;
 
-	void ResetAutoaim();
-
 	/**
 	 *	@brief set crosshair position to point to enemey
 	 */
 	Vector GetAutoaimVector(float flDelta);
-
-	Vector GetAutoaimVectorFromPoint(const Vector& vecSrc, float flDelta);
-	Vector AutoaimDeflection(const Vector& vecSrc, float flDist, float flDelta);
 
 	/**
 	 *	@brief When recording a demo, we need to have the server tell us the entire client state
@@ -595,33 +560,7 @@ public:
 	// Whether to fire game_playerspawn next time we check for updates.
 	bool m_FireSpawnTarget = false;
 
-	bool IsOnRope() const { return (m_afPhysicsFlags & PFLAG_ONROPE) != 0; }
-
-	void SetOnRopeState(bool bOnRope)
-	{
-		if (bOnRope)
-			m_afPhysicsFlags |= PFLAG_ONROPE;
-		else
-			m_afPhysicsFlags &= ~PFLAG_ONROPE;
-	}
-
-	CRope* GetRope() { return m_pRope; }
-
-	void SetRope(CRope* pRope)
-	{
-		m_pRope = pRope;
-	}
-
-	void SetIsClimbing(const bool bIsClimbing)
-	{
-		m_bIsClimbing = bIsClimbing;
-	}
-
 private:
-	CRope* m_pRope;
-	float m_flLastClimbTime = 0;
-	bool m_bIsClimbing = false;
-
 	// For saving and level changes.
 	int m_HudColor = RGB_HUD_COLOR.ToInteger();
 	int m_CrosshairColor = RGB_CROSSHAIR_COLOR.ToInteger();
