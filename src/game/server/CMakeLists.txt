@@ -185,70 +185,7 @@ target_sources(server PRIVATE
 	entities/NPCs/squadmonster.h
 	entities/NPCs/talkmonster.cpp
 	entities/NPCs/talkmonster.h
-	
-	entities/NPCs/aliens/aflock.cpp
-	entities/NPCs/aliens/agrunt.cpp
-	entities/NPCs/aliens/barnacle.cpp
-	entities/NPCs/aliens/bigmomma.cpp
-	entities/NPCs/aliens/bloater.cpp
-	entities/NPCs/aliens/bullsquid.cpp
-	entities/NPCs/aliens/controller.cpp
-	entities/NPCs/aliens/gargantua.cpp
-	entities/NPCs/aliens/headcrab.cpp
-	entities/NPCs/aliens/hornet.cpp
-	entities/NPCs/aliens/hornet.h
-	entities/NPCs/aliens/houndeye.cpp
-	entities/NPCs/aliens/ichthyosaur.cpp
-	entities/NPCs/aliens/islave.cpp
-	entities/NPCs/aliens/leech.cpp
-	entities/NPCs/aliens/nihilanth.cpp
-	entities/NPCs/aliens/tentacle.cpp
-	
-	entities/NPCs/blackmesa/barney.cpp
-	entities/NPCs/blackmesa/barney.h
-	entities/NPCs/blackmesa/cleansuit_scientist.cpp
-	entities/NPCs/blackmesa/loader.cpp
-	entities/NPCs/blackmesa/otis.cpp
-	entities/NPCs/blackmesa/rosenberg.cpp
-	entities/NPCs/blackmesa/scientist.cpp
-	entities/NPCs/blackmesa/scientist.h
-	
-	entities/NPCs/blackops/blkop_apache.cpp
-	entities/NPCs/blackops/blkop_osprey.cpp
-	entities/NPCs/blackops/hassassin.cpp
-	entities/NPCs/blackops/male_assassin.cpp
-	
-	entities/NPCs/military/apache.cpp
-	entities/NPCs/military/apache.h
-	entities/NPCs/military/COFSquadTalkMonster.cpp
-	entities/NPCs/military/COFSquadTalkMonster.h
-	entities/NPCs/military/drill_sergeant.cpp
-	entities/NPCs/military/hfgrunt.cpp
-	entities/NPCs/military/hgrunt.cpp
-	entities/NPCs/military/hgrunt.h
-	entities/NPCs/military/hgrunt_ally.cpp
-	entities/NPCs/military/hgrunt_ally_base.cpp
-	entities/NPCs/military/hgrunt_ally_base.h
-	entities/NPCs/military/hgrunt_medic.cpp
-	entities/NPCs/military/hgrunt_torch.cpp
-	entities/NPCs/military/osprey.cpp
-	entities/NPCs/military/osprey.h
-	entities/NPCs/military/recruit.cpp
-	entities/NPCs/military/turret.cpp
-	
-	entities/NPCs/other/genericmonster.cpp
-	entities/NPCs/other/gman.cpp
-	entities/NPCs/other/penguin_grenade.cpp
-	entities/NPCs/other/rat.cpp
-	entities/NPCs/other/roach.cpp
-	entities/NPCs/other/skeleton.cpp
 
-	entities/NPCs/zombies/gonome.cpp
-	entities/NPCs/zombies/zombie.cpp
-	entities/NPCs/zombies/zombie.h
-	entities/NPCs/zombies/zombie_barney.cpp
-	entities/NPCs/zombies/zombie_soldier.cpp
-	
 	gamerules/CGameRules.cpp
 	gamerules/CGameRules.h
 	gamerules/CHalfLifeCoopplay.cpp

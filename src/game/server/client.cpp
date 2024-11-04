@@ -1323,9 +1323,6 @@ void ClientPrecache()
 
 	// for cheat_givemagazine
 	UTIL_PrecacheSound(DefaultItemPickupSound);
-
-	if (giPrecacheGrunt)
-		UTIL_PrecacheOther("monster_human_grunt");
 }
 
 /**

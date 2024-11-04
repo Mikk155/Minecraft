@@ -30,7 +30,6 @@
 #include "talkmonster.h"
 #include "squadmonster.h"
 #include "items/CWeaponBox.h"
-#include "military/COFSquadTalkMonster.h"
 #include "shake.h"
 #include "spawnpoints.h"
 #include "CHalfLifeCTFplay.h"
@@ -292,12 +291,6 @@ void CBasePlayer::TraceAttack(CBaseEntity* attacker, float flDamage, Vector vecD
 #define ARMOR_RATIO 0.2 // Armor Takes 80% of the damage
 #define ARMOR_BONUS 0.5 // Each Point of Armor is work 1/x points of health
 
-static const char* m_szSquadClasses[] =
-	{
-		"monster_human_grunt_ally",
-		"monster_human_medic_ally",
-		"monster_human_torch_ally"};
-
 bool CBasePlayer::TakeDamage(CBaseEntity* inflictor, CBaseEntity* attacker, float flDamage, int bitsDamageType)
 {
 	// have suit diagnose the problem - ie: report damage type
@@ -542,30 +535,6 @@ bool CBasePlayer::TakeDamage(CBaseEntity* inflictor, CBaseEntity* attacker, floa
 		}
 		else
 			SetSuitUpdate("!HEV_HLTH1", SUIT_NEXT_IN_10MIN); // health dropping
-	}
-
-	// Make all grunts following me attack the NPC that attacked me
-	if (pAttacker)
-	{
-		auto enemy = pAttacker->MyMonsterPointer();
-
-		if (!enemy || enemy->IRelationship(this) == Relationship::Ally)
-		{
-			return fTookDamage;
-		}
-
-		for (std::size_t i = 0; i < std::size(m_szSquadClasses); ++i)
-		{
-			for (auto ally : UTIL_FindEntitiesByClassname<CBaseEntity>(m_szSquadClasses[i]))
-			{
-				auto squadAlly = ally->MySquadTalkMonsterPointer();
-
-				if (squadAlly && squadAlly->m_hTargetEnt && squadAlly->m_hTargetEnt->IsPlayer())
-				{
-					squadAlly->SquadMakeEnemy(enemy);
-				}
-			}
-		}
 	}
 
 	return fTookDamage;
@@ -3155,22 +3124,6 @@ void CBasePlayer::CheatImpulseCommands(int iImpulse)
 
 	switch (iImpulse)
 	{
-	case 76:
-	{
-		if (!giPrecacheGrunt)
-		{
-			giPrecacheGrunt = true;
-			Con_DPrintf("You must now restart to use Grunt-o-matic.\n");
-		}
-		else
-		{
-			UTIL_MakeVectors(Vector(0, pev->v_angle.y, 0));
-			Create("monster_human_grunt", pev->origin + gpGlobals->v_forward * 128, pev->angles);
-		}
-		break;
-	}
-
-
 	case 101:
 	{
 		const bool hasActiveWeapon = m_pActiveWeapon != nullptr;
