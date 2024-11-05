@@ -1260,6 +1260,10 @@ void CBasePlayer::StartDeathCam()
 	pev->modelindex = 0;
 }
 
+void CBasePlayer::LeaveObserver(Vector vecPosition, Vector vecViewAngle)
+{
+}
+
 void CBasePlayer::StartObserver(Vector vecPosition, Vector vecViewAngle)
 {
 	// clear any clientside entities attached to this player

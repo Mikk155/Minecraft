@@ -642,6 +642,22 @@ void SV_CreateClientCommands()
 			player->inventory_active_item = std::clamp( atoi( args.Argument(1) ), minecraft::slot::SLOT1, minecraft::slot::SLOT9 );
 	} } );
 
+	g_ClientCommands.Create("gamemode", [](CBasePlayer* player, const CommandArgs& args)
+	{
+		if( args.Count() > 1 )
+		{
+			switch( atoi( args.Argument(1) ) )
+			{
+				case 0:
+					player->LeaveObserver( player->pev->origin, player->pev->angles );
+				break;
+				case 1:
+					player->StartObserver( player->pev->origin, player->pev->angles );
+				break;
+			}
+		}
+	}, {.Flags = ClientCommandFlag::Cheat} );
+
 	g_ClientCommands.Create("drop", [](CBasePlayer* player, const auto& args)
 	{
 		// -MC drop current item in slot

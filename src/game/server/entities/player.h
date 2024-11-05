@@ -398,6 +398,7 @@ public:
 	 */
 	void StartDeathCam();
 	void StartObserver(Vector vecPosition, Vector vecViewAngle);
+	void LeaveObserver(Vector vecPosition = g_vecZero, Vector vecViewAngle = g_vecZero);
 
 	void AddPoints(int score, bool bAllowNegativeScore);
 	void AddPointsToTeam(int score, bool bAllowNegativeScore);
