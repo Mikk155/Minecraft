@@ -1,0 +1,11 @@
+{
+    "player_health": 10.0,
+    "player_max_health": 10.0,
+    "player_max_absortion": 5.0,
+
+    "player_damage_deduction_head": 3,
+    "player_damage_deduction_chest": 2,
+    "player_damage_deduction_stomach": 2,
+    "player_damage_deduction_arm": 1,
+    "player_damage_deduction_leg": 1
+}

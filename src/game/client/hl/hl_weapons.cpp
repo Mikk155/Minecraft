@@ -83,42 +83,6 @@ void CBaseEntity::Killed(CBaseEntity* attacker, int iGib)
 
 /*
 =====================
-CBaseEntity::FireBulletsPlayer
-
-Only produces random numbers to match the server ones.
-=====================
-*/
-Vector CBaseEntity::FireBulletsPlayer(unsigned int cShots, Vector vecSrc, Vector vecDirShooting, Vector vecSpread, float flDistance, int iBulletType, int iTracerFreq, int iDamage, CBaseEntity* attacker, int shared_rand)
-{
-	float x = 0, y = 0, z;
-
-	for (unsigned int iShot = 1; iShot <= cShots; iShot++)
-	{
-		if (attacker == nullptr)
-		{
-			// get circular gaussian spread
-			do
-			{
-				x = RANDOM_FLOAT(-0.5, 0.5) + RANDOM_FLOAT(-0.5, 0.5);
-				y = RANDOM_FLOAT(-0.5, 0.5) + RANDOM_FLOAT(-0.5, 0.5);
-				z = x * x + y * y;
-			} while (z > 1);
-		}
-		else
-		{
-			// Use player's random seed.
-			//  get circular gaussian spread
-			x = UTIL_SharedRandomFloat(shared_rand + iShot, -0.5, 0.5) + UTIL_SharedRandomFloat(shared_rand + (1 + iShot), -0.5, 0.5);
-			y = UTIL_SharedRandomFloat(shared_rand + (2 + iShot), -0.5, 0.5) + UTIL_SharedRandomFloat(shared_rand + (3 + iShot), -0.5, 0.5);
-			z = x * x + y * y;
-		}
-	}
-
-	return Vector(x * vecSpread.x, y * vecSpread.y, 0.0);
-}
-
-/*
-=====================
 CBasePlayer::Killed
 
 =====================

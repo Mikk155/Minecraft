@@ -3108,11 +3108,6 @@ CBaseEntity* CBaseMonster::DropItem(const char* pszItemName, const Vector& vecPo
 		return nullptr;
 	}
 
-	if (GetSkillFloat("allow_npc_item_dropping") == 0)
-	{
-		return nullptr;
-	}
-
 	if (!m_AllowItemDropping)
 	{
 		return nullptr;

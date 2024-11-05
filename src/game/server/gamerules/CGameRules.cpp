@@ -36,14 +36,13 @@ class ItemRespawnTimeVisitor final : public IItemVisitor
 public:
 	void Visit(CBasePlayerAmmo* ammo) override
 	{
-		RespawnTime = g_Skill.GetValue("ammo_respawn_time", ITEM_NEVER_RESPAWN_DELAY);
+		RespawnTime = ITEM_NEVER_RESPAWN_DELAY;
 	}
 
 	void Visit(CBasePlayerWeapon* weapon) override
 	{
-		RespawnTime = g_Skill.GetValue("weapon_respawn_time", ITEM_NEVER_RESPAWN_DELAY);
 
-		if (RespawnTime != ITEM_NEVER_RESPAWN_DELAY && g_Skill.GetValue("weapon_instant_respawn", 0) != 0)
+		if (RespawnTime != ITEM_NEVER_RESPAWN_DELAY )
 		{
 			// make sure it's only certain weapons
 			if ((weapon->iFlags() & ITEM_FLAG_LIMITINWORLD) == 0)
@@ -56,7 +55,7 @@ public:
 
 	void Visit(CItem* pickupItem) override
 	{
-		RespawnTime = g_Skill.GetValue("pickupitem_respawn_time", ITEM_NEVER_RESPAWN_DELAY);
+		RespawnTime = ITEM_NEVER_RESPAWN_DELAY;
 	}
 
 	// Don't respawn unknown items.
@@ -108,19 +107,6 @@ public:
 
 	void Visit(CBasePlayerWeapon* weapon) override
 	{
-		if (g_Skill.GetValue("weapon_instant_respawn", 0) != 0)
-		{
-			if ((weapon->iFlags() & ITEM_FLAG_LIMITINWORLD) == 0)
-			{
-				// check if the player already has this weapon
-				if (Player->HasPlayerWeapon(weapon))
-				{
-					CanHaveItem = false;
-					return;
-				}
-			}
-		}
-
 		// only living players can have items
 		if (Player->pev->deadflag != DEAD_NO)
 		{

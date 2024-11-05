@@ -254,21 +254,21 @@ void CBasePlayer::TraceAttack(CBaseEntity* attacker, float flDamage, Vector vecD
 		case HITGROUP_GENERIC:
 			break;
 		case HITGROUP_HEAD:
-			flDamage *= GetSkillFloat("player_head"sv);
+			flDamage *= g_Cfg.GetValue( "player_damage_deduction_head"sv, 3 );
 			break;
 		case HITGROUP_CHEST:
-			flDamage *= GetSkillFloat("player_chest"sv);
+			flDamage *= g_Cfg.GetValue( "player_damage_deduction_chest"sv, 3 );
 			break;
 		case HITGROUP_STOMACH:
-			flDamage *= GetSkillFloat("player_stomach"sv);
+			flDamage *= g_Cfg.GetValue( "player_damage_deduction_stomach"sv, 2 );
 			break;
 		case HITGROUP_LEFTARM:
 		case HITGROUP_RIGHTARM:
-			flDamage *= GetSkillFloat("player_arm"sv);
+			flDamage *= g_Cfg.GetValue( "player_damage_deduction_arm"sv, 1 );
 			break;
 		case HITGROUP_LEFTLEG:
 		case HITGROUP_RIGHTLEG:
-			flDamage *= GetSkillFloat("player_leg"sv);
+			flDamage *= g_Cfg.GetValue( "player_damage_deduction_leg"sv, 1 );
 			break;
 		default:
 			break;
@@ -2472,12 +2472,13 @@ void CBasePlayer::Spawn()
 			m_bIsSpawning = false;
 		}};
 
-	pev->health = GetSkillFloat( "player_health"sv );
+	pev->health = g_Cfg.GetValue( "player_health"sv, 10 );
 	pev->takedamage = DAMAGE_AIM;
 	pev->solid = SOLID_SLIDEBOX;
 	pev->movetype = MOVETYPE_WALK;
-	pev->max_health = GetSkillFloat( "player_maxhealth"sv );
+	pev->max_health = g_Cfg.GetValue( "player_max_health"sv, 10 );
 	pev->armorvalue = 0;
+	pev->armortype = g_Cfg.GetValue( "player_max_absortion"sv, 5 );
 	pev->flags &= FL_PROXY | FL_FAKECLIENT; // keep proxy and fakeclient flags set by engine
 	pev->flags |= FL_CLIENT;
 	pev->air_finished = gpGlobals->time + 12;
@@ -3653,11 +3654,6 @@ void CBasePlayer::UpdateClientData()
 		MESSAGE_BEGIN(MSG_ONE, SVC_ROOMTYPE, nullptr, this);
 		WRITE_SHORT((short)m_SndRoomtype); // sequence number
 		MESSAGE_END();
-	}
-
-	if (fullHUDInitRequired || m_bRestored)
-	{
-		g_Skill.SendAllNetworkedSkillVars(this);
 	}
 
 	// Handled anything that needs resetting
