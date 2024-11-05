@@ -22,7 +22,6 @@
 #include <EASTL/fixed_string.h>
 
 #include "cbase.h"
-#include "CCorpse.h"
 #include "AmmoTypeSystem.h"
 #include "player.h"
 #include "trains.h"
@@ -1200,7 +1199,7 @@ void CBasePlayer::PlayerDeathThink()
 
 	// Logger->debug("Respawn");
 
-	respawn(this, (m_afPhysicsFlags & PFLAG_OBSERVER) == 0); // don't copy a corpse if we're in deathcam.
+	Spawn();
 	pev->nextthink = -1;
 }
 
@@ -1233,8 +1232,6 @@ void CBasePlayer::StartDeathCam()
 			iRand--;
 		}
 
-		CopyToBodyQue(this);
-
 		SetOrigin(pSpot->pev->origin);
 		pev->angles = pev->v_angle = pSpot->pev->v_angle;
 	}
@@ -1242,7 +1239,6 @@ void CBasePlayer::StartDeathCam()
 	{
 		// no intermission spot. Push them up in the air, looking down at their corpse
 		TraceResult tr;
-		CopyToBodyQue(this);
 		UTIL_TraceLine(pev->origin, pev->origin + Vector(0, 0, 128), ignore_monsters, edict(), &tr);
 
 		SetOrigin(tr.vecEndPos);

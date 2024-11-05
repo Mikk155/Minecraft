@@ -28,7 +28,6 @@
 
 #include "cbase.h"
 #include "changelevel.h"
-#include "CCorpse.h"
 #include "com_model.h"
 #include "client.h"
 #include "customentity.h"
@@ -113,21 +112,7 @@ void ClientDisconnect(edict_t* pEntity)
  */
 void respawn(CBasePlayer* player, bool fCopyCorpse)
 {
-	if (g_pGameRules->IsMultiplayer())
-	{
-		if (fCopyCorpse)
-		{
-			// make a copy of the dead body for appearances sake
-			CopyToBodyQue(player);
-		}
-
-		// respawn player
-		player->Spawn();
-	}
-	else
-	{ // restart the entire server
-		SERVER_COMMAND("reload\n");
-	}
+	player->Spawn();
 }
 
 /**

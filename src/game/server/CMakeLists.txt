@@ -90,8 +90,6 @@ target_sources(server PRIVATE
 	entities/CBaseTrigger.h
 	entities/CClientFog.cpp
 	entities/CClientFog.h
-	entities/CCorpse.cpp
-	entities/CCorpse.h
 	entities/changelevel.cpp
 	entities/changelevel.h
 	entities/CMultiSource.h
