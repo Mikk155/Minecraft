@@ -69,6 +69,32 @@ std::vector<CampaignInfo> CampaignSelectSystem::LoadCampaigns()
 
 	FileFindHandle_t handle = FILESYSTEM_INVALID_FIND_HANDLE;
 
+	// -MC Load test maps menu when running in DEBUG
+	if( auto levelName = gEngfuncs.pfnGetLevelName(); levelName != nullptr && strcmp( levelName, "maps/-test_menu.bsp" ) == 0 )
+	{
+		if (auto fileName = g_pFileSystem->FindFirst("maps/-test_*.bsp", &handle); fileName)
+		{
+			do { if ( std::find_if(campaigns.begin(), campaigns.end(), [=](const auto& candidate)
+					{ return candidate.FileName == fileName; }) != campaigns.end()) {
+						continue;
+				}
+
+				CampaignInfo info;
+
+				info.FileName = std::move(fileName);
+				info.Label = "";
+				info.Description = "No description provided.";
+				info.CampaignMap = fileName;
+				info.TrainingMap = "";
+				campaigns.push_back(info);
+
+			} while ((fileName = g_pFileSystem->FindNext(handle)) != nullptr);
+
+			g_pFileSystem->FindClose(handle);
+		}
+		return campaigns;
+	}
+
 	if (auto fileName = g_pFileSystem->FindFirst("campaigns/*.json", &handle); fileName)
 	{
 		do

@@ -302,6 +302,7 @@ void ClientLibrary::AddCheatCommands()
 void ClientLibrary::LoadBackgroundMap()
 {
 #ifdef DEBUG
+	gEngfuncs.pfnClientCmd( "map -test_menu\n" );
 	return;
 #endif
 
@@ -323,7 +324,7 @@ void ClientLibrary::LoadBackgroundMap()
 	std::string selectedMap = maps[ map_index ];
 
 #if 0
-	if( !IS_MAP_VALID( selectedMap.c_str() ) )
+	if( !IS_MAP_VALID( selectedMap.c_str() ) ) // -MC g_pFileSystem->FileExists ?
 	{
 		ConsolePrint( fmt::format( "Invalid map entry \"{}\" at \"cfg/client/background_maps.json\"\n", selectedMap ).c_str() );
 		return;
