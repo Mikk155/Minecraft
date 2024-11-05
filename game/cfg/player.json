@@ -1,6 +1,6 @@
 {
-    "player_health": 50.0,
-    "player_max_health": 50.0,
+    "player_health": 10.0,
+    "player_max_health": 10.0,
     "player_max_absortion": 5.0,
 
     "player_damage_deduction_head": 3,
