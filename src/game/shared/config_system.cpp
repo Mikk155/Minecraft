@@ -73,6 +73,7 @@ void ConfigurationSystem::LoadConfigFiles()
 	m_config = std::make_unique<json>();
 
 	LoadConfigFile( "cfg/player.json" );
+	LoadConfigFile( "cfg/mobs.json" );
 #endif
 }
 

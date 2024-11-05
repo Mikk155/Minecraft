@@ -24,7 +24,6 @@
 #include "util.h"
 #include "DataMap.h"
 #include "EntityClassificationSystem.h"
-#include "skill.h"
 #include "minecraft.h"
 
 class CBaseEntity;

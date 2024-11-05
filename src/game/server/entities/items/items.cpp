@@ -123,7 +123,7 @@ public:
 	void OnCreate() override
 	{
 		CItem::OnCreate();
-//		m_HealthAmount = GetSkillFloat("healthkit"sv);
+//		m_HealthAmount = ("healthkit"sv);
 		pev->model = MAKE_STRING("models/w_medkit.mdl");
 	}
 
@@ -196,7 +196,7 @@ public:
 	void OnCreate() override
 	{
 		CItem::OnCreate();
-//		m_ArmorAmount = GetSkillFloat("battery"sv);
+//		m_ArmorAmount = ("battery"sv);
 		pev->model = MAKE_STRING("models/w_battery.mdl");
 	}
 
@@ -288,7 +288,7 @@ public:
 	void OnCreate() override
 	{
 		CItem::OnCreate();
-		m_ArmorAmount = 40; // TODO: add to skill.json
+		m_ArmorAmount = 40;
 		pev->model = MAKE_STRING("models/barney_helmet.mdl");
 	}
 
@@ -306,7 +306,7 @@ public:
 	void OnCreate() override
 	{
 		CItem::OnCreate();
-		m_ArmorAmount = 60; // TODO: add to skill.json
+		m_ArmorAmount = 60;
 		pev->model = MAKE_STRING("models/barney_vest.mdl");
 	}
 

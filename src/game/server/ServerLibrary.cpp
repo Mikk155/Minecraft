@@ -31,7 +31,6 @@
 #include "scripted.h"
 #include "ServerConfigContext.h"
 #include "ServerLibrary.h"
-#include "skill.h"
 #include "config_system.h"
 #include "UserMessages.h"
 #include "voice_gamemgr.h"
@@ -151,7 +150,6 @@ bool ServerLibrary::Initialize()
 	LoadCommandWhitelist();
 
 	CreateConfigDefinitions();
-	DefineSkillVariables();
 
 	return true;
 }
@@ -422,7 +420,6 @@ void ServerLibrary::CreateConfigDefinitions()
 			sections.push_back(std::make_unique<CrosshairColorSection>());
 			sections.push_back(std::make_unique<SentencesSection>());
 			sections.push_back(std::make_unique<MaterialsSection>());
-			sections.push_back(std::make_unique<SkillSection>());
 			sections.push_back(std::make_unique<GlobalModelReplacementSection>());
 			sections.push_back(std::make_unique<GlobalSentenceReplacementSection>());
 			sections.push_back(std::make_unique<GlobalSoundReplacementSection>());
@@ -433,10 +430,6 @@ void ServerLibrary::CreateConfigDefinitions()
 			sections.push_back(std::make_unique<HudReplacementSection>());
 
 			return sections; }());
-}
-
-void ServerLibrary::DefineSkillVariables()
-{
 }
 
 void ServerLibrary::LoadServerConfigFiles()
@@ -507,17 +500,6 @@ void ServerLibrary::LoadServerConfigFiles()
 	// Initialize file lists to their defaults.
 	context.SentencesFiles.push_back("sound/sentences.json");
 	context.MaterialsFiles.push_back("sound/materials.json");
-	context.SkillFiles.push_back("cfg/skill.json");
-
-	if (g_pGameRules->IsMultiplayer())
-	{
-		context.SkillFiles.push_back("cfg/skill_multiplayer.json");
-	}
-
-	if (g_pGameRules->IsCoOp())
-	{
-		context.SkillFiles.push_back("cfg/skill_coop.json");
-	}
 
 	context.EntityClassificationsFileName = "cfg/default_entity_classes.json";
 
@@ -538,7 +520,6 @@ void ServerLibrary::LoadServerConfigFiles()
 
 	sentences::g_Sentences.LoadSentences(context.SentencesFiles);
 	g_MaterialSystem.LoadMaterials(context.MaterialsFiles);
-	g_Skill.LoadSkillConfigFiles(context.SkillFiles);
 	g_Cfg.LoadConfigFiles();
 
 	m_MapState->m_GlobalModelReplacement = g_ReplacementMaps.LoadMultiple(

@@ -3654,11 +3654,6 @@ void CBasePlayer::UpdateClientData()
 		MESSAGE_END();
 	}
 
-	if (fullHUDInitRequired || m_bRestored)
-	{
-		g_Skill.SendAllNetworkedSkillVars(this);
-	}
-
 	// Handled anything that needs resetting
 	m_bRestored = false;
 }

@@ -371,7 +371,7 @@ CGrenade* CGrenade::ShootContact(CBaseEntity* owner, Vector vecStart, Vector vec
 	// Explode on contact
 	pGrenade->SetTouch(&CGrenade::ExplodeTouch);
 
-//	pGrenade->pev->dmg = GetSkillFloat("plr_9mmAR_grenade"sv);
+//	pGrenade->pev->dmg = ("plr_9mmAR_grenade"sv);
 
 	return pGrenade;
 }

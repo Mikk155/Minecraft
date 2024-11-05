@@ -20,7 +20,6 @@
 
 #include "hud.h"
 #include "CampaignSelectSystem.h"
-#include "skill.h"
 #include "vgui_CampaignSelect.h"
 #include "vgui_listbox.h"
 
@@ -34,12 +33,6 @@
 #define CAMPAIGNSELECT_WINDOW_Y YRES(64)
 #define CAMPAIGNSELECT_WINDOW_SIZE_X XRES((640 - (64 * 2)))
 #define CAMPAIGNSELECT_WINDOW_SIZE_Y YRES(200)
-
-constexpr std::array<const char*, SkillLevelCount> DifficultyLabels =
-	{
-		"#CampaignSelect_Easy",
-		"#CampaignSelect_Medium",
-		"#CampaignSelect_Hard"};
 
 class CampaignSelectionChangedButtonSignal : public ActionSignal
 {
@@ -145,8 +138,6 @@ CCampaignSelectPanel::CCampaignSelectPanel(int iTrans, int x, int y, int wide, i
 
 	const int missionButtonWidth = 150;
 
-	const int difficultyXPos = CAMPAIGNSELECT_WINDOW_X + missionButtonWidth + XRES(20);
-
 	auto missionLabel = new Label(gHUD.m_TextMessage.BufferedLocaliseTextString("#CampaignSelect_Mission"),
 		CAMPAIGNSELECT_WINDOW_X, CAMPAIGNSELECT_WINDOW_Y + yOffset);
 
@@ -155,15 +146,6 @@ CCampaignSelectPanel::CCampaignSelectPanel(int iTrans, int x, int y, int wide, i
 
 	missionLabel->setFgColor(Scheme::sc_primary1);
 	missionLabel->setBgColor(0, 0, 0, 255);
-
-	auto difficultyLabel = new Label(gHUD.m_TextMessage.BufferedLocaliseTextString("#CampaignSelect_Difficulty"),
-		difficultyXPos, CAMPAIGNSELECT_WINDOW_Y + yOffset);
-
-	difficultyLabel->setParent(this);
-	difficultyLabel->setContentAlignment(Label::a_west);
-
-	difficultyLabel->setFgColor(Scheme::sc_primary1);
-	difficultyLabel->setBgColor(0, 0, 0, 255);
 
 	yOffset += m_TextHeight;
 
@@ -190,31 +172,6 @@ CCampaignSelectPanel::CCampaignSelectPanel(int iTrans, int x, int y, int wide, i
 	m_TrainingButton->setBgColor(0, 0, 0, 0);
 
 	yOffset += m_TextHeight;
-
-	m_DifficultyGroup = new ButtonGroup();
-
-	const int difficultyButtonWidth = 200;
-	int difficultyYOffset = buttonsYStart;
-
-	for (auto label : DifficultyLabels)
-	{
-		auto button = new CampaignRadioButton(gHUD.m_TextMessage.BufferedLocaliseTextString(label),
-			difficultyXPos,
-			CAMPAIGNSELECT_WINDOW_Y + difficultyYOffset, difficultyButtonWidth, m_TextHeight);
-		button->setParent(this);
-		button->setButtonGroup(m_DifficultyGroup);
-		button->setContentAlignment(Label::a_west);
-		button->setFgColor(Scheme::sc_primary1);
-		button->setBgColor(0, 0, 0, 0);
-
-		m_Difficulties.push_back(button);
-
-		difficultyYOffset += m_TextHeight;
-	}
-
-	m_Difficulties[0]->setSelected(true);
-
-	yOffset = difficultyYOffset;
 
 	// Create the Scroll panel
 	m_pScrollPanel = new CTFScrollPanel(CAMPAIGNSELECT_WINDOW_X, CAMPAIGNSELECT_WINDOW_Y + yOffset,
@@ -313,18 +270,6 @@ void CCampaignSelectPanel::StartCurrentCampaign()
 		return;
 	}
 
-	int difficulty = 1;
-
-	for (const auto button : m_Difficulties)
-	{
-		if (button->isSelected())
-		{
-			break;
-		}
-
-		++difficulty;
-	}
-
 	const auto& campaign = m_Campaigns[index];
 
 	std::string_view mapName;
@@ -344,7 +289,7 @@ void CCampaignSelectPanel::StartCurrentCampaign()
 	}
 
 	// Matches the commands used in the New Game dialog.
-	const auto commands = fmt::format("disconnect;maxplayers 1;deathmatch 0;skill {};map {};", difficulty, mapName);
+	const auto commands = fmt::format("disconnect;maxplayers 1;deathmatch 0;map {};", mapName);
 	gEngfuncs.pfnClientCmd(commands.c_str());
 }
 
@@ -354,12 +299,6 @@ void CCampaignSelectPanel::SetCampaignByIndex(int index)
 	{
 		m_MissionButton->setVisible(false);
 		m_TrainingButton->setVisible(false);
-
-		for (auto button : m_Difficulties)
-		{
-			button->setVisible(false);
-		}
-
 		m_Description->setText("No campaigns available.");
 		m_StartButton->setVisible(false);
 		return;
@@ -377,11 +316,6 @@ void CCampaignSelectPanel::SetCampaignByIndex(int index)
 	else
 	{
 		m_TrainingButton->setSelected(true);
-	}
-
-	for (auto button : m_Difficulties)
-	{
-		button->setVisible(true);
 	}
 
 	m_Description->setText(campaign.Description.c_str());
