@@ -54,10 +54,7 @@ target_sources(server PRIVATE
 	vector.h
 	voice_gamemgr.cpp
 	voice_gamemgr.h
-	
-	bot/BotSystem.cpp
-	bot/BotSystem.h
-	
+
 	config/CommandWhitelist.cpp
 	config/CommandWhitelist.h
 	config/ConditionEvaluator.cpp
@@ -135,7 +132,6 @@ target_sources(server PRIVATE
 	entities/triggers.cpp
 	entities/world.cpp
 	entities/world.h
-	entities/xen.cpp
 	
 	entities/ctf/CHUDIconTrigger.cpp
 	entities/ctf/CHUDIconTrigger.h
