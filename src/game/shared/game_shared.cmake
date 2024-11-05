@@ -3,6 +3,8 @@ function(add_game_shared_sources target)
 		PRIVATE
 			${CMAKE_CURRENT_FUNCTION_LIST_DIR}/GameLibrary.cpp
 			${CMAKE_CURRENT_FUNCTION_LIST_DIR}/GameLibrary.h
+			${CMAKE_CURRENT_FUNCTION_LIST_DIR}/config_system.cpp
+			${CMAKE_CURRENT_FUNCTION_LIST_DIR}/config_system.h
 			${CMAKE_CURRENT_FUNCTION_LIST_DIR}/palette.h
 			${CMAKE_CURRENT_FUNCTION_LIST_DIR}/ProjectInfoSystem.cpp
 			${CMAKE_CURRENT_FUNCTION_LIST_DIR}/ProjectInfoSystem.h

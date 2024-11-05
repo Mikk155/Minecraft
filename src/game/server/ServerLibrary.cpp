@@ -32,6 +32,7 @@
 #include "ServerConfigContext.h"
 #include "ServerLibrary.h"
 #include "skill.h"
+#include "config_system.h"
 #include "UserMessages.h"
 #include "voice_gamemgr.h"
 
@@ -587,6 +588,7 @@ void ServerLibrary::LoadServerConfigFiles()
 	sentences::g_Sentences.LoadSentences(context.SentencesFiles);
 	g_MaterialSystem.LoadMaterials(context.MaterialsFiles);
 	g_Skill.LoadSkillConfigFiles(context.SkillFiles);
+	g_Cfg.LoadConfigFiles();
 
 	// Override skill vars with cvars if they are enabled only.
 	if (sv_infinite_ammo.value != 0)

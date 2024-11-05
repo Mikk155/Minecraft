@@ -15,8 +15,8 @@
 	}
 	"3"
 	{
-		"label" "#GameUI_CampaignSelect"
-		"command" "engine disconnect; maxplayers 1; map hlu_campaignselect"
+		"label" "Test maps"
+		"command" "engine disconnect; maxplayers 1; map test_sky"
 	}
 	"4"
 	{
@@ -38,25 +38,9 @@
 		"command" ""
 		"OnlyInGame" "1"
 	}
-	//"7"
-	//{
-	//	"label" "#GameUI_GameMenu_NewGame"
-	//	"command" "OpenNewGameDialog"
-	//	"notmulti" "1"
-	//}
-	"8"
-	{
-		"label" "#GameUI_GameMenu_LoadGame"
-		"command" "OpenLoadGameDialog"
-		"notmulti" "1"
-	}
-	"9"
-	{
-		"label" "#GameUI_GameMenu_SaveGame"
-		"command" "OpenSaveGameDialog"
-		"notmulti" "1"
-		"OnlyInGame" "1"
-	}
+//	"7"
+//	"8"
+//	"9"
 	"10"
 	{
 		"label" ""
@@ -76,11 +60,6 @@
 		"notsingle" "1"
 	}
 //	"13"
-//	{
-//		"name" "LoadDemo"
-//		"label" "#GameUI_GameMenu_PlayDemo"
-//		"command" "OpenLoadDemoDialog"
-//	}
 	"14"
 	{
 		"label" ""
@@ -88,13 +67,6 @@
 		"notsingle" "1"
 	}
 	//"15"
-	//{
-	//	"label" "#GameUI_GameMenu_ChangeGame"
-	//	"command" "OpenChangeGameDialog"
-	//	"notsteam" "1"
-	//	"notsingle" "1"
-	//	"notmulti" "1"
-	//}
 	"16"
 	{
 		"label" "#GameUI_GameMenu_Options"
