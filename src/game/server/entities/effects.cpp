@@ -2352,3 +2352,8 @@ void CWarpBall::BallThink()
 		m_flLastTime = gpGlobals->time;
 	}
 }
+
+//=========================================================
+// LRC - env_sky, an unreal tournament-style sky effect
+//=========================================================
+LINK_ENTITY_TO_CLASS(env_sky, CPointEntity);

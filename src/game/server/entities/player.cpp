@@ -135,6 +135,11 @@ DEFINE_FIELD(m_SuitLightType, FIELD_INTEGER),
 	// in the split second between spawning and the first update.
 	DEFINE_FIELD(m_FireSpawnTarget, FIELD_BOOLEAN),
 
+	//!New
+	DEFINE_FIELD(viewEntity, FIELD_STRING),
+	DEFINE_FIELD(viewFlags, FIELD_INTEGER),
+	DEFINE_FIELD(viewNeedsUpdate, FIELD_INTEGER),
+
 	DEFINE_FUNCTION(PlayerDeathThink),
 
 	// DEFINE_FIELD(m_fDeadTime, FIELD_FLOAT), // only used in multiplayer games
@@ -3867,6 +3872,29 @@ void CBasePlayer::UpdateClientData()
 			if (g_pGameRules->IsMultiplayer())
 			{
 				FireTargets("game_playerjoin", this, this, USE_TOGGLE, 0);
+			}
+		}
+
+		//! New
+		{
+			// g-cont. found env sky and send message all players
+			CBaseEntity* pSky = UTIL_FindEntityByClassname(NULL, "env_sky");
+			if (!FNullEnt(pSky))
+			{
+				MESSAGE_BEGIN(MSG_ONE, gmsgSetSky, nullptr, this);
+				WRITE_BYTE(1);					  // mode
+				WRITE_COORD(pSky->pev->origin.x); // view position
+				WRITE_COORD(pSky->pev->origin.y);
+				WRITE_COORD(pSky->pev->origin.z);
+				MESSAGE_END();
+
+				// g-cont. found all skyents
+				edict_t* pent = UTIL_EntitiesInPVS(pSky->edict());
+				while (!FNullEnt(pent))
+				{
+					SetBits(pent->v.flags, FL_IMMUNE_WATER); // hack
+					pent = pent->v.chain;
+				}
 			}
 		}
 

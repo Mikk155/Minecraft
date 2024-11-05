@@ -484,6 +484,62 @@ void V_CalcNormalRefdef(ref_params_t* pparams)
 	Vector camAngles, camForward, camRight, camUp;
 	cl_entity_t* pwater;
 
+	//!New
+	//! #define SKY_OFF 0
+	//! #define SKY_ON 1
+	//!
+	static struct model_t* savedviewmodel;
+	{
+		// LRC - if this is the second pass through, then we've just drawn the sky, and now we're setting up the normal view.
+		if (pparams->nextView == 1)
+		{
+			view = gEngfuncs.GetViewModel();
+			view->model = savedviewmodel;
+			pparams->viewangles[0] = v_angles.x;
+			pparams->viewangles[1] = v_angles.y;
+			pparams->viewangles[2] = v_angles.z;
+			pparams->vieworg[0] = v_origin.x;
+			pparams->vieworg[1] = v_origin.y;
+			pparams->vieworg[2] = v_origin.z;
+			pparams->nextView = 0;
+
+			if (gHUD.m_SetSky.viewFlags & 1)
+			{
+				cl_entity_t* viewentity;
+				viewentity = gEngfuncs.GetEntityByIndex(gHUD.m_SetSky.viewEntityIndex);
+
+				if (viewentity)
+				{
+					if (gHUD.m_SetSky.viewFlags & 8)
+					{
+						studiohdr_t* viewmonster = (studiohdr_t*)IEngineStudio.Mod_Extradata(viewentity->model);
+						if (viewmonster)
+						{
+							pparams->vieworg[0] = viewmonster->eyeposition[0];
+							pparams->vieworg[1] = viewmonster->eyeposition[1];
+							pparams->vieworg[2] = viewmonster->eyeposition[2];
+						}
+						else
+						{
+							pparams->vieworg[0] = viewentity->origin[0];
+							pparams->vieworg[1] = viewentity->origin[1];
+							pparams->vieworg[2] = viewentity->origin[2];
+						}
+					}
+
+					if (gHUD.m_SetSky.viewFlags & 4)
+						pparams->viewangles[0] = -viewentity->angles[0];
+					else
+						pparams->viewangles[0] = viewentity->angles[0];
+
+					pparams->viewangles[1] = viewentity->angles[1];
+					pparams->viewangles[2] = viewentity->angles[2];
+				}
+			}
+			return;
+		}
+	}
+
 	V_DriftPitch(pparams);
 
 	if (0 != gEngfuncs.IsSpectateOnly())
@@ -498,6 +554,15 @@ void V_CalcNormalRefdef(ref_params_t* pparams)
 
 	// view is the weapon model (only visible from inside body )
 	view = gEngfuncs.GetViewModel();
+
+	//!New
+	{
+		if (gHUD.m_SetSky.m_iSkyMode == 1) //1
+		{
+			savedviewmodel = view->model;
+			view->model = NULL;
+		}
+	}
 
 	// transform the view offset by the model's matrix to get the offset from
 	// model origin for the view
@@ -816,11 +881,71 @@ void V_CalcNormalRefdef(ref_params_t* pparams)
 			v_angles = pparams->viewangles;
 		}
 	}
-
 	lasttime = pparams->time;
 
 	v_origin = pparams->vieworg;
 	v_crosshairangle = pparams->crosshairangle;
+
+	//! New
+	{
+		if (gHUD.m_SetSky.viewFlags & 1 && gHUD.m_SetSky.m_iSkyMode == 0) // custom view active (trigger_viewset)
+		{
+			cl_entity_t* viewentity;
+			viewentity = gEngfuncs.GetEntityByIndex(gHUD.m_SetSky.viewEntityIndex);
+
+			if (viewentity)
+			{
+				if (gHUD.m_SetSky.viewFlags & 8)
+				{
+					// use monster eye position
+					studiohdr_t* viewmonster = (studiohdr_t*)IEngineStudio.Mod_Extradata(viewentity->model);
+					if (viewmonster)
+					{
+						pparams->vieworg[0] = viewmonster->eyeposition[0] + viewentity->origin[0];
+						pparams->vieworg[1] = viewmonster->eyeposition[1] + viewentity->origin[1];
+						pparams->vieworg[2] = viewmonster->eyeposition[2] + viewentity->origin[2];
+					}
+				}
+				else
+				{
+					pparams->vieworg[0] = viewentity->origin[0];
+					pparams->vieworg[1] = viewentity->origin[1];
+					pparams->vieworg[2] = viewentity->origin[2];
+				}
+				if (gHUD.m_SetSky.viewFlags & 4)
+					pparams->viewangles[0] = -viewentity->angles[0];
+				else
+					pparams->viewangles[0] = viewentity->angles[0];
+
+				pparams->viewangles[1] = viewentity->angles[1];
+				pparams->viewangles[2] = viewentity->angles[2];
+			}
+		}
+
+		if (gHUD.m_SetSky.m_iSkyMode == 1 && pparams->nextView == 0)
+		{
+			pparams->vieworg[0] = gHUD.m_SetSky.m_vecSkyPos.x;
+			pparams->vieworg[1] = gHUD.m_SetSky.m_vecSkyPos.y;
+			pparams->vieworg[2] = gHUD.m_SetSky.m_vecSkyPos.z;
+
+			if (gHUD.m_SetSky.viewFlags & 1)
+			{
+				cl_entity_t* viewentity;
+				viewentity = gEngfuncs.GetEntityByIndex(gHUD.m_SetSky.viewEntityIndex);
+				if (viewentity)
+				{
+					if (gHUD.m_SetSky.viewFlags & 4)
+						pparams->viewangles[0] = -viewentity->angles[0];
+					else
+						pparams->viewangles[0] = viewentity->angles[0];
+
+					pparams->viewangles[1] = viewentity->angles[1];
+					pparams->viewangles[2] = viewentity->angles[2];
+				}
+			}
+			pparams->nextView = 1;
+		}
+	}
 }
 
 void V_SmoothInterpolateAngles(Vector& startAngle, Vector& endAngle, Vector& finalAngle, float degreesPerSec)

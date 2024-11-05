@@ -1414,6 +1414,20 @@ void SetupVisibility(edict_t* pViewEntity, edict_t* pClient, unsigned char** pvs
 		pView = pViewEntity;
 	}
 
+	//!New
+	{
+		CBasePlayer * pPlayer = (CBasePlayer *)CBaseEntity::Instance(pClient);
+		CBaseEntity* pEntity = CBaseEntity::Instance(pViewEntity);
+
+		if (pPlayer && pEntity)
+		{
+			MESSAGE_BEGIN(MSG_ONE, gmsgCamData, nullptr, pPlayer);
+			WRITE_SHORT(pEntity->entindex());
+			WRITE_SHORT(pPlayer->viewFlags |= 8);
+			MESSAGE_END();
+		}
+	}
+
 	if ((pClient->v.flags & FL_PROXY) != 0)
 	{
 		*pvs = nullptr; // the spectator proxy sees
@@ -1484,10 +1498,10 @@ int AddToFullPack(entity_state_t* state, int e, edict_t* ent, edict_t* host, int
 	{
 		if (!ENGINE_CHECK_VISIBILITY((const edict_t*)ent, pSet))
 		{
-			return 0;
+			//if (!(ent->v.flags & FL_IMMUNE_WATER)) // hack ? Que hack pedazo de pelotudo
+				return 0;
 		}
 	}
-
 
 	// Don't send entity to local client if the client says it's predicting the entity itself.
 	if ((ent->v.flags & FL_SKIPLOCALHOST) != 0)

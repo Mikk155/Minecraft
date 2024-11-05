@@ -302,7 +302,7 @@ target_sources(client PRIVATE
 	../../public/keydefs.h
 	../../public/cl_dll/IGameClientExports.h
 	../../public/steam/steamtypes.h
-)
+ "ui/hud/setsky.cpp")
 
 add_game_shared_sources(client)
 

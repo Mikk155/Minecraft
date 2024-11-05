@@ -86,4 +86,8 @@ inline int gmsgFog = 0;
 
 inline int gmsgClientGibs = 0;
 
+//!New
+inline int gmsgSetSky = 0; // LRC
+inline int gmsgCamData = 0; // LRC
+
 void LinkUserMessages();

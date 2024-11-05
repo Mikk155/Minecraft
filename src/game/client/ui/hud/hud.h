@@ -707,6 +707,23 @@ struct HudSprite
 	HSPRITE Handle{0};
 };
 
+/**
+ *	@brief env_sky
+ */
+class CHudSetSky : public CHudBase
+{
+public:
+	bool Init() override;
+	void MsgFunc_SetSky(const char* pszName, BufferReader& reader);
+	void MsgFunc_CamData(const char* pszName, BufferReader& reader);
+
+public:
+	int viewEntityIndex;
+	int viewFlags;
+	int m_iSkyMode;
+	Vector m_vecSkyPos;
+};
+
 class CHud
 {
 private:
@@ -817,6 +834,9 @@ public:
 	CHudProjectInfo m_ProjectInfo;
 	CHudDebugInfo m_DebugInfo;
 	CHudEntityInfo m_EntityInfo;
+
+	//!New
+	CHudSetSky m_SetSky;
 
 	void Init();
 	void Shutdown();

@@ -275,6 +275,11 @@ public:
 	float m_flShieldTime;
 	float m_flJumpTime;
 
+	//!New
+	string_t viewEntity;
+	int viewFlags;
+	int viewNeedsUpdate;
+
 	// usable player weapons
 	CBasePlayerWeapon* m_rgpPlayerWeapons[MAX_WEAPON_SLOTS];
 	CBasePlayerWeapon* m_pActiveWeapon;

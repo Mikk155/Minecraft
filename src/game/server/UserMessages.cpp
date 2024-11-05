@@ -91,4 +91,8 @@ void LinkUserMessages()
 	gmsgFog = REG_USER_MSG("Fog", 14);
 
 	gmsgClientGibs = REG_USER_MSG("ClientGibs", 18);
+
+	//!New
+	gmsgSetSky = REG_USER_MSG("SetSky", 7); // LRC | 1(byte) + 2(vec.x) + 2(vec.y) + 2(vec.z)
+	gmsgCamData = REG_USER_MSG("CamData", -1); // LRC
 }

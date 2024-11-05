@@ -1,0 +1,33 @@
+{
+	"configurations": [
+		{
+			"name": "Win32-Debug",
+			"generator": "Visual Studio 17 2022",
+			"configurationType": "Release",
+			"inheritEnvironments": [],
+			"buildRoot": "${projectDir}\\out\\build\\${name}",
+			"installRoot": "D:\\SteamLibrary\\steamapps\\common\\Half-Life\\mc",
+			"cmakeCommandArgs": "",
+			"buildCommandArgs": "",
+			"ctestCommandArgs": "",
+			"cmakeToolchain": "D:/Repositorio/MC-Unity/Minecraft-Survival/cmake/WindowsToolchain.cmake",
+			"variables": [
+				{
+					"name": "CMAKE_GENERATOR_PLATFORM",
+					"value": "Win32",
+					"type": "STRING"
+				},
+				{
+					"name": "HalfLife_DEVELOPER_LEVEL",
+					"value": "1",
+					"type": "STRING"
+				},
+				{
+					"name": "HalfLife_ENABLE_DEV_MODE",
+					"value": "True",
+					"type": "BOOL"
+				}
+			]
+		}
+	]
+}
