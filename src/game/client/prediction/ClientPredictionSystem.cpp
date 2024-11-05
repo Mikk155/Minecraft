@@ -317,12 +317,6 @@ void ClientPredictionSystem::WeaponsPostThink(local_state_t* from, local_state_t
 	//  over the wire ( fixes some animation glitches )
 	if (g_runfuncs && (HUD_GetWeaponAnim() != to->client.weaponanim))
 	{
-		// Make sure the 357 has the right body
-		if (pWeapon->ClassnameIs("weapon_357"))
-		{
-			pWeapon->pev->body = g_Skill.GetValue("revolver_laser_sight") != 0 ? 1 : 0;
-		}
-
 		// Force a fixed anim down to viewmodel
 		HUD_SendWeaponAnim(to->client.weaponanim, pWeapon->pev->body, true);
 	}

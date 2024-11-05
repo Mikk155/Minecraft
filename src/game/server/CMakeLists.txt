@@ -119,7 +119,6 @@ target_sources(server PRIVATE
 	entities/monsterevent.h
 	entities/mortar.cpp
 	entities/observer.cpp
-	entities/op4mortar.cpp
 	entities/pathcorner.cpp
 	entities/plats.cpp
 	entities/player.cpp

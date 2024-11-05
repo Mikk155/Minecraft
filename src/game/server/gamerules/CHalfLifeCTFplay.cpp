@@ -379,16 +379,6 @@ void FlushCTFPowerupTimes()
 		}
 	}
 
-	for (auto pItem : UTIL_FindEntitiesByClassname<CItemRegenerationCTF>("item_ctfregeneration"))
-	{
-		auto pPlayer = ToBasePlayer(pItem->pev->owner);
-
-		if (pPlayer)
-		{
-			pPlayer->m_flHealthTime += gpGlobals->time - pItem->m_flPickupTime;
-		}
-	}
-
 	for (auto pItem : UTIL_FindEntitiesByClassname<CItemBackpackCTF>("item_ctfbackpack"))
 	{
 		auto pPlayer = ToBasePlayer(pItem->pev->owner);

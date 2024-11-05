@@ -5,6 +5,7 @@
 		"label" "#GameUI_GameMenu_ResumeGame"
 		"command" "ResumeGame"
 		"OnlyInGame" "1"
+		"notsingle" "1"
 	}
 	"2"
 	{
@@ -24,13 +25,11 @@
 	{
 		"label" "#GameUI_GameMenu_FindServers"
 		"command" "OpenServerBrowser"
-		"notsingle" "1"
 	}
 	"5"
 	{
 		"label" "#GameUI_GameMenu_CreateServer"
 		"command" "OpenCreateMultiplayerGameDialog"
-		"notsingle" "1"
 	}
 	"6"
 	{

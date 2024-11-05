@@ -93,9 +93,6 @@ enum USE_TYPE : int
 #define GIB_NEVER 1	 // never gib, no matter how much death damage is done ( freezing, etc )
 #define GIB_ALWAYS 2 // always gib ( Houndeye Shock, Barnacle Bite )
 
-// TODO: 4 is used as a magic number in FireBullets(Player) above. Refactor.
-#define TRACER_FREQ 4 // Tracers fire every 4 bullets
-
 void FireTargets(const char* targetName, CBaseEntity* pActivator, CBaseEntity* pCaller, USE_TYPE useType, float value);
 
 /**
@@ -404,22 +401,6 @@ public:
 	bool ShouldToggle(USE_TYPE useType, bool currentState);
 
 	/**
-	 *	@brief Go to the trouble of combining multiple pellets into a single damage call.
-	 *	This version is used by Monsters.
-	 */
-	void FireBullets(unsigned int cShots, Vector vecSrc, Vector vecDirShooting, Vector vecSpread,
-		float flDistance, int iBulletType,
-		int iTracerFreq = 4, int iDamage = 0, CBaseEntity* attacker = nullptr);
-
-	/**
-	 *	@brief Go to the trouble of combining multiple pellets into a single damage call.
-	 *	This version is used by Players, uses the random seed generator to sync client and server side shots.
-	 */
-	Vector FireBulletsPlayer(unsigned int cShots, Vector vecSrc, Vector vecDirShooting, Vector vecSpread,
-		float flDistance, int iBulletType,
-		int iTracerFreq = 4, int iDamage = 0, CBaseEntity* attacker = nullptr, int shared_rand = 0);
-
-	/**
 	 *	@brief If self.delay is set, a delayed_use entity will be created that will actually
 	 *	do the SUB_UseTargets after that many seconds have passed.
 	 *	Removes all entities with a targetname that match self.killtarget,
@@ -576,11 +557,6 @@ public:
 	 *	@brief returns true if a line can be traced from the caller's eyes to the target vector
 	 */
 	virtual bool FVisible(const Vector& vecOrigin);
-
-	static float GetSkillFloat(std::string_view name)
-	{
-		return g_Skill.GetValue(name);
-	}
 
 	// Sound playback.
 	void EmitSound(int channel, const char* sample, float volume, float attenuation);

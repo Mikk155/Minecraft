@@ -463,16 +463,5 @@ void CBasePlayerWeapon::AdjustMagazine1(int count)
 		return;
 	}
 
-	if (count < 0)
-	{
-		// Subtract from reserve ammo first.
-		if (g_Skill.GetValue("bottomless_magazines") != 0)
-		{
-			const int amountAdjusted = m_pPlayer->AdjustAmmoByIndex(m_iPrimaryAmmoType, count);
-
-			count -= amountAdjusted;
-		}
-	}
-
 	m_iClip = std::clamp(m_iClip + count, 0, iMaxClip());
 }

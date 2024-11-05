@@ -45,11 +45,6 @@ int CBasePlayer::GetAmmoCountByIndex(int ammoIndex) const
 		return -1;
 	}
 
-	if (g_Skill.GetValue("infinite_ammo") != 0)
-	{
-		return g_AmmoTypes.GetByIndex(ammoIndex)->MaximumCapacity;
-	}
-
 	return m_rgAmmo[ammoIndex];
 }
 
@@ -65,11 +60,6 @@ void CBasePlayer::SetAmmoCountByIndex(int ammoIndex, int count)
 		return;
 	}
 
-	if (g_Skill.GetValue("infinite_ammo") != 0)
-	{
-		count = g_AmmoTypes.GetByIndex(ammoIndex)->MaximumCapacity;
-	}
-
 	m_rgAmmo[ammoIndex] = std::max(0, count);
 }
 
@@ -81,12 +71,6 @@ int CBasePlayer::AdjustAmmoByIndex(int ammoIndex, int count)
 	}
 
 	const auto ammoType = g_AmmoTypes.GetByIndex(ammoIndex);
-
-	if (g_Skill.GetValue("infinite_ammo") != 0)
-	{
-		m_rgAmmo[ammoIndex] = ammoType->MaximumCapacity;
-		return count;
-	}
 
 	// Don't allow ammo to overflow capacity.
 	const int old = m_rgAmmo[ammoIndex];
