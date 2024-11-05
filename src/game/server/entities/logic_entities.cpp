@@ -15,7 +15,6 @@
 
 #include "cbase.h"
 #include "UserMessages.h"
-#include "config/CommandWhitelist.h"
 
 class CLogicSetCVar : public CPointEntity
 {
@@ -69,15 +68,6 @@ void CLogicSetCVar::Use(CBaseEntity* pActivator, CBaseEntity* pCaller, USE_TYPE 
 	const auto cvarValue = STRING(m_CVarValue);
 
 	Logger->trace("{}:{}:{}: Attempting to set cvar", GetClassname(), entindex(), GetTargetname());
-
-	// Commands should be evaluated on execution in case we've saved and restored and the whitelist has changed.
-	if (!g_CommandWhitelist.contains(cvarName))
-	{
-		Logger->error(
-			"The console variable \"{} {}\" cannot be changed because it is not listed in the command whitelist",
-			cvarName, cvarValue);
-		return;
-	}
 
 	if (!m_CVar)
 	{

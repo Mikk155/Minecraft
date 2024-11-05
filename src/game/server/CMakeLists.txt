@@ -55,15 +55,12 @@ target_sources(server PRIVATE
 	voice_gamemgr.cpp
 	voice_gamemgr.h
 
-	config/CommandWhitelist.cpp
-	config/CommandWhitelist.h
 	config/ConditionEvaluator.cpp
 	config/ConditionEvaluator.h
 	config/GameConfigIncludeStack.h
 	config/GameConfig.cpp
 	config/GameConfig.h
 	config/sections/BaseFileNamesListSection.h
-	config/sections/CommandsSection.h
 	config/sections/CrosshairColorSection.h
 	config/sections/EchoSection.h
 	config/sections/EntityClassificationsSection.h
