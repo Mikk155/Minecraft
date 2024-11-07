@@ -21,7 +21,7 @@
 #include "world.h"
 #include "sound/ServerSoundSystem.h"
 #include "utils/ReplacementMaps.h"
-#include "minecraft.h"
+#include "CMinecraft.h"
 
 static void SetObjectCollisionBox(entvars_t* pev);
 
@@ -641,8 +641,8 @@ bool CBaseEntity::TakeDamage(CBaseEntity* inflictor, CBaseEntity* attacker, floa
 	if( pev->takedamage == DAMAGE_NO || !IsAlive() || FBitSet( pev->flags, FL_GODMODE ) )
 		return false;
 
-	if( bitsDamageType == DMG_MC_FIRE && effects.find(minecraft::effect::fire_resistance) != effects.end() )
-		return false;
+//	if( bitsDamageType == DMG_MC_FIRE && effects.find(effect::fire_resistance) != effects.end() )
+//		return false;
 
 	float flAdditionalKnockBack = 0;
 
@@ -681,7 +681,7 @@ bool CBaseEntity::TakeDamage(CBaseEntity* inflictor, CBaseEntity* attacker, floa
 				}
 				else if( FStrEq( szEnchant, "Bane of Arthropods" ) )
 				{
-					if( std::find( std::begin( minecraft::arthropods ), std::end( minecraft::arthropods ), GetClassname() ) != std::end( minecraft::arthropods ) )
+					if( IsArthropod() )
 					{
 						// -MC Apply slowness
 						flDamage += ( 2.5 * iLevel );
@@ -689,7 +689,7 @@ bool CBaseEntity::TakeDamage(CBaseEntity* inflictor, CBaseEntity* attacker, floa
 				}
 				else if( FStrEq( szEnchant, "Smite" ) )
 				{
-					if( std::find( std::begin( minecraft::undead ), std::end( minecraft::undead ), GetClassname() ) != std::end( minecraft::undead ) )
+					if( IsUndead() )
 					{
 						flDamage += ( 2.5 * iLevel );
 					}
@@ -750,10 +750,11 @@ bool CBaseEntity::TakeDamage(CBaseEntity* inflictor, CBaseEntity* attacker, floa
 			}
 		}
 
-		if( inflictor->durability != minecraft::FUnbreakable ) {
+		if( !FUnbreakable( inflictor->durability ) ) {
 			inflictor->durability--;
 		if( inflictor->durability <= 0 )
-			inflictor->DestroyItem();
+		// -MC Break sound
+			UTIL_Remove( inflictor );
 		}
 
 		pev->dmg_inflictor = inflictor->edict();
@@ -1052,63 +1053,9 @@ void CBaseEntity::StopSound(int channel, const char* sample)
 	sound::g_ServerSound.EmitSound(this, channel, sample, 0, 0, SND_STOP, PITCH_NORM);
 }
 
-CBaseEntity* CBaseEntity::FindInventoryItem(const char* pszItemName, const int iInventoryIndex)
-{
-	CBaseEntity* pItem = nullptr;
-
-	minecraft::inventory* pInventory;
-
-	if( iInventoryIndex >= 0 )
-	{
-		pInventory = &inventory[iInventoryIndex];
-		pItem = pInventory->pItem;
-	}
-	else if( pszItemName != nullptr )
-	{
-		for( size_t i = 0; i < inventory.size(); ++i )
-		{
-			pInventory = &inventory[i];
-
-			if( pInventory->pItem != nullptr && FStrEq( pInventory->pItem->GetClassname(), pszItemName ) )
-			{
-				pItem = pInventory->pItem;
-			}
-		}
-	}
-
-	return pItem;
-}
-
-void CBaseEntity::ApplyEffect( std::string_view name, int level, float end, float time )
-{
-	std::string_view key = fmt::format( "{} {}", name, minecraft::level( level ));
-
-	auto it = effects.find( key );
-
-	if( it != effects.end() )
-	{
-		if( end > it->second->end )
-		{
-			it->second->end = end;
-			// Re-send to client
-			it->second->should_update = true;
-		}
-	}
-	else
-	{
-		effects[ key ] = std::make_unique<minecraft::effects>( name, level, end, time );
-	}
-}
-
 void CBaseEntity::effect_fire(int level, CBaseEntity* inflictor, CBaseEntity* attacker)
 {
 	TakeDamage(inflictor, attacker, 0.5, DMG_MC_FIRE);
-}
-
-void CBaseEntity::DestroyItem()
-{
-	// -MC Play break sound
-	UTIL_Remove(this);
 }
 
 int CBaseEntity::GetConfiguration(const char* pszConfigFileName)

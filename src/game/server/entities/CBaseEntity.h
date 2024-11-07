@@ -24,7 +24,7 @@
 #include "util.h"
 #include "DataMap.h"
 #include "EntityClassificationSystem.h"
-#include "minecraft.h"
+#include "CMinecraft.h"
 
 class CBaseEntity;
 class CBaseItem;
@@ -595,26 +595,25 @@ public:
 	 */
 	Vector m_SoundOffset{};
 
+	virtual void ActionRightHand(bool* bHandled = nullptr) {}
+	float m_ActionRightHand;
+	virtual void ActionLeftHand() {}
+	float m_ActionLeftHand;
+
 	int enchant_index = 0;
-	// Insert in here minecraft::effect enchantments name
+	// Insert in here effect enchantments name
 	string_t enchant_name[32];
 	// Insert in here minecraft:effect enchantments level
 	string_t enchant_value[32];
 
-	// Effects Dictionary
-	void ApplyEffect( std::string_view name, int level, float end, float time = 0 );
-	std::unordered_map<std::string_view, std::unique_ptr<minecraft::effects>> effects;
+	int durability = Unbreakable;
+	int max_durability = Unbreakable;
 
-	int durability = minecraft::FUnbreakable;
-	int max_durability = minecraft::FUnbreakable;
+	// Whatever a player can interact with this by using ActionRightHand
+	int m_IsUseAble;
 
-	void DestroyItem();
-
-	// Player inventory
-	std::vector<minecraft::inventory> inventory;
-	int inventory_active_item = minecraft::slot::SLOT1;
-	CBaseEntity() : inventory( minecraft::slot::LAST_SLOT ) {}
-	CBaseEntity* FindInventoryItem(const char* pszItemName = nullptr, const int iInventoryIndex = -1 );
+	virtual bool IsArthropod() { return false; }
+	virtual bool IsUndead() { return false; }
 
 	// Various effect handlers, wrote this way so specific classes can override
 	void effect_fire(int level, CBaseEntity* inflictor, CBaseEntity* attacker);

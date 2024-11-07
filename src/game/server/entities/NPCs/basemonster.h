@@ -876,6 +876,16 @@ public:
 	void LimitFollowers(CBaseEntity* pPlayer, int maxFollowers);
 
 	void FollowerUse(CBaseEntity* pActivator, CBaseEntity* pCaller, USE_TYPE useType, float value);
+
+	// Player inventory
+	std::vector<CInventory> inventory;
+
+	InventorySlot m_iActiveItem = InventorySlot::Hotbar1;
+
+	void InventorySelectSlot(int slot);
+	void InventorySwapSlot(int from, int to);
+	void InventoryDropItem(int slot);
+	void InventoryPostFrame();
 };
 
 template <typename Callback>

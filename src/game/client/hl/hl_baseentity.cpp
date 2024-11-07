@@ -292,6 +292,8 @@ int CBasePlayer::GiveAmmo(int iCount, const char* szName) { return 0; }
 void CBasePlayer::AddPoints(int score, bool bAllowNegativeScore) {}
 void CBasePlayer::AddPointsToTeam(int score, bool bAllowNegativeScore) {}
 void CBasePlayer::PostRestore() {}
+void CBasePlayer::ActionRightHand(bool* bHandled) {}
+void CBasePlayer::ActionLeftHand() {}
 
 void ClearMultiDamage() {}
 void ApplyMultiDamage(CBaseEntity* inflictor, CBaseEntity* attacker) {}

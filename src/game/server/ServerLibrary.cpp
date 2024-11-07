@@ -35,10 +35,8 @@
 #include "UserMessages.h"
 #include "voice_gamemgr.h"
 
-#include "config/CommandWhitelist.h"
 #include "config/ConditionEvaluator.h"
 #include "config/GameConfig.h"
-#include "config/sections/CommandsSection.h"
 #include "config/sections/CrosshairColorSection.h"
 #include "config/sections/EchoSection.h"
 #include "config/sections/EntityClassificationsSection.h"
@@ -142,10 +140,6 @@ bool ServerLibrary::Initialize()
 
 				g_engfuncs.pfnSetPhysicsKeyValue(player->edict(), "bj", setting.c_str());
 			} });
-
-	RegisterCommandWhitelistSchema();
-
-	LoadCommandWhitelist();
 
 	CreateConfigDefinitions();
 
@@ -402,7 +396,6 @@ void ServerLibrary::CreateConfigDefinitions()
 
 			// Server configs only get common and command sections. All other configuration is handled elsewhere.
 			sections.push_back(std::make_unique<EchoSection<ServerConfigContext>>());
-			sections.push_back(std::make_unique<CommandsSection<ServerConfigContext>>());
 
 			return sections; }());
 
@@ -411,7 +404,6 @@ void ServerLibrary::CreateConfigDefinitions()
 			std::vector<std::unique_ptr<const GameConfigSection<ServerConfigContext>>> sections;
 
 			sections.push_back(std::make_unique<EchoSection<ServerConfigContext>>());
-			sections.push_back(std::make_unique<CommandsSection<ServerConfigContext>>(&g_CommandWhitelist));
 			sections.push_back(std::make_unique<CrosshairColorSection>());
 			sections.push_back(std::make_unique<SentencesSection>());
 			sections.push_back(std::make_unique<MaterialsSection>());

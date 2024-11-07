@@ -28,7 +28,6 @@
 
 #include "cbase.h"
 #include "changelevel.h"
-#include "CCorpse.h"
 #include "com_model.h"
 #include "client.h"
 #include "customentity.h"
@@ -39,7 +38,7 @@
 #include "UserMessages.h"
 #include "ClientCommandRegistry.h"
 #include "ServerLibrary.h"
-#include "minecraft.h"
+#include "CMinecraft.h"
 
 #include "ctf/ctf_goals.h"
 
@@ -113,21 +112,7 @@ void ClientDisconnect(edict_t* pEntity)
  */
 void respawn(CBasePlayer* player, bool fCopyCorpse)
 {
-	if (g_pGameRules->IsMultiplayer())
-	{
-		if (fCopyCorpse)
-		{
-			// make a copy of the dead body for appearances sake
-			CopyToBodyQue(player);
-		}
-
-		// respawn player
-		player->Spawn();
-	}
-	else
-	{ // restart the entire server
-		SERVER_COMMAND("reload\n");
-	}
+	player->Spawn();
 }
 
 /**
@@ -632,15 +617,35 @@ void SV_CreateClientCommands()
 			} },
 		{.Flags = ClientCommandFlag::Cheat});
 
-	g_ClientCommands.Create("use", [](CBasePlayer* player, const auto& args)
-		{ player->SelectItem(args.Argument(1)); });
-
 	g_ClientCommands.Create("slot", [](CBasePlayer* player, const auto& args)
 	{
 		if( args.Count() > 1 )
 		{
-			player->inventory_active_item = std::clamp( atoi( args.Argument(1) ), minecraft::slot::SLOT1, minecraft::slot::SLOT9 );
+			player->InventorySelectSlot( atoi( args.Argument(1) ) );
 	} } );
+
+	g_ClientCommands.Create("swap", [](CBasePlayer* player, const auto& args)
+	{
+		if( args.Count() > 2 )
+		{
+			player->InventorySwapSlot(atoi(args.Argument(1)),atoi(args.Argument(2)));
+	} } );
+
+	g_ClientCommands.Create("gamemode", [](CBasePlayer* player, const CommandArgs& args)
+	{
+		if( args.Count() > 1 )
+		{
+			switch( atoi( args.Argument(1) ) )
+			{
+				case 0:
+					player->LeaveObserver( player->pev->origin, player->pev->angles );
+				break;
+				case 1:
+					player->StartObserver( player->pev->origin, player->pev->angles );
+				break;
+			}
+		}
+	}, {.Flags = ClientCommandFlag::Cheat} );
 
 	g_ClientCommands.Create("drop", [](CBasePlayer* player, const auto& args)
 	{

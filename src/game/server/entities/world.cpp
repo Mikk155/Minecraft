@@ -18,7 +18,6 @@
  */
 
 #include "cbase.h"
-#include "CCorpse.h"
 #include "nodes.h"
 #include "client.h"
 #include "CHalfLifeCTFplay.h"
@@ -273,8 +272,6 @@ void CWorld::Precache()
 	{
 		Logger->debug("**COULD NOT CREATE SOUNDENT**");
 	}
-
-	InitBodyQue();
 
 	// the area based ambient sounds MUST be the first precache_sounds
 

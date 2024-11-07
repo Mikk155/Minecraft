@@ -70,7 +70,16 @@ void ConfigurationSystem::Shutdown()
 void ConfigurationSystem::LoadConfigFiles()
 {
 #ifndef CLIENT
-	m_config = std::make_unique<json>();
+
+	if( m_config != nullptr )
+	{
+		if( !m_config->empty() )
+			m_config->clear();
+	}
+	else
+	{
+		m_config = std::make_unique<json>();
+	}
 
 	LoadConfigFile( "cfg/player.json" );
 	LoadConfigFile( "cfg/mobs.json" );
