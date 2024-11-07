@@ -103,6 +103,9 @@ jobs:
   #     - name: Install
   #       run: cmake --install ${{github.workspace}}/build --config ${{env.BUILD_TYPE}}
 
+  # -MC Should we really upload it all?
+  # Why not just download the win32 release and insert the linux libraries
+
   #     - name: Zip Binaries
   #       run: zip -r Linux-x86 ${{ env.game }}
 
