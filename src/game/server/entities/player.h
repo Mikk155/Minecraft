@@ -587,6 +587,8 @@ public:
 	void SendScoreInfoAll();
 
 	void ToggleCheat(Cheat cheat);
+	void ActionRightHand(bool* bHandled = nullptr) override;
+	void ActionLeftHand() override;
 };
 
 inline void CBasePlayer::SetWeaponBit(int id)

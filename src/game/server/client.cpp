@@ -38,7 +38,7 @@
 #include "UserMessages.h"
 #include "ClientCommandRegistry.h"
 #include "ServerLibrary.h"
-#include "minecraft.h"
+#include "CMinecraft.h"
 
 #include "ctf/ctf_goals.h"
 
@@ -621,14 +621,14 @@ void SV_CreateClientCommands()
 	{
 		if( args.Count() > 1 )
 		{
-			player->inventory_active_item = std::clamp( atoi( args.Argument(1) ), minecraft::slot::SLOT1, minecraft::slot::SLOT9 );
+			player->InventorySelectSlot( atoi( args.Argument(1) ) );
 	} } );
 
 	g_ClientCommands.Create("swap", [](CBasePlayer* player, const auto& args)
 	{
 		if( args.Count() > 2 )
 		{
-			std::swap( player->inventory[atoi(args.Argument(1))], player->inventory[atoi(args.Argument(2))] );
+			player->InventorySwapSlot(atoi(args.Argument(1)),atoi(args.Argument(2)));
 	} } );
 
 	g_ClientCommands.Create("gamemode", [](CBasePlayer* player, const CommandArgs& args)

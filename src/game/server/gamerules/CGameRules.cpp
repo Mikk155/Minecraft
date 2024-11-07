@@ -310,6 +310,7 @@ void CGameRules::m_pEffectShedule()
 	{
 		auto entity = m_pEffectList[i];
 
+		/*
 		for( size_t e = 0; e < entity->effects.size(); ++e )
 		{
 			auto it = entity->effects.begin();
@@ -318,7 +319,6 @@ void CGameRules::m_pEffectShedule()
 			{
 				auto& effect = it->second;
 
-				/*
 				-MC Client catch
 				if( effect->should_update )
 				{
@@ -332,7 +332,6 @@ void CGameRules::m_pEffectShedule()
 					}
 					effect->should_update = false;
 				}
-				*/
 
 				bool DoEffect = false;
 
@@ -352,14 +351,14 @@ void CGameRules::m_pEffectShedule()
 
 				if( DoEffect )
 				{
-					if( effect->name == minecraft::effect::fire )
+					/*if( effect->name == effect::fire )
 					{
 						entity->effect_fire(effect->level, effect->inflictor, effect->attacker);
 					}
 				}
 
 				// If done remove, otherwise update timer.
-				if( effect->end <= 0 )
+				/*if( effect->end <= 0 )
 				{
 					it = entity->effects.erase(it);
 				}
@@ -370,6 +369,7 @@ void CGameRules::m_pEffectShedule()
 				}
 			}
 		}
+	*/
 	}
 }
 

@@ -1343,27 +1343,6 @@ void CBasePlayer::PlayerUse()
 	WRITE_BYTE((int)m_fOnInventory);
 	MESSAGE_END();
 
-	/*
-	minecraft::inventory* item;
-
-	for( size_t i = 0; i < inventory.size(); ++i )
-	{
-		item = &inventory[i];
-
-		if( item->pItem != nullptr )
-		{
-			MESSAGE_BEGIN( MSG_BROADCAST, gmsgInventory, nullptr, this );
-				WRITE_BYTE( i ); // slot index
-				WRITE_STRING( item->pItem->GetClassname() ); // item name to print info and identify texture
-				WRITE_BYTE( item->amount ); // Amount of items in this slot
-				WRITE_BYTE( item->pItem->enchant_index ); // > 0 if is enchanted to bright and glow the texture
-				// -MC Elije como enviar esta array si en for o en string
-				WRITE_STRING( item->pItem->enchant_name ); // > enchant names
-				WRITE_STRING( item->pItem->enchant_value ); // > enchant values
-			MESSAGE_END();
-		}
-	}
-*/
 	// -MC Open inventory
 }
 
@@ -2999,39 +2978,6 @@ void CBasePlayer::CheatImpulseCommands(int iImpulse)
 
 	switch (iImpulse)
 	{
-	case 101:
-	{
-		const bool hasActiveWeapon = m_pActiveWeapon != nullptr;
-
-		const WeaponSwitchMode savedWepSwitch = m_AutoWepSwitch;
-		m_AutoWepSwitch = WeaponSwitchMode::Never;
-
-		SetHasSuit(true);
-
-		pev->armorvalue = MAX_NORMAL_BATTERY;
-
-		for (auto weapon : g_WeaponDictionary->GetClassNames())
-		{
-			GiveNamedItem(weapon, -1);
-		}
-
-		for (int i = 0; i < g_AmmoTypes.GetCount(); ++i)
-		{
-			auto ammoType = g_AmmoTypes.GetByIndex(i + 1);
-			SetAmmoCount(ammoType->Name.c_str(), ammoType->MaximumCapacity);
-		}
-
-		// Default to the MP5.
-		if (!hasActiveWeapon)
-		{
-			SelectItem("weapon_9mmar");
-		}
-
-		m_AutoWepSwitch = savedWepSwitch;
-
-		break;
-	}
-
 	case 102:
 		// Gibbage!!!
 		// CGib::SpawnRandomGibs(this, 1, true);
@@ -4222,6 +4168,30 @@ void CBasePlayer::SendScoreInfoAll()
 {
 	MESSAGE_BEGIN(MSG_ALL, gmsgScoreInfo);
 	SendScoreInfoMessage(this);
+}
+
+void CBasePlayer::ActionRightHand( bool* bHandled )
+{
+	TraceResult tr;
+
+	Vector start = pev->origin + pev->view_ofs;
+
+	Vector end = start + gpGlobals->v_forward * ( 40 * g_Cfg.GetValue( "player_interaction_distance"sv, 3 ) );
+
+	UTIL_TraceLine( start, end, dont_ignore_monsters, dont_ignore_glass, edict(), &tr );
+
+	if( auto hit = CBaseEntity::Instance( tr.pHit ); hit != nullptr && hit->m_IsUseAble )
+	{
+		hit->Use( this, this, USE_SET, 0 );
+		// -MC Send hit anim
+		*bHandled = true;
+	}
+	m_ActionRightHand = gpGlobals->time + g_Cfg.GetValue( "player_interaction_time"sv, 0.2f );
+}
+
+void CBasePlayer::ActionLeftHand()
+{
+	// -MC Punch
 }
 
 static edict_t* SV_TestEntityPosition(CBaseEntity* ent)

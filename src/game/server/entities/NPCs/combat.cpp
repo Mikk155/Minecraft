@@ -1233,3 +1233,76 @@ void CBaseMonster::MakeDamageBloodDecal(int cCount, float flNoise, TraceResult* 
 		}
 	}
 }
+
+void CBaseMonster::InventorySelectSlot(int slot)
+{
+	m_iActiveItem = static_cast<InventorySlot>(std::clamp(slot,(int)InventorySlot::Hotbar1, (int)InventorySlot::Hotbar9));
+}
+
+void CBaseMonster::InventorySwapSlot(int from, int to)
+{
+	std::swap( inventory[ from ], inventory[ to ] );
+}
+
+void CBaseMonster::InventoryDropItem(int slot)
+{
+	if( auto pItem = inventory[slot].pItem; pItem != nullptr )
+	{
+		// -MC Drop logic
+		pItem = nullptr;
+	}
+}
+
+void CBaseMonster::InventoryPostFrame()
+{
+	auto m_RightHandSlot = inventory[(int)m_iActiveItem].pItem;
+	auto m_LeftHandSlot = inventory[(int)InventorySlot::LeftHand].pItem;
+
+	if( FBitSet( pev->button, IN_ATTACK2 ) )
+	{
+		if( m_ActionRightHand > gpGlobals->time )
+			return;
+
+		bool bHandled = false;
+
+		ActionRightHand( &bHandled );
+
+		if( !bHandled )
+		{
+			if( m_RightHandSlot != nullptr )
+			{
+				m_RightHandSlot->ActionRightHand( &bHandled );
+			}
+
+			if( !bHandled )
+			{
+				if( m_LeftHandSlot != nullptr )
+				{
+					m_LeftHandSlot->ActionRightHand();
+				}
+			}
+		}
+
+		ClearBits( pev->button, IN_ATTACK2 );
+	}
+	else if( FBitSet( pev->button, IN_ATTACK ) )
+	{
+		if( m_ActionLeftHand > gpGlobals->time )
+			return;
+
+		if( m_RightHandSlot != nullptr )
+		{
+			m_RightHandSlot->ActionLeftHand();
+		}
+		if( m_LeftHandSlot != nullptr )
+		{
+			m_LeftHandSlot->ActionLeftHand();
+		}
+		else
+		{
+			ActionLeftHand();
+		}
+
+		ClearBits( pev->button, IN_ATTACK );
+	}
+}
