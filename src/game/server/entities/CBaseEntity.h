@@ -647,21 +647,8 @@ public:
 	// Various effect handlers, wrote this way so specific classes can override
 	void effect_fire(int level, CBaseEntity* inflictor, CBaseEntity* attacker);
 
-	// Configuration file
+	// Configuration file, This overrides g_Cfg.
     std::unique_ptr<json> m_config;
-private:
-	const char* m_CustomConfig = nullptr;
-public:
-	/**
-	 *	@brief Base Entity. All entity types derive from this
-	 *
-	 * ( GetConfiguration == 0 ) no files loaded.
-	 * 
-	 * ( ( GetConfiguration & 1 ) != 0 ) default file loaded.
-	 * 
-	 * ( ( GetConfiguration & 2 ) != 0 ) custom file loaded.
-	*/
-	int GetConfiguration(const char* pszConfigFileName);
 };
 
 inline bool FNullEnt(CBaseEntity* ent) { return (ent == nullptr) || FNullEnt(ent->edict()); }

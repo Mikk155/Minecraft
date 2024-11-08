@@ -552,7 +552,17 @@ bool CBaseEntity::RequiredKeyValue(KeyValueData* pkvd)
 {
 	if( FStrEq( pkvd->szKeyName, "config" ) )
 	{
-		m_CustomConfig = pkvd->szValue;
+		std::optional<json> m_Configuration = g_JSON.LoadJSONFile( fmt::format( "cfg/maps/{}.json", pkvd->szValue ).c_str() );
+
+		if( m_Configuration.has_value() )
+		{
+    		m_config = std::make_unique<json>( m_Configuration.value() );
+		}
+		else
+		{
+			CBaseEntity::Logger->error( "{}:{} failed to load \"cfg/maps/{}.json\".", GetClassname(), entindex(), pkvd->szValue );
+			return false;
+		}
 		return true;
 	}
 	return false;
@@ -1056,50 +1066,4 @@ void CBaseEntity::StopSound(int channel, const char* sample)
 void CBaseEntity::effect_fire(int level, CBaseEntity* inflictor, CBaseEntity* attacker)
 {
 	TakeDamage(inflictor, attacker, 0.5, DMG_MC_FIRE);
-}
-
-int CBaseEntity::GetConfiguration(const char* pszConfigFileName)
-{
-	int iReturnCode = 0;
-
-	const char* szPath = fmt::format( "cfg/entity_config/{}.json", pszConfigFileName ).c_str();
-
-    std::optional<json> m_Configuration = g_JSON.LoadJSONFile( szPath );
-
-    if( m_Configuration.has_value() )
-	{
-        m_config = std::make_unique<json>( m_Configuration.value() );
-		iReturnCode |= 1;
-    }
-	else
-	{
-		m_config = std::make_unique<json>();
-		Logger->error( "{}:{} failed to load \"{}\".", GetClassname(), entindex(), szPath );
-    }
-
-	if( m_CustomConfig != nullptr )
-	{
-		const char* szCustomPath = fmt::format( "cfg/maps/{}.json", m_CustomConfig ).c_str();
-
-		m_Configuration = g_JSON.LoadJSONFile( szCustomPath );
-
-		if( m_Configuration.has_value() )
-		{
-    		std::unique_ptr<json> customConfig = std::make_unique<json>( m_Configuration.value() );
-
-			for( auto it = customConfig->begin(); it != customConfig->end(); ++it )
-			{
-		        (*m_config)[ it.key() ] = it.value();
-			}
-			iReturnCode |= 2;
-		}
-		else
-		{
-			Logger->error( "{}:{} failed to load \"{}\".", GetClassname(), entindex(), szCustomPath );
-		}
-		// No more use, free
-		m_CustomConfig = nullptr;
-	}
-
-	return iReturnCode;
 }

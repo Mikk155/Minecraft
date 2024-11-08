@@ -1,0 +1,14 @@
+{
+	"$schema": "../schema.json",
+    "Class": "Base",
+    "data":
+    {
+        "config":
+        {
+            "variable": "string",
+            "value": "",
+            "title": "Path to a custom config json",
+            "description": "The path is already in 'cfg/maps/' and '.json' is not needed to be defined."
+        }
+    }
+}
