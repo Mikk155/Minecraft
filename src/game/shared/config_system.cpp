@@ -33,25 +33,45 @@ bool ConfigurationSystem::Initialize()
 
 #ifndef CLIENT_DLL
 
+/*
+	-MC Should we really waste resources on this? Seems pointless
+
 	g_ConCommands.CreateCommand(
 		"cfg_find", [this](const auto& args)
 		{
-			if (args.Count() < 2)
+			if( args.Count() < 2 )
 			{
-				Con_Printf("Usage: %s\n", args.Argument(0));
+				Con_Printf("Usage: %s key_name_prefix\n", args.Argument(0) );
 				return;
 			}
 		},
 		CommandLibraryPrefix::No
 	);
+*/
 
 	g_ConCommands.CreateCommand(
-		"cfg_set", [this](const auto& args)
+		"cfg_update", [this](const auto& args)
 		{
-			if (args.Count() != 3)
+			if( args.Count() != 3 )
 			{
-				Con_Printf("Usage: %s\n", args.Argument(0));
-				return;
+				Con_Printf( "Usage: %s key_name value\n", args.Argument(0) );
+			}
+			else if( auto sv = std::string_view( args.Argument(1) ); m_config->contains( sv ) )
+			{
+				if( (*m_config)[ sv ].is_number() )
+				{
+					Con_Printf( "Set key_name %s to float value %f\n", sv, atof( args.Argument(2) ) );
+					SetValue( sv, atof( args.Argument(2) ) );
+				}
+				else
+				{
+					Con_Printf( "Set key_name %s to string value %f\n", sv, args.Argument(2) );
+					SetValue( sv, args.Argument(2) );
+				}
+			}
+			else
+			{
+				Con_Printf( "Unsuported key_name %s\n", args.Argument(1) );
 			}
 		},
 		CommandLibraryPrefix::No
@@ -69,11 +89,13 @@ void ConfigurationSystem::Shutdown()
 
 void ConfigurationSystem::LoadConfigFiles()
 {
-#ifndef CLIENT
+#ifndef CLIENT_DLL
+
+	m_list_logged->clear();
 
 	if( m_config != nullptr )
 	{
-		if( !m_config->empty() )
+		if(!m_config->empty())
 			m_config->clear();
 	}
 	else
@@ -81,6 +103,7 @@ void ConfigurationSystem::LoadConfigFiles()
 		m_config = std::make_unique<json>();
 	}
 
+	// -MC Merge all in one json, for the moment is just as for dev
 	LoadConfigFile( "cfg/player.json" );
 	LoadConfigFile( "cfg/mobs.json" );
 #endif
@@ -106,7 +129,7 @@ void ConfigurationSystem::LoadConfigFile( const char* name )
 
 float ConfigurationSystem::GetValue(std::string_view name, float defaultValue, CBaseEntity* pEntity) const
 {
-#ifndef CLIENT
+#ifndef CLIENT_DLL
 	if( pEntity != nullptr && pEntity->m_config != nullptr && pEntity->m_config->contains( name ) && (*pEntity->m_config)[ name ].is_number() )
 	{
 		return (*pEntity->m_config)[name].get<float>();
@@ -129,7 +152,7 @@ float ConfigurationSystem::GetValue(std::string_view name, float defaultValue, C
 
 std::string_view ConfigurationSystem::GetValue(std::string_view name, const std::string& defaultValue, CBaseEntity* pEntity) const
 {
-#ifndef CLIENT
+#ifndef CLIENT_DLL
 	if( pEntity != nullptr && pEntity->m_config != nullptr && pEntity->m_config->contains( name ) && (*pEntity->m_config)[ name ].is_string() )
 	{
 		return (*pEntity->m_config)[name].get<std::string>();
@@ -150,12 +173,28 @@ std::string_view ConfigurationSystem::GetValue(std::string_view name, const std:
     return defaultValue;
 }
 
-void ConfigurationSystem::SetValue(std::string_view name, float value)
+void ConfigurationSystem::SetValue(std::string_view name, float value, CBaseEntity* pEntity)
 {
+#ifndef CLIENT_DLL
+	if( pEntity != nullptr && pEntity->m_config != nullptr && pEntity->m_config->contains( name ) && (*pEntity->m_config)[ name ].is_string() )
+	{
+		(*pEntity->m_config)[name] = value;	
+		return;
+	}
+#endif
+
 	(*m_config)[name] = value;
 }
 
-void ConfigurationSystem::SetValue(std::string_view name, std::string_view value)
+void ConfigurationSystem::SetValue(std::string_view name, std::string_view value, CBaseEntity* pEntity)
 {
+#ifndef CLIENT_DLL
+	if( pEntity != nullptr && pEntity->m_config != nullptr && pEntity->m_config->contains( name ) && (*pEntity->m_config)[ name ].is_number() )
+	{
+		(*pEntity->m_config)[name] = value;	
+		return;
+	}
+#endif
+
 	(*m_config)[name] = value;
 }
