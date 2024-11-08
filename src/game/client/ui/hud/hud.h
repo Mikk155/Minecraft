@@ -719,7 +719,7 @@ private:
 //
 //-----------------------------------------------------
 //
-//#include "vgui/vgui_InventoryMenuPanel.h"
+#include "vgui/vgui_InventoryMenuPanel.h"
 
 struct HudSprite
 {
@@ -840,7 +840,7 @@ public:
 	CHudDebugInfo m_DebugInfo;
 	CHudEntityInfo m_EntityInfo;
 
-	CHudInventory m_Inventory;
+	//CHudInventory m_Inventory;
 
 	void Init();
 	void Shutdown();
