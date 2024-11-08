@@ -94,6 +94,35 @@ enum USE_TYPE : int
 
 void FireTargets(const char* targetName, CBaseEntity* pActivator, CBaseEntity* pCaller, USE_TYPE useType, float value);
 
+struct DamageInfo
+{
+	CBaseEntity* attacker;
+	float damage;
+	int bits;
+	CBaseEntity* weapon;
+	CBaseEntity* inflictor;
+	Vector direction;
+	TraceResult* tr;
+
+	DamageInfo(
+		CBaseEntity* attacker = nullptr,
+		float damage = 0.0,
+		int bits = 0,
+		CBaseEntity* weapon = nullptr,
+		CBaseEntity* inflictor = nullptr,
+		Vector direction = g_vecZero,
+		TraceResult* tr = nullptr
+	) :
+	attacker(attacker),
+	damage(damage),
+	bits(bits),
+	weapon(weapon),
+	inflictor(inflictor),
+	direction(direction),
+	tr(tr)
+	{}
+};
+
 /**
  *	@brief Base Entity. All entity types derive from this
  */
@@ -294,7 +323,7 @@ public:
 
 	void MaybeNotifyOwnerOfDeath();
 
-	virtual void TraceAttack(CBaseEntity* attacker, float flDamage, Vector vecDir, TraceResult* ptr, int bitsDamageType);
+	virtual void TraceAttack(DamageInfo* info);
 
 	/**
 	 *	@brief inflict damage on this entity.

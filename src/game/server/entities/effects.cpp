@@ -705,7 +705,16 @@ void CBeam::BeamDamage(TraceResult* ptr)
 		if (pHit)
 		{
 			ClearMultiDamage();
-			pHit->TraceAttack(this, pev->dmg * (gpGlobals->time - pev->dmgtime), (ptr->vecEndPos - pev->origin).Normalize(), ptr, DMG_ENERGYBEAM);
+			DamageInfo info(
+				this,
+				pev->dmg * (gpGlobals->time - pev->dmgtime),
+				DMG_ENERGYBEAM,
+				nullptr,
+				nullptr,
+				(ptr->vecEndPos - pev->origin).Normalize(),
+				ptr
+			);
+			pHit->TraceAttack(&info);
 			ApplyMultiDamage(this, this);
 			if ((pev->spawnflags & SF_BEAM_DECALS) != 0)
 			{

@@ -305,7 +305,7 @@ public:
 	virtual void PostThink();
 	Vector GetGunPosition() override;
 	bool GiveHealth(float flHealth, int bitsDamageType) override;
-	void TraceAttack(CBaseEntity* attacker, float flDamage, Vector vecDir, TraceResult* ptr, int bitsDamageType) override;
+	void TraceAttack(DamageInfo* info) override;
 
 	/**
 	 *	@brief NOTE: each call to TakeDamage with bitsDamageType set to

@@ -750,7 +750,7 @@ public:
 	bool GetEnemy();
 
 	void MakeDamageBloodDecal(int cCount, float flNoise, TraceResult* ptr, const Vector& vecDir);
-	void TraceAttack(CBaseEntity* attacker, float flDamage, Vector vecDir, TraceResult* ptr, int bitsDamageType) override;
+	void TraceAttack(DamageInfo* info) override;
 
 	// combat functions
 	/**

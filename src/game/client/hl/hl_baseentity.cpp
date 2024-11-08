@@ -197,7 +197,7 @@ void CBaseAnimating::GetAutomovement(Vector& origin, Vector& angles, float flInt
 void CBaseAnimating::SetBodygroup(int iGroup, int iValue) {}
 int CBaseAnimating::GetBodygroup(int iGroup) const { return 0; }
 Vector CBaseMonster::GetGunPosition() { return g_vecZero; }
-void CBaseEntity::TraceAttack(CBaseEntity* attacker, float flDamage, Vector vecDir, TraceResult* ptr, int bitsDamageType) {}
+void CBaseEntity::TraceAttack(DamageInfo* info) {}
 void CBaseEntity::TraceBleed(float flDamage, Vector vecDir, TraceResult* ptr, int bitsDamageType) {}
 void CBaseMonster::MakeDamageBloodDecal(int cCount, float flNoise, TraceResult* ptr, const Vector& vecDir) {}
 bool CBaseMonster::FGetNodeRoute(Vector vecDest) { return true; }
@@ -217,7 +217,7 @@ void CBaseMonster::CorpseFallThink() {}
 void CBaseMonster::MonsterInitDead() {}
 bool CBaseMonster::BBoxFlat() { return true; }
 bool CBaseMonster::GetEnemy() { return false; }
-void CBaseMonster::TraceAttack(CBaseEntity* attacker, float flDamage, Vector vecDir, TraceResult* ptr, int bitsDamageType) {}
+void CBaseMonster::TraceAttack(DamageInfo* info) {}
 CBaseEntity* CBaseMonster::DropItem(const char* pszItemName, const Vector& vecPos, const Vector& vecAng) { return nullptr; }
 bool CBaseMonster::ShouldFadeOnDeath() { return false; }
 void CBaseMonster::RadiusDamage(CBaseEntity* inflictor, CBaseEntity* attacker, float flDamage, int bitsDamageType, EntityClassification iClassIgnore) {}
@@ -242,7 +242,7 @@ void CBaseMonster::StartFollowing(CBaseEntity* pLeader) {}
 int TrainSpeed(int iSpeed, int iMax) { return 0; }
 void CBasePlayer::DeathSound() {}
 bool CBasePlayer::GiveHealth(float flHealth, int bitsDamageType) { return false; }
-void CBasePlayer::TraceAttack(CBaseEntity* attacker, float flDamage, Vector vecDir, TraceResult* ptr, int bitsDamageType) {}
+void CBasePlayer::TraceAttack(DamageInfo* info) {}
 bool CBasePlayer::TakeDamage(CBaseEntity* inflictor, CBaseEntity* attacker, float flDamage, int bitsDamageType) { return false; }
 void CBasePlayer::PackDeadPlayerItems() {}
 void CBasePlayer::RemoveAllItems(bool removeSuit) {}

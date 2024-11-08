@@ -242,40 +242,40 @@ Vector CBasePlayer::GetGunPosition()
 	return origin;
 }
 
-void CBasePlayer::TraceAttack(CBaseEntity* attacker, float flDamage, Vector vecDir, TraceResult* ptr, int bitsDamageType)
+void CBasePlayer::TraceAttack(DamageInfo* info)
 {
 	if (0 != pev->takedamage)
 	{
-		m_LastHitGroup = ptr->iHitgroup;
+		m_LastHitGroup = info->tr->iHitgroup;
 
-		switch (ptr->iHitgroup)
+		switch (info->tr->iHitgroup)
 		{
 		case HITGROUP_GENERIC:
 			break;
 		case HITGROUP_HEAD:
-			flDamage *= g_Cfg.GetValue( "player_damage_deduction_head"sv, 3 );
+			info->damage *= g_Cfg.GetValue( "player_damage_deduction_head"sv, 3 );
 			break;
 		case HITGROUP_CHEST:
-			flDamage *= g_Cfg.GetValue( "player_damage_deduction_chest"sv, 3 );
+			info->damage *= g_Cfg.GetValue( "player_damage_deduction_chest"sv, 3 );
 			break;
 		case HITGROUP_STOMACH:
-			flDamage *= g_Cfg.GetValue( "player_damage_deduction_stomach"sv, 2 );
+			info->damage *= g_Cfg.GetValue( "player_damage_deduction_stomach"sv, 2 );
 			break;
 		case HITGROUP_LEFTARM:
 		case HITGROUP_RIGHTARM:
-			flDamage *= g_Cfg.GetValue( "player_damage_deduction_arm"sv, 1 );
+			info->damage *= g_Cfg.GetValue( "player_damage_deduction_arm"sv, 1 );
 			break;
 		case HITGROUP_LEFTLEG:
 		case HITGROUP_RIGHTLEG:
-			flDamage *= g_Cfg.GetValue( "player_damage_deduction_leg"sv, 1 );
+			info->damage *= g_Cfg.GetValue( "player_damage_deduction_leg"sv, 1 );
 			break;
 		default:
 			break;
 		}
 
-		SpawnBlood(ptr->vecEndPos, BloodColor(), flDamage); // a little surface blood.
-		TraceBleed(flDamage, vecDir, ptr, bitsDamageType);
-		AddMultiDamage(attacker, this, flDamage, bitsDamageType);
+		//SpawnBlood(ptr->vecEndPos, BloodColor(), flDamage); // a little surface blood.
+		//TraceBleed(flDamage, vecDir, ptr, bitsDamageType);
+		//AddMultiDamage(attacker, this, flDamage, bitsDamageType);
 	}
 }
 

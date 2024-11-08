@@ -912,7 +912,16 @@ void RadiusDamage(Vector vecSrc, CBaseEntity* inflictor, CBaseEntity* attacker, 
 				if (tr.flFraction != 1.0)
 				{
 					ClearMultiDamage();
-					pEntity->TraceAttack(inflictor, flAdjustedDamage, (tr.vecEndPos - vecSrc).Normalize(), &tr, bitsDamageType);
+					DamageInfo info(
+						inflictor,
+						flAdjustedDamage,
+						bitsDamageType,
+						nullptr,
+						nullptr,
+						(tr.vecEndPos - vecSrc).Normalize(),
+						&tr
+					);
+					pEntity->TraceAttack(&info);
 					ApplyMultiDamage(inflictor, attacker);
 				}
 				else
@@ -1055,8 +1064,9 @@ bool CBaseEntity::FVisible(const Vector& vecOrigin)
 	}
 }
 
-void CBaseEntity::TraceAttack(CBaseEntity* attacker, float flDamage, Vector vecDir, TraceResult* ptr, int bitsDamageType)
+void CBaseEntity::TraceAttack(DamageInfo* info)
 {
+	/*
 	Vector vecOrigin = ptr->vecEndPos - vecDir * 4;
 
 	if (0 != pev->takedamage)
@@ -1074,45 +1084,39 @@ void CBaseEntity::TraceAttack(CBaseEntity* attacker, float flDamage, Vector vecD
 			TraceBleed(flDamage, vecDir, ptr, bitsDamageType);
 		}
 	}
+	*/
 }
 
-void CBaseMonster::TraceAttack(CBaseEntity* attacker, float flDamage, Vector vecDir, TraceResult* ptr, int bitsDamageType)
+void CBaseMonster::TraceAttack(DamageInfo* info)
 {
 	if (0 != pev->takedamage)
 	{
-		m_LastHitGroup = ptr->iHitgroup;
+		m_LastHitGroup = info->tr->iHitgroup;
 
-		switch (ptr->iHitgroup)
+		switch (info->tr->iHitgroup)
 		{
 		case HITGROUP_GENERIC:
 			break;
 		case HITGROUP_HEAD:
-			flDamage *= g_Cfg.GetValue( "mob_damage_deduction_head"sv, 3 );
+			info->damage *= g_Cfg.GetValue( "mob_damage_deduction_head"sv, 3 );
 			break;
 		case HITGROUP_CHEST:
-			flDamage *= g_Cfg.GetValue( "mob_damage_deduction_chest"sv, 2 );
+			info->damage *= g_Cfg.GetValue( "mob_damage_deduction_chest"sv, 2 );
 			break;
 		case HITGROUP_STOMACH:
-			flDamage *= g_Cfg.GetValue( "mob_damage_deduction_stomach"sv, 2 );
+			info->damage *= g_Cfg.GetValue( "mob_damage_deduction_stomach"sv, 2 );
 			break;
 		case HITGROUP_LEFTARM:
 		case HITGROUP_RIGHTARM:
-			flDamage *= g_Cfg.GetValue( "mob_damage_deduction_arm"sv, 1 );
+			info->damage *= g_Cfg.GetValue( "mob_damage_deduction_arm"sv, 1 );
 			break;
 		case HITGROUP_LEFTLEG:
 		case HITGROUP_RIGHTLEG:
-			flDamage *= g_Cfg.GetValue( "mob_damage_deduction_leg"sv, 1 );
+			info->damage *= g_Cfg.GetValue( "mob_damage_deduction_leg"sv, 1 );
 			break;
 		default:
 			break;
 		}
-
-		SpawnBlood(ptr->vecEndPos, BloodColor(), flDamage); // a little surface blood.
-		TraceBleed(flDamage, vecDir, ptr, bitsDamageType);
-		if( FNullEnt( attacker->pev->owner ) )
-			AddMultiDamage(attacker, this, flDamage, bitsDamageType);
-		else
-			AddMultiDamage( FNullEnt( attacker->pev->euser1 ) ? attacker : CBaseEntity::Instance( attacker->pev->euser1 ), CBaseEntity::Instance( attacker->pev->owner ), flDamage, bitsDamageType);
 	}
 }
 
