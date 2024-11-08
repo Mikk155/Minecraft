@@ -24,58 +24,6 @@
 #define Unbreakable -100
 #define FUnbreakable( var ) ( var == Unbreakable )
 
-// Sharpness adds 0.5 * level + 0.5 extra damage.
-#define Enchant_sharpness "Sharpness"
-
-/**
-*	@brief Each level on a sword or axe adds 2.5 ♥ × level of extra damage to each hit on arthropods only.
-*
-*	The enchantment also inflicts Slowness IV on an arthropod when hit, with a random duration between 1 and 1.5 seconds at level I increasing the maximum duration by 0.5 seconds at each level, up to 3.5 seconds with Bane of Arthropods V.
-*/
-#define Enchant_bane_of_arthropods "Bane of Arthropods";
-
-/**
-*	@brief Smite increases damage dealt to un-dead mobs.
-*
-*	Each level separately adds 2.5 ♥ × level of extra damage on each hit to undead mobs.
-*/
-#define Enchant_smite "Smite";
-
-/**
-*	@brief Fire Aspect adds 4 seconds of burning per level to the target.
-*
-*	Because the first hit is caused by the item with this enchantment, the first second of fire damage is not recognized. Targets receive 3 ♥ and 6 ♥ damage with level I and II respectively.
-*/
-#define Enchant_fire_aspect "Fire Ascpect";
-
-/**
-*	@brief Life Steal restores health to the attacker in 10% per level of the dealt damage.
-*
-*	This is done before any damage multiplication and after damage deductions.
-*/
-#define Enchant_life_steal "Life Steal";
-
-/**
-*	@brief Critic Chance has a chance of 10% per level to multiply the damage dealth by a random value between 1.0 and 2.0.
-*
-*	This is done before any damage multiplication and after damage deductions.
-*/
-#define Enchant_critical_chance "Critic Chance";
-
-/**
-*	@brief Knock Back will push the hit entity based on the received damage and enchant level.
-*/
-#define Enchant_knockback "Knock Back";
-
-/**
-*	@brief Sweeping Edge Expanding to 512 units from the victim and hurt enemies in the path.
-*
-*   Does 25% (per level) of the original damage on each entity slashed. the formula is done after both the entity and the weapon buffs.
-* 
-*	This uses DMG_SLASH to prevent recursion, use DMG_SLASH safely.
-*/
-#define Enchant_sweeping_edge "Sweeping Edge";
-
 struct CInventory
 {
 	CBaseEntity* pItem;
@@ -102,6 +50,80 @@ enum class InventorySlot : int
 	// Arrows slots, only projectiles for bow and crossbow goes here.
 	Arrows = 42,
 };
+#include <string_view>
+
+struct CEnchantStruct
+{
+    std::string_view name;
+    std::string_view display_name;
+    int max_level;
+
+    constexpr CEnchantStruct(
+		std::string_view name,
+		std::string_view display_name,
+		int max_level
+	) :
+		name(name),
+		display_name(display_name),
+		max_level(max_level)
+	{}
+};
+
+class CEnchants
+{
+	public:
+		// Sharpness adds 0.5 * level + 0.5 extra damage.
+		constexpr static CEnchantStruct sharpness{ "sharpness"sv, "Sharpness"sv, 5 };
+
+		/**
+		*	@brief Each level on a sword or axe adds 2.5 ♥ × level of extra damage to each hit on arthropods only.
+		*
+		*	The enchantment also inflicts Slowness IV on an arthropod when hit, with a random duration between 1 and 1.5 seconds at level I increasing the maximum duration by 0.5 seconds at each level, up to 3.5 seconds with Bane of Arthropods V.
+		*/
+		constexpr static CEnchantStruct bane_of_arthropods{ "bane_of_arthropods"sv, "Bane of Arthropods"sv, 5 };
+
+		/**
+		*	@brief Smite increases damage dealt to un-dead mobs.
+		*
+		*	Each level separately adds 2.5 ♥ × level of extra damage on each hit to undead mobs.
+		*/
+		constexpr static CEnchantStruct smite{ "smite"sv, "Smite"sv, 5 };
+
+		/**
+		*	@brief Fire Aspect adds 4 seconds of burning per level to the target.
+		*
+		*	Because the first hit is caused by the item with this enchantment, the first second of fire damage is not recognized. Targets receive 3 ♥ and 6 ♥ damage with level I and II respectively.
+		*/
+		constexpr static CEnchantStruct fire_aspect{ "fire_aspect"sv, "Fire Ascpect"sv, 2 };
+
+		/**
+		*	@brief Life Steal restores health to the attacker in 10% per level of the dealt damage.
+		*
+		*	This is done before any damage multiplication and after damage deductions.
+		*/
+		constexpr static CEnchantStruct life_steal{ "life_steal"sv, "Life Steal"sv, 5 };
+
+		/**
+		*	@brief Critic Chance has a chance of 10% per level to multiply the damage dealth by a random value between 1.0 and 2.0.
+		*
+		*	This is done before any damage multiplication and after damage deductions.
+		*/
+		constexpr static CEnchantStruct critical_chance{ "critical_chance"sv, "Critic Chance"sv, 7 };
+
+		/**
+		*	@brief Knock Back will push the hit entity based on the received damage and enchant level.
+		*/
+		constexpr static CEnchantStruct knockback{ "knockback"sv, "Knock Back"sv, 2 };
+
+		/**
+		*	@brief Sweeping Edge Expanding to 512 units from the victim and hurt enemies in the path.
+		*
+		*   Does 25% (per level) of the original damage on each entity slashed. the formula is done after both the entity and the weapon buffs.
+		* 
+		*	This uses DMG_SLASH to prevent recursion, use DMG_SLASH safely.
+		*/
+		constexpr static CEnchantStruct sweeping_edge{ "sweeping_edge"sv, "Sweeping Edge"sv, 2 };
+};
 
 /**
  *	@brief Minecraft utilities
@@ -118,7 +140,11 @@ class CMinecraft final
 		// Returns a formatted string using level(int num)
 		std::string format_level(const char* str1, int num = 0);
 
+		static CEnchants Enchants;
+
 	private:
 };
+
+inline CEnchants CMinecraft::Enchants;
 
 inline CMinecraft g_Minecraft;
