@@ -17,8 +17,6 @@
 
 inline int gmsgShake = 0;
 inline int gmsgFade = 0;
-inline int gmsgFlashlight = 0;
-inline int gmsgFlashBattery = 0;
 inline int gmsgResetHUD = 0;
 inline int gmsgInitHUD = 0;
 inline int gmsgShowGameTitle = 0;
@@ -75,8 +73,6 @@ inline int gmsgEntityInfo = 0;
 inline int gmsgEmitSound = 0;
 
 inline int gmsgTempEntity = 0;
-
-inline int gmsgSkillVars = 0;
 
 inline int gmsgCampaignSelect = 0;
 

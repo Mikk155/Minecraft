@@ -70,7 +70,7 @@ bool PersistentInventorySystem::TryApplyToPlayer(CBasePlayer* player)
 		return false;
 	}
 
-	const float gracePeriod = g_Skill.GetValue("coop_persistent_inventory_grace_period", 0);
+	const float gracePeriod = 70; // -MC We really want this?
 
 	// Grace period ended, can't restore.
 	if (gracePeriod != -1 && gpGlobals->time >= (player->m_ConnectTime + std::max(0.f, gracePeriod)))

@@ -641,8 +641,6 @@ void CBasePlayerWeapon::DoRetireWeapon()
 	m_pPlayer->pev->weaponmodel = string_t::Null;
 	// m_pPlayer->pev->viewmodelindex = 0;
 
-	g_pGameRules->GetNextBestWeapon(m_pPlayer, this);
-
 	// If we're still equipped and we couldn't switch to another weapon, dequip this one
 	if (CanHolster() && m_pPlayer->m_pActiveWeapon == this)
 	{

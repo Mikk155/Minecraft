@@ -28,7 +28,6 @@
 
 #include "cbase.h"
 #include "changelevel.h"
-#include "CCorpse.h"
 #include "com_model.h"
 #include "client.h"
 #include "customentity.h"
@@ -39,6 +38,7 @@
 #include "UserMessages.h"
 #include "ClientCommandRegistry.h"
 #include "ServerLibrary.h"
+#include "CMinecraft.h"
 
 #include "ctf/ctf_goals.h"
 
@@ -112,21 +112,7 @@ void ClientDisconnect(edict_t* pEntity)
  */
 void respawn(CBasePlayer* player, bool fCopyCorpse)
 {
-	if (g_pGameRules->IsMultiplayer())
-	{
-		if (fCopyCorpse)
-		{
-			// make a copy of the dead body for appearances sake
-			CopyToBodyQue(player);
-		}
-
-		// respawn player
-		player->Spawn();
-	}
-	else
-	{ // restart the entire server
-		SERVER_COMMAND("reload\n");
-	}
+	player->Spawn();
 }
 
 /**
@@ -586,11 +572,6 @@ void SV_CreateClientCommands()
 			player->GiveNamedItem(STRING(iszItem)); },
 		{.Flags = ClientCommandFlag::Cheat});
 
-	g_ClientCommands.Create("drop", [](CBasePlayer* player, const auto& args)
-		{
-			// player is dropping an item.
-			player->DropPlayerWeapon(args.Argument(1)); });
-
 	g_ClientCommands.Create("fov", [](CBasePlayer* player, const auto& args)
 		{
 			if (0 != g_psv_cheats->value && args.Count() > 1)
@@ -636,36 +617,40 @@ void SV_CreateClientCommands()
 			} },
 		{.Flags = ClientCommandFlag::Cheat});
 
-	g_ClientCommands.Create("set_suit_light_type", [](CBasePlayer* player, const auto& args)
+	g_ClientCommands.Create("slot", [](CBasePlayer* player, const auto& args)
+	{
+		if( args.Count() > 1 )
 		{
-			if (args.Count() > 1)
-			{
-				const auto type = SuitLightTypeFromString(args.Argument(1));
+			player->InventorySelectSlot( atoi( args.Argument(1) ) );
+	} } );
 
-				if (type.has_value())
-				{
-					player->SetSuitLightType(type.value());
-				}
-				else
-				{
-					UTIL_ConsolePrint(player, "Unknown suit light type \"{}\"\n", args.Argument(1));
-				}
-			} },
-		{.Flags = ClientCommandFlag::Cheat});
-
-	g_ClientCommands.Create("use", [](CBasePlayer* player, const auto& args)
-		{ player->SelectItem(args.Argument(1)); });
-
-	g_ClientCommands.Create("selectweapon", [](CBasePlayer* player, const auto& args)
+	g_ClientCommands.Create("swap", [](CBasePlayer* player, const auto& args)
+	{
+		if( args.Count() > 2 )
 		{
-			if (args.Count() > 1)
+			player->InventorySwapSlot(atoi(args.Argument(1)),atoi(args.Argument(2)));
+	} } );
+
+	g_ClientCommands.Create("gamemode", [](CBasePlayer* player, const CommandArgs& args)
+	{
+		if( args.Count() > 1 )
+		{
+			switch( atoi( args.Argument(1) ) )
 			{
-				player->SelectItem(args.Argument(1));
+				case 0:
+					player->LeaveObserver( player->pev->origin, player->pev->angles );
+				break;
+				case 1:
+					player->StartObserver( player->pev->origin, player->pev->angles );
+				break;
 			}
-			else
-			{
-				UTIL_ConsolePrint(player, "usage: selectweapon <weapon name>\n");
-			} });
+		}
+	}, {.Flags = ClientCommandFlag::Cheat} );
+
+	g_ClientCommands.Create("drop", [](CBasePlayer* player, const auto& args)
+	{
+		// -MC drop current item in slot
+	} );
 
 	g_ClientCommands.Create("lastinv", [](CBasePlayer* player, const auto& args)
 		{ player->SelectLastItem(); });
@@ -1286,12 +1271,6 @@ void ClientPrecache()
 	UTIL_PrecacheSound("debris/glass2.wav");
 	UTIL_PrecacheSound("debris/glass3.wav");
 
-	UTIL_PrecacheSound(SOUND_FLASHLIGHT_ON);
-	UTIL_PrecacheSound(SOUND_FLASHLIGHT_OFF);
-
-	UTIL_PrecacheSound(SOUND_NIGHTVISION_ON);
-	UTIL_PrecacheSound(SOUND_NIGHTVISION_OFF);
-
 	// player gib sounds
 	UTIL_PrecacheSound("common/bodysplat.wav");
 
@@ -1326,9 +1305,6 @@ void ClientPrecache()
 
 	// for cheat_givemagazine
 	UTIL_PrecacheSound(DefaultItemPickupSound);
-
-	if (giPrecacheGrunt)
-		UTIL_PrecacheOther("monster_human_grunt");
 }
 
 /**

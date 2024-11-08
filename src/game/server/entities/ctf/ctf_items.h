@@ -128,17 +128,3 @@ public:
 
 	void Spawn() override;
 };
-
-class CItemRegenerationCTF : public CItemCTF
-{
-public:
-	void OnCreate() override;
-
-	void Precache() override;
-
-	void RemoveEffect(CBasePlayer* pPlayer) override;
-
-	bool MyTouch(CBasePlayer* pPlayer) override;
-
-	void Spawn() override;
-};

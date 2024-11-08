@@ -25,7 +25,6 @@
 #include "CHalfLifeCTFplay.h"
 #include "ctf/ctf_goals.h"
 #include "ctf/ctf_items.h"
-#include "items/weapons/CSatchelCharge.h"
 
 #include "pm_shared.h"
 
@@ -377,16 +376,6 @@ void FlushCTFPowerupTimes()
 		if (pPlayer)
 		{
 			pPlayer->m_flShieldTime += gpGlobals->time - pItem->m_flPickupTime;
-		}
-	}
-
-	for (auto pItem : UTIL_FindEntitiesByClassname<CItemRegenerationCTF>("item_ctfregeneration"))
-	{
-		auto pPlayer = ToBasePlayer(pItem->pev->owner);
-
-		if (pPlayer)
-		{
-			pPlayer->m_flHealthTime += gpGlobals->time - pItem->m_flPickupTime;
 		}
 	}
 
@@ -797,16 +786,6 @@ bool CHalfLifeCTFplay::FPlayerCanTakeDamage(CBasePlayer* pPlayer, CBaseEntity* p
 		return false;
 
 	return CHalfLifeMultiplay::FPlayerCanTakeDamage(pPlayer, pAttacker);
-}
-
-bool CHalfLifeCTFplay::ShouldAutoAim(CBasePlayer* pPlayer, CBaseEntity* target)
-{
-	if (target && target->IsPlayer())
-	{
-		return PlayerRelationship(pPlayer, target) != GR_TEAMMATE;
-	}
-
-	return true;
 }
 
 void CHalfLifeCTFplay::PlayerSpawn(CBasePlayer* pPlayer)
@@ -1278,7 +1257,7 @@ void CHalfLifeCTFplay::ChangePlayerTeam(CBasePlayer* pPlayer, const char* pCharN
 		// TODO: check how much of this is handled by newer observer code.
 		if (pPlayer->pev->health <= 0.0)
 		{
-			respawn(pPlayer, false);
+			pPlayer->Spawn();
 		}
 
 		pPlayer->pev->effects |= EF_NODRAW;
@@ -1324,9 +1303,6 @@ void CHalfLifeCTFplay::ChangePlayerTeam(CBasePlayer* pPlayer, const char* pCharN
 		pPlayer->pev->flags &= ~FL_DUCKING;
 		pPlayer->Observer_SetMode(OBS_CHASE_FREE);
 		pPlayer->pev->deadflag = DEAD_RESPAWNABLE;
-
-		if (pPlayer->HasNamedPlayerWeapon("weapon_satchel"))
-			DeactivateSatchels(pPlayer);
 
 		pPlayer->RemoveAllItems(false);
 

@@ -37,8 +37,6 @@ public:
 
 	int PlayerRelationship(CBasePlayer* pPlayer, CBaseEntity* pTarget) override;
 
-	bool ShouldAutoAim(CBasePlayer* pPlayer, CBaseEntity* target) override;
-
 	int IPointsForKill(CBasePlayer* pAttacker, CBasePlayer* pKilled) override;
 
 	int IPointsForMonsterKill(CBasePlayer* pAttacker, CBaseMonster* pKilled) override;

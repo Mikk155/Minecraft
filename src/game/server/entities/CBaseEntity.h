@@ -24,8 +24,7 @@
 #include "util.h"
 #include "DataMap.h"
 #include "EntityClassificationSystem.h"
-#include "skill.h"
-#include "minecraft.h"
+#include "CMinecraft.h"
 
 class CBaseEntity;
 class CBaseItem;
@@ -92,9 +91,6 @@ enum USE_TYPE : int
 #define GIB_NORMAL 0 // gib if entity was overkilled
 #define GIB_NEVER 1	 // never gib, no matter how much death damage is done ( freezing, etc )
 #define GIB_ALWAYS 2 // always gib ( Houndeye Shock, Barnacle Bite )
-
-// TODO: 4 is used as a magic number in FireBullets(Player) above. Refactor.
-#define TRACER_FREQ 4 // Tracers fire every 4 bullets
 
 void FireTargets(const char* targetName, CBaseEntity* pActivator, CBaseEntity* pCaller, USE_TYPE useType, float value);
 
@@ -404,22 +400,6 @@ public:
 	bool ShouldToggle(USE_TYPE useType, bool currentState);
 
 	/**
-	 *	@brief Go to the trouble of combining multiple pellets into a single damage call.
-	 *	This version is used by Monsters.
-	 */
-	void FireBullets(unsigned int cShots, Vector vecSrc, Vector vecDirShooting, Vector vecSpread,
-		float flDistance, int iBulletType,
-		int iTracerFreq = 4, int iDamage = 0, CBaseEntity* attacker = nullptr);
-
-	/**
-	 *	@brief Go to the trouble of combining multiple pellets into a single damage call.
-	 *	This version is used by Players, uses the random seed generator to sync client and server side shots.
-	 */
-	Vector FireBulletsPlayer(unsigned int cShots, Vector vecSrc, Vector vecDirShooting, Vector vecSpread,
-		float flDistance, int iBulletType,
-		int iTracerFreq = 4, int iDamage = 0, CBaseEntity* attacker = nullptr, int shared_rand = 0);
-
-	/**
 	 *	@brief If self.delay is set, a delayed_use entity will be created that will actually
 	 *	do the SUB_UseTargets after that many seconds have passed.
 	 *	Removes all entities with a targetname that match self.killtarget,
@@ -577,11 +557,6 @@ public:
 	 */
 	virtual bool FVisible(const Vector& vecOrigin);
 
-	static float GetSkillFloat(std::string_view name)
-	{
-		return g_Skill.GetValue(name);
-	}
-
 	// Sound playback.
 	void EmitSound(int channel, const char* sample, float volume, float attenuation);
 	void EmitSoundDyn(int channel, const char* sample, float volume, float attenuation, int flags, int pitch);
@@ -620,28 +595,44 @@ public:
 	 */
 	Vector m_SoundOffset{};
 
+	virtual void ActionRightHand(bool* bHandled = nullptr) {}
+	float m_ActionRightHand;
+	virtual void ActionLeftHand() {}
+	float m_ActionLeftHand;
+
 	int enchant_index = 0;
-	// Insert in here minecraft::effect enchantments name
+	// Insert in here effect enchantments name
 	string_t enchant_name[32];
 	// Insert in here minecraft:effect enchantments level
 	string_t enchant_value[32];
 
-	// Effects Dictionary
-    void ApplyEffect( std::string_view name, int level, float end, float time = 0 );
-    std::unordered_map<std::string_view, std::unique_ptr<minecraft::effects>> effects;
+	int durability = Unbreakable;
+	int max_durability = Unbreakable;
 
-	int durability = minecraft::FUnbreakable;
-	int max_durability = minecraft::FUnbreakable;
+	// Whatever a player can interact with this by using ActionRightHand
+	int m_IsUseAble;
 
-	void DestroyItem();
-
-	// Player inventory
-	std::vector<minecraft::inventory> inventory;
-	CBaseEntity() : inventory( minecraft::slot::LAST_SLOT ) {}
-	CBaseEntity* FindInventoryItem(const char* pszItemName = nullptr, const int iInventoryIndex = -1 );
+	virtual bool IsArthropod() { return false; }
+	virtual bool IsUndead() { return false; }
 
 	// Various effect handlers, wrote this way so specific classes can override
 	void effect_fire(int level, CBaseEntity* inflictor, CBaseEntity* attacker);
+
+	// Configuration file
+    std::unique_ptr<json> m_config;
+private:
+	const char* m_CustomConfig = nullptr;
+public:
+	/**
+	 *	@brief Base Entity. All entity types derive from this
+	 *
+	 * ( GetConfiguration == 0 ) no files loaded.
+	 * 
+	 * ( ( GetConfiguration & 1 ) != 0 ) default file loaded.
+	 * 
+	 * ( ( GetConfiguration & 2 ) != 0 ) custom file loaded.
+	*/
+	int GetConfiguration(const char* pszConfigFileName);
 };
 
 inline bool FNullEnt(CBaseEntity* ent) { return (ent == nullptr) || FNullEnt(ent->edict()); }

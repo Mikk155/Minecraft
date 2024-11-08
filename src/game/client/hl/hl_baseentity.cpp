@@ -198,7 +198,6 @@ void CBaseAnimating::SetBodygroup(int iGroup, int iValue) {}
 int CBaseAnimating::GetBodygroup(int iGroup) const { return 0; }
 Vector CBaseMonster::GetGunPosition() { return g_vecZero; }
 void CBaseEntity::TraceAttack(CBaseEntity* attacker, float flDamage, Vector vecDir, TraceResult* ptr, int bitsDamageType) {}
-void CBaseEntity::FireBullets(unsigned int cShots, Vector vecSrc, Vector vecDirShooting, Vector vecSpread, float flDistance, int iBulletType, int iTracerFreq, int iDamage, CBaseEntity* attacker) {}
 void CBaseEntity::TraceBleed(float flDamage, Vector vecDir, TraceResult* ptr, int bitsDamageType) {}
 void CBaseMonster::MakeDamageBloodDecal(int cCount, float flNoise, TraceResult* ptr, const Vector& vecDir) {}
 bool CBaseMonster::FGetNodeRoute(Vector vecDest) { return true; }
@@ -268,9 +267,6 @@ void CBasePlayer::RenewItems() {}
 void CBasePlayer::SelectNextItem(int iItem) {}
 bool CBasePlayer::HasWeapons() { return false; }
 void CBasePlayer::SelectPrevItem(int iItem) {}
-bool CBasePlayer::FlashlightIsOn() { return false; }
-void CBasePlayer::FlashlightTurnOn() {}
-void CBasePlayer::FlashlightTurnOff() {}
 void CBasePlayer::ForceClientDllUpdate() {}
 void CBasePlayer::ImpulseCommands() {}
 void CBasePlayer::CheatImpulseCommands(int iImpulse) {}
@@ -286,11 +282,8 @@ void CBasePlayer::BarnacleVictimReleased() {}
 int CBasePlayer::Illumination() { return 0; }
 void CBasePlayer::EnableControl(bool fControl) {}
 Vector CBasePlayer::GetAutoaimVector(float flDelta) { return g_vecZero; }
-Vector CBasePlayer::AutoaimDeflection(const Vector& vecSrc, float flDist, float flDelta) { return g_vecZero; }
-void CBasePlayer::ResetAutoaim() {}
 void CBasePlayer::SetCustomDecalFrames(int nFrames) {}
 int CBasePlayer::GetCustomDecalFrames() { return -1; }
-void CBasePlayer::DropPlayerWeapon(const char* pszItemName) {}
 bool CBasePlayer::HasPlayerWeapon(CBasePlayerWeapon* weapon) { return false; }
 bool CBasePlayer::SwitchWeapon(CBasePlayerWeapon* weapon) { return false; }
 Vector CBasePlayer::GetGunPosition() { return g_vecZero; }
@@ -299,6 +292,8 @@ int CBasePlayer::GiveAmmo(int iCount, const char* szName) { return 0; }
 void CBasePlayer::AddPoints(int score, bool bAllowNegativeScore) {}
 void CBasePlayer::AddPointsToTeam(int score, bool bAllowNegativeScore) {}
 void CBasePlayer::PostRestore() {}
+void CBasePlayer::ActionRightHand(bool* bHandled) {}
+void CBasePlayer::ActionLeftHand() {}
 
 void ClearMultiDamage() {}
 void ApplyMultiDamage(CBaseEntity* inflictor, CBaseEntity* attacker) {}

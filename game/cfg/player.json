@@ -1,0 +1,16 @@
+{
+    "player_health": 10.0,
+    "player_max_health": 10.0,
+    "player_max_absortion": 5.0,
+
+    "player_damage_deduction_head": 3,
+    "player_damage_deduction_chest": 2,
+    "player_damage_deduction_stomach": 2,
+    "player_damage_deduction_arm": 1,
+    "player_damage_deduction_leg": 1,
+
+    // cooldown when using the right click to interact with anything
+    "player_interaction_time": 0.2,
+    // Distance to interact with anything (In blocks)
+    "player_interaction_distance": 3
+}

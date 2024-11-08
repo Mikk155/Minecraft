@@ -1,0 +1,14 @@
+{
+	"$schema": "../schema.json",
+    "Class": "Base",
+    "data":
+    {
+        "angles":
+        {
+            "variable": "vector",
+            "value": "0 0 0",
+            "title": "Pitch Yaw Roll (Y Z X)",
+            "description": ""
+        }
+    }
+}

@@ -1,0 +1,48 @@
+{
+	"$schema": "../schema.json",
+    "Class": "Base",
+    "data":
+    {
+        "zhlt_lightflags":
+        {
+            "variable": "choices",
+            "value": 0,
+            "choices":
+            {
+                "0":
+                {
+                    "title": "Default",
+                    "description": ""
+                },
+                "1":
+                {
+                    "title": "Embedded Fix",
+                    "description": ""
+                },
+                "2":
+                {
+                    "title": "Opaque (blocks light)",
+                    "description": ""
+                },
+                "3":
+                {
+                    "title": "Opaque + Embedded fix",
+                    "description": ""
+                },
+                "6":
+                {
+                    "title": "Opaque + Concave Fix",
+                    "description": ""
+                }
+            },
+            "title": "ZHLT Lightflags",
+            "description": ""
+        },
+        "light_origin":
+        {
+            "variable": "string",
+            "title": "Light Origin Target",
+            "description": ""
+        }
+    }
+}

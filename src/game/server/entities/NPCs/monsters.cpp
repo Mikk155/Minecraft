@@ -1781,13 +1781,6 @@ void CBaseMonster::MoveExecute(CBaseEntity* pTargetEnt, const Vector& vecDir, fl
 
 void CBaseMonster::MonsterInit()
 {
-	if (!g_pGameRules->FAllowMonsters())
-	{
-		pev->flags |= FL_KILLME; // Post this because some monster code modifies class data after calling this function
-								 //		REMOVE_ENTITY(edict());
-		return;
-	}
-
 	// Set fields common to all monsters
 	pev->effects = 0;
 	pev->takedamage = DAMAGE_AIM;
@@ -3112,11 +3105,6 @@ CBaseEntity* CBaseMonster::DropItem(const char* pszItemName, const Vector& vecPo
 	if (!pszItemName)
 	{
 		AILogger->debug("DropItem() - No item name!");
-		return nullptr;
-	}
-
-	if (GetSkillFloat("allow_npc_item_dropping") == 0)
-	{
 		return nullptr;
 	}
 

@@ -21,7 +21,7 @@
 #include "world.h"
 #include "sound/ServerSoundSystem.h"
 #include "utils/ReplacementMaps.h"
-#include "minecraft.h"
+#include "CMinecraft.h"
 
 static void SetObjectCollisionBox(entvars_t* pev);
 
@@ -550,49 +550,11 @@ static void LoadSentenceReplacementMap(const ReplacementMap*& destination, strin
 
 bool CBaseEntity::RequiredKeyValue(KeyValueData* pkvd)
 {
-	// Replacement maps can be changed at runtime using trigger_changekeyvalue.
-	// Note that this may cause host_error or sys_error if files aren't precached.
-	if (FStrEq(pkvd->szKeyName, "model_replacement_filename"))
+	if( FStrEq( pkvd->szKeyName, "config" ) )
 	{
-		m_ModelReplacementFileName = ALLOC_STRING(pkvd->szValue);
-		LoadFileNameReplacementMap(m_ModelReplacement, m_ModelReplacementFileName);
-	}
-	else if (FStrEq(pkvd->szKeyName, "sound_replacement_filename"))
-	{
-		m_SoundReplacementFileName = ALLOC_STRING(pkvd->szValue);
-		LoadFileNameReplacementMap(m_SoundReplacement, m_SoundReplacementFileName);
-	}
-	else if (FStrEq(pkvd->szKeyName, "sentence_replacement_filename"))
-	{
-		m_SentenceReplacementFileName = ALLOC_STRING(pkvd->szValue);
-		LoadSentenceReplacementMap(m_SentenceReplacement, m_SentenceReplacementFileName);
-	}
-	// Note: while this code does fix backwards bounds here it will not apply to partial hulls mixing with hard-coded ones.
-	else if (FStrEq(pkvd->szKeyName, "custom_hull_min"))
-	{
-		UTIL_StringToVector(m_CustomHullMin, pkvd->szValue);
-		m_HasCustomHullMin = true;
-
-		if (m_HasCustomHullMax)
-		{
-			CheckForBackwardsBounds(this);
-		}
-
+		m_CustomConfig = pkvd->szValue;
 		return true;
 	}
-	else if (FStrEq(pkvd->szKeyName, "custom_hull_max"))
-	{
-		UTIL_StringToVector(m_CustomHullMax, pkvd->szValue);
-		m_HasCustomHullMax = true;
-
-		if (m_HasCustomHullMin)
-		{
-			CheckForBackwardsBounds(this);
-		}
-
-		return true;
-	}
-
 	return false;
 }
 
@@ -679,8 +641,8 @@ bool CBaseEntity::TakeDamage(CBaseEntity* inflictor, CBaseEntity* attacker, floa
 	if( pev->takedamage == DAMAGE_NO || !IsAlive() || FBitSet( pev->flags, FL_GODMODE ) )
 		return false;
 
-	if( bitsDamageType == DMG_MC_FIRE && effects.find(minecraft::effect::fire_resistance) != effects.end() )
-		return false;
+//	if( bitsDamageType == DMG_MC_FIRE && effects.find(effect::fire_resistance) != effects.end() )
+//		return false;
 
 	float flAdditionalKnockBack = 0;
 
@@ -719,7 +681,7 @@ bool CBaseEntity::TakeDamage(CBaseEntity* inflictor, CBaseEntity* attacker, floa
 				}
 				else if( FStrEq( szEnchant, "Bane of Arthropods" ) )
 				{
-					if( std::find( std::begin( minecraft::arthropods ), std::end( minecraft::arthropods ), GetClassname() ) != std::end( minecraft::arthropods ) )
+					if( IsArthropod() )
 					{
 						// -MC Apply slowness
 						flDamage += ( 2.5 * iLevel );
@@ -727,7 +689,7 @@ bool CBaseEntity::TakeDamage(CBaseEntity* inflictor, CBaseEntity* attacker, floa
 				}
 				else if( FStrEq( szEnchant, "Smite" ) )
 				{
-					if( std::find( std::begin( minecraft::undead ), std::end( minecraft::undead ), GetClassname() ) != std::end( minecraft::undead ) )
+					if( IsUndead() )
 					{
 						flDamage += ( 2.5 * iLevel );
 					}
@@ -788,10 +750,11 @@ bool CBaseEntity::TakeDamage(CBaseEntity* inflictor, CBaseEntity* attacker, floa
 			}
 		}
 
-		if( inflictor->durability != minecraft::FUnbreakable ) {
+		if( !FUnbreakable( inflictor->durability ) ) {
 			inflictor->durability--;
 		if( inflictor->durability <= 0 )
-			inflictor->DestroyItem();
+		// -MC Break sound
+			UTIL_Remove( inflictor );
 		}
 
 		pev->dmg_inflictor = inflictor->edict();
@@ -1090,61 +1053,53 @@ void CBaseEntity::StopSound(int channel, const char* sample)
 	sound::g_ServerSound.EmitSound(this, channel, sample, 0, 0, SND_STOP, PITCH_NORM);
 }
 
-CBaseEntity* CBaseEntity::FindInventoryItem(const char* pszItemName, const int iInventoryIndex)
-{
-	CBaseEntity* pItem = nullptr;
-
-	minecraft::inventory* pInventory;
-
-	if( iInventoryIndex >= 0 )
-	{
-		pInventory = &inventory[iInventoryIndex];
-		pItem = pInventory->pItem;
-	}
-	else if( pszItemName != nullptr )
-	{
-		for( size_t i = 0; i < inventory.size(); ++i )
-		{
-			pInventory = &inventory[i];
-
-			if( pInventory->pItem != nullptr && FStrEq( pInventory->pItem->GetClassname(), pszItemName ) )
-			{
-				pItem = pInventory->pItem;
-			}
-		}
-	}
-
-	return pItem;
-}
-
-void CBaseEntity::ApplyEffect( std::string_view name, int level, float end, float time )
-{
-	std::string_view key = fmt::format( "{} {}", name, minecraft::level( level ));
-
-	auto it = effects.find( key );
-
-	if( it != effects.end() )
-	{
-		if( end > it->second->end )
-		{
-			it->second->end = end;
-			// Re-send to client
-			it->second->should_update = true;
-		}
-	}
-	else
-	{
-		effects[ key ] = std::make_unique<minecraft::effects>( name, level, end, time );
-	}
-}
-
 void CBaseEntity::effect_fire(int level, CBaseEntity* inflictor, CBaseEntity* attacker)
 {
 	TakeDamage(inflictor, attacker, 0.5, DMG_MC_FIRE);
 }
 
-void CBaseEntity::DestroyItem()
+int CBaseEntity::GetConfiguration(const char* pszConfigFileName)
 {
-	// -MC Play break sound
-	// -MC Remove item from inventory
+	int iReturnCode = 0;
+
+	const char* szPath = fmt::format( "cfg/entity_config/{}.json", pszConfigFileName ).c_str();
+
+    std::optional<json> m_Configuration = g_JSON.LoadJSONFile( szPath );
+
+    if( m_Configuration.has_value() )
+	{
+        m_config = std::make_unique<json>( m_Configuration.value() );
+		iReturnCode |= 1;
+    }
+	else
+	{
+		m_config = std::make_unique<json>();
+		Logger->error( "{}:{} failed to load \"{}\".", GetClassname(), entindex(), szPath );
+    }
+
+	if( m_CustomConfig != nullptr )
+	{
+		const char* szCustomPath = fmt::format( "cfg/maps/{}.json", m_CustomConfig ).c_str();
+
+		m_Configuration = g_JSON.LoadJSONFile( szCustomPath );
+
+		if( m_Configuration.has_value() )
+		{
+    		std::unique_ptr<json> customConfig = std::make_unique<json>( m_Configuration.value() );
+
+			for( auto it = customConfig->begin(); it != customConfig->end(); ++it )
+			{
+		        (*m_config)[ it.key() ] = it.value();
+			}
+			iReturnCode |= 2;
+		}
+		else
+		{
+			Logger->error( "{}:{} failed to load \"{}\".", GetClassname(), entindex(), szCustomPath );
+		}
+		// No more use, free
+		m_CustomConfig = nullptr;
+	}
+
+	return iReturnCode;
 }

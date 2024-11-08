@@ -77,36 +77,6 @@ void CBaseMonster::ChangeSchedule(const Schedule_t* pNewSchedule)
 		AILogger->debug("Schedule {} not in table!!!", pNewSchedule->pName);
 	}
 #endif
-
-	// this is very useful code if you can isolate a test case in a level with a single monster. It will notify
-	// you of every schedule selection the monster makes.
-#if 0
-	if (ClassnameIs("monster_human_grunt"))
-	{
-		const Task_t* pTask = GetTask();
-
-		if (pTask)
-		{
-			const char* pName = nullptr;
-
-			if (m_pSchedule)
-			{
-				pName = m_pSchedule->pName;
-			}
-			else
-			{
-				pName = "No Schedule";
-			}
-
-			if (!pName)
-			{
-				pName = "Unknown";
-			}
-
-			AILogger->debug("{}: picked schedule {}", STRING(pev->classname), pName);
-		}
-	}
-#endif // 0
 }
 
 void CBaseMonster::NextScheduledTask()

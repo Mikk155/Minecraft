@@ -3,9 +3,12 @@
 //
 game "Minecraft"
 icon "game"
-mpentity "info_player_deathmatch"
 gamedll "dlls\server.dll"
 gamedll_linux "dlls/server.so"
 gamedll_osx "dlls/server.dylib"
 secure "1"
 edicts "2048"
+type "multiplayer_only"
+nohimodels "1"
+detailed_textures "1"
+mpfilter "-"

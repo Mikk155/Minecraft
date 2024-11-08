@@ -396,7 +396,7 @@ void CBasePlayerWeapon::ItemPostFrame()
 		{
 #ifndef CLIENT_DLL
 			// weapon isn't useable, switch.
-			if ((iFlags() & ITEM_FLAG_NOAUTOSWITCHEMPTY) == 0 && g_pGameRules->GetNextBestWeapon(m_pPlayer, this))
+			if ((iFlags() & ITEM_FLAG_NOAUTOSWITCHEMPTY) == 0 )
 			{
 				m_flNextPrimaryAttack = (UseDecrement() ? 0.0 : gpGlobals->time) + 0.3;
 				return;
@@ -461,17 +461,6 @@ void CBasePlayerWeapon::AdjustMagazine1(int count)
 	if (m_iClip == WEAPON_NOCLIP)
 	{
 		return;
-	}
-
-	if (count < 0)
-	{
-		// Subtract from reserve ammo first.
-		if (g_Skill.GetValue("bottomless_magazines") != 0)
-		{
-			const int amountAdjusted = m_pPlayer->AdjustAmmoByIndex(m_iPrimaryAmmoType, count);
-
-			count -= amountAdjusted;
-		}
 	}
 
 	m_iClip = std::clamp(m_iClip + count, 0, iMaxClip());

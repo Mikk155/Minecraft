@@ -36,14 +36,13 @@ class ItemRespawnTimeVisitor final : public IItemVisitor
 public:
 	void Visit(CBasePlayerAmmo* ammo) override
 	{
-		RespawnTime = g_Skill.GetValue("ammo_respawn_time", ITEM_NEVER_RESPAWN_DELAY);
+		RespawnTime = ITEM_NEVER_RESPAWN_DELAY;
 	}
 
 	void Visit(CBasePlayerWeapon* weapon) override
 	{
-		RespawnTime = g_Skill.GetValue("weapon_respawn_time", ITEM_NEVER_RESPAWN_DELAY);
 
-		if (RespawnTime != ITEM_NEVER_RESPAWN_DELAY && g_Skill.GetValue("weapon_instant_respawn", 0) != 0)
+		if (RespawnTime != ITEM_NEVER_RESPAWN_DELAY )
 		{
 			// make sure it's only certain weapons
 			if ((weapon->iFlags() & ITEM_FLAG_LIMITINWORLD) == 0)
@@ -56,7 +55,7 @@ public:
 
 	void Visit(CItem* pickupItem) override
 	{
-		RespawnTime = g_Skill.GetValue("pickupitem_respawn_time", ITEM_NEVER_RESPAWN_DELAY);
+		RespawnTime = ITEM_NEVER_RESPAWN_DELAY;
 	}
 
 	// Don't respawn unknown items.
@@ -108,19 +107,6 @@ public:
 
 	void Visit(CBasePlayerWeapon* weapon) override
 	{
-		if (g_Skill.GetValue("weapon_instant_respawn", 0) != 0)
-		{
-			if ((weapon->iFlags() & ITEM_FLAG_LIMITINWORLD) == 0)
-			{
-				// check if the player already has this weapon
-				if (Player->HasPlayerWeapon(weapon))
-				{
-					CanHaveItem = false;
-					return;
-				}
-			}
-		}
-
 		// only living players can have items
 		if (Player->pev->deadflag != DEAD_NO)
 		{
@@ -175,26 +161,6 @@ CGameRules::CGameRules()
 				player->Observer_SetMode(atoi(CMD_ARGV(1))); });
 }
 
-bool CGameRules::FAllowFlashlight()
-{
-	return g_Skill.GetValue("allow_flashlight") != 0;
-}
-
-float CGameRules::FlPlayerFallDamage(CBasePlayer* pPlayer)
-{
-	switch (FallDamageMode(g_Skill.GetValue("falldamagemode")))
-	{
-	case FallDamageMode::Progressive:
-		// subtract off the speed at which a player is allowed to fall without being hurt,
-		// so damage will be based on speed beyond that, not the entire fall
-		pPlayer->m_flFallVelocity -= PLAYER_MAX_SAFE_FALL_SPEED;
-		return pPlayer->m_flFallVelocity * DAMAGE_FOR_FALL_SPEED;
-	default:
-	case FallDamageMode::Fixed:
-		return 10;
-	}
-}
-
 void CGameRules::SetupPlayerInventory(CBasePlayer* player)
 {
 	// Originally game_player_equip entities were triggered in PlayerSpawn to set up the player's inventory.
@@ -206,77 +172,6 @@ void CGameRules::SetupPlayerInventory(CBasePlayer* player)
 	{
 		g_SpawnInventory.GetInventory()->ApplyToPlayer(player);
 	}
-}
-
-CBasePlayerWeapon* CGameRules::FindNextBestWeapon(CBasePlayer* pPlayer, CBasePlayerWeapon* pCurrentWeapon)
-{
-	if (pCurrentWeapon != nullptr && !pCurrentWeapon->CanHolster())
-	{
-		// can't put this gun away right now, so can't switch.
-		return nullptr;
-	}
-
-	const int currentWeight = pCurrentWeapon != nullptr ? pCurrentWeapon->iWeight() : -1;
-
-	CBasePlayerWeapon* pBest = nullptr; // this will be used in the event that we don't find a weapon in the same category.
-
-	int iBestWeight = -1; // no weapon lower than -1 can be autoswitched to
-
-	for (int i = 0; i < MAX_WEAPON_SLOTS; i++)
-	{
-		for (auto pCheck = pPlayer->m_rgpPlayerWeapons[i]; pCheck; pCheck = pCheck->m_pNext)
-		{
-			// don't reselect the weapon we're trying to get rid of
-			if (pCheck == pCurrentWeapon)
-			{
-				continue;
-			}
-
-			if (pCheck->iWeight() > -1 && pCheck->iWeight() == currentWeight)
-			{
-				// this weapon is from the same category.
-				if (pCheck->CanDeploy())
-				{
-					if (pPlayer->SwitchWeapon(pCheck))
-					{
-						return pCheck;
-					}
-				}
-			}
-			else if (pCheck->iWeight() > iBestWeight)
-			{
-				// Logger->debug("Considering {}", STRING(pCheck->pev->classname));
-				//  we keep updating the 'best' weapon just in case we can't find a weapon of the same weight
-				//  that the player was using. This will end up leaving the player with his heaviest-weighted
-				//  weapon.
-				if (pCheck->CanDeploy())
-				{
-					// if this weapon is useable, flag it as the best
-					iBestWeight = pCheck->iWeight();
-					pBest = pCheck;
-				}
-			}
-		}
-	}
-
-	// if we make it here, we've checked all the weapons and found no useable
-	// weapon in the same catagory as the current weapon.
-
-	// if pBest is nullptr, we didn't find ANYTHING. Shouldn't be possible- should always
-	// at least get the crowbar, but ya never know.
-
-	return pBest;
-}
-
-bool CGameRules::GetNextBestWeapon(CBasePlayer* pPlayer, CBasePlayerWeapon* pCurrentWeapon, bool alwaysSearch)
-{
-	if (auto pBest = FindNextBestWeapon(pPlayer, pCurrentWeapon); pBest != nullptr)
-	{
-		pPlayer->SwitchWeapon(pBest);
-		return true;
-	}
-
-	return false;
 }
 
 float CGameRules::GetRespawnDelay(CBaseItem* item)
@@ -387,21 +282,6 @@ bool CGameRules::CanHaveItem(CBasePlayer* player, CBaseItem* item)
 	return visitor.CanHaveItem;
 }
 
-int CGameRules::HealthChargerRechargeTime()
-{
-	return g_Skill.GetValue("healthcharger_recharge_time", ChargerRechargeDelayNever);
-}
-
-int CGameRules::HEVChargerRechargeTime()
-{
-	return g_Skill.GetValue("hevcharger_recharge_time", ChargerRechargeDelayNever);
-}
-
-bool CGameRules::FAllowMonsters()
-{
-	return g_Skill.GetValue("allow_monsters", 1) != 0;
-}
-
 void CGameRules::BecomeSpectator(CBasePlayer* player, const CommandArgs& args)
 {
 	// Default implementation: applies to all game modes, even singleplayer.
@@ -430,6 +310,7 @@ void CGameRules::m_pEffectShedule()
 	{
 		auto entity = m_pEffectList[i];
 
+		/*
 		for( size_t e = 0; e < entity->effects.size(); ++e )
 		{
 			auto it = entity->effects.begin();
@@ -438,7 +319,6 @@ void CGameRules::m_pEffectShedule()
 			{
 				auto& effect = it->second;
 
-				/*
 				-MC Client catch
 				if( effect->should_update )
 				{
@@ -452,7 +332,6 @@ void CGameRules::m_pEffectShedule()
 					}
 					effect->should_update = false;
 				}
-				*/
 
 				bool DoEffect = false;
 
@@ -472,14 +351,14 @@ void CGameRules::m_pEffectShedule()
 
 				if( DoEffect )
 				{
-					if( effect->name == minecraft::effect::fire )
+					/*if( effect->name == effect::fire )
 					{
 						entity->effect_fire(effect->level, effect->inflictor, effect->attacker);
 					}
 				}
 
 				// If done remove, otherwise update timer.
-				if( effect->end <= 0 )
+				/*if( effect->end <= 0 )
 				{
 					it = entity->effects.erase(it);
 				}
@@ -490,6 +369,7 @@ void CGameRules::m_pEffectShedule()
 				}
 			}
 		}
+	*/
 	}
 }
 

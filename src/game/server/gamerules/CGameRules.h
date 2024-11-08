@@ -94,21 +94,6 @@ public:
 	 */
 	virtual bool IsAllowedToSpawn(CBaseEntity* pEntity) = 0;
 
-	/**
-	 *	@brief Are players allowed to switch on their flashlight
-	 */
-	bool FAllowFlashlight();
-
-	/**
-	 *	@brief should the player switch to this weapon?
-	 */
-	virtual bool FShouldSwitchWeapon(CBasePlayer* pPlayer, CBasePlayerWeapon* pWeapon) = 0;
-
-	/**
-	 *	@brief I can't use this weapon anymore, get me the next best one.
-	 */
-	virtual bool GetNextBestWeapon(CBasePlayer* pPlayer, CBasePlayerWeapon* pCurrentWeapon, bool alwaysSearch = false);
-
 	// Functions to verify the single/multiplayer status of a game
 
 	/**
@@ -139,7 +124,7 @@ public:
 	/**
 	 *	@brief this is the game name that gets seen in the server browser
 	 */
-	virtual const char* GetGameDescription() { return "Half-Life"; }
+	virtual const char* GetGameDescription() { return "Minecraft"; }
 
 	// Client connection/disconnection
 	/**
@@ -164,18 +149,10 @@ public:
 	 */
 	virtual void UpdateGameMode(CBasePlayer* pPlayer) {}
 
-	// Client damage rules
-	/**
-	 *	@brief this client just hit the ground after a fall. How much damage?
-	 */
-	float FlPlayerFallDamage(CBasePlayer* pPlayer);
-
 	/**
 	 *	@brief can this player take damage from this attacker?
 	 */
 	virtual bool FPlayerCanTakeDamage(CBasePlayer* pPlayer, CBaseEntity* pAttacker) { return true; }
-
-	virtual bool ShouldAutoAim(CBasePlayer* pPlayer, CBaseEntity* target) { return true; }
 
 	// Client spawn/respawn control
 	/**
@@ -202,8 +179,6 @@ public:
 	 *	@brief Place this player on their spawnspot and face them the proper direction.
 	 */
 	virtual CBaseEntity* GetPlayerSpawnSpot(CBasePlayer* pPlayer);
-
-	virtual bool AllowAutoTargetCrosshair() { return true; }
 
 	/**
 	 *	@brief the player has changed userinfo;  can change it now
@@ -271,16 +246,6 @@ public:
 	float ItemTryRespawn(CBaseItem* item);
 
 	/**
-	 *	@brief how long until a depleted HealthCharger recharges itself?
-	 */
-	int HealthChargerRechargeTime();
-
-	/**
-	 *	@brief how long until a depleted HEV Charger recharges itself?
-	 */
-	int HEVChargerRechargeTime();
-
-	/**
 	 *	@brief what do I do with a player's weapons when he's killed?
 	 */
 	virtual int DeadPlayerWeapons(CBasePlayer* pPlayer) = 0;
@@ -315,12 +280,6 @@ public:
 	virtual bool PlayTextureSounds() { return true; }
 	virtual bool PlayFootstepSounds(CBasePlayer* pl, float fvol) { return true; }
 
-	// Monsters
-	/**
-	 *	@brief are monsters allowed
-	 */
-	bool FAllowMonsters();
-
 	/**
 	 *	@brief Immediately end a multiplayer game
 	 */
@@ -330,8 +289,6 @@ protected:
 	void SetupPlayerInventory(CBasePlayer* player);
 
 	float GetRespawnDelay(CBaseItem* item);
-
-	CBasePlayerWeapon* FindNextBestWeapon(CBasePlayer* pPlayer, CBasePlayerWeapon* pCurrentWeapon);
 
 	virtual void BecomeSpectator(CBasePlayer* player, const CommandArgs& args);
 

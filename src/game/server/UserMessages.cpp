@@ -27,8 +27,6 @@ void LinkUserMessages()
 
 	gmsgCurWeapon = REG_USER_MSG("CurWeapon", 3);
 	gmsgGeigerRange = REG_USER_MSG("Geiger", 1);
-	gmsgFlashlight = REG_USER_MSG("Flashlight", 3);
-	gmsgFlashBattery = REG_USER_MSG("FlashBat", 1);
 	gmsgHealth = REG_USER_MSG("Health", 2);
 	gmsgDamage = REG_USER_MSG("Damage", 12);
 	gmsgBattery = REG_USER_MSG("Battery", 2);
@@ -82,7 +80,6 @@ void LinkUserMessages()
 	gmsgEntityInfo = REG_USER_MSG("EntityInfo", -1);
 	gmsgEmitSound = REG_USER_MSG("EmitSound", -1);
 	gmsgTempEntity = REG_USER_MSG("TempEntity", -1);
-	gmsgSkillVars = REG_USER_MSG("SkillVars", -1);
 
 	gmsgCampaignSelect = REG_USER_MSG("CmpgnSlct", 0);
 

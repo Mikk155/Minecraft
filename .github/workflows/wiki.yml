@@ -6,14 +6,15 @@ on:
       - main
     paths:
       - 'docs/*.md'
+      - '.github/workflows/wiki.*'
 
 env:
   USER: ${{github.repository_owner}}
   REPOSITORY: Minecraft
 
 jobs:
-  release:
-    name: release
+  wiki_update:
+    name: wiku_update
     runs-on: windows-latest
     steps:
     - name: Checkout

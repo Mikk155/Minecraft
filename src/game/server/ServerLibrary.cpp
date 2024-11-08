@@ -31,16 +31,12 @@
 #include "scripted.h"
 #include "ServerConfigContext.h"
 #include "ServerLibrary.h"
-#include "skill.h"
+#include "config_system.h"
 #include "UserMessages.h"
 #include "voice_gamemgr.h"
 
-#include "bot/BotSystem.h"
-
-#include "config/CommandWhitelist.h"
 #include "config/ConditionEvaluator.h"
 #include "config/GameConfig.h"
-#include "config/sections/CommandsSection.h"
 #include "config/sections/CrosshairColorSection.h"
 #include "config/sections/EchoSection.h"
 #include "config/sections/EntityClassificationsSection.h"
@@ -50,7 +46,6 @@
 #include "config/sections/HudColorSection.h"
 #include "config/sections/HudReplacementSection.h"
 #include "config/sections/SpawnInventorySection.h"
-#include "config/sections/SuitLightTypeSection.h"
 
 #include "entities/EntityClassificationSystem.h"
 
@@ -146,18 +141,7 @@ bool ServerLibrary::Initialize()
 				g_engfuncs.pfnSetPhysicsKeyValue(player->edict(), "bj", setting.c_str());
 			} });
 
-	g_ConCommands.RegisterChangeCallback(&sv_infinite_ammo, [](const auto& state)
-		{ g_Skill.SetValue("infinite_ammo", state.Cvar->value); });
-
-	g_ConCommands.RegisterChangeCallback(&sv_bottomless_magazines, [](const auto& state)
-		{ g_Skill.SetValue("bottomless_magazines", state.Cvar->value); });
-
-	RegisterCommandWhitelistSchema();
-
-	LoadCommandWhitelist();
-
 	CreateConfigDefinitions();
-	DefineSkillVariables();
 
 	return true;
 }
@@ -198,8 +182,6 @@ void ServerLibrary::RunFrame()
 	ForceCvarToValue(m_AllowDownload, 1);
 	ForceCvarToValue(m_SendResources, 1);
 	ForceCvarToValue(m_AllowDLFile, 1);
-
-	g_Bots.RunFrame();
 
 	// If we're loading all maps then change maps after 3 seconds (time starts at 1)
 	// to give the game time to generate files.
@@ -371,12 +353,6 @@ void ServerLibrary::PlayerActivating(CBasePlayer* player)
 		player->SetCrosshairColor(*m_MapState->m_CrosshairColor);
 	}
 
-	// Override the light type.
-	if (m_MapState->m_LightType)
-	{
-		player->SetSuitLightType(*m_MapState->m_LightType);
-	}
-
 	SendFogMessage(player);
 }
 
@@ -390,7 +366,6 @@ void ServerLibrary::AddGameSystems()
 	g_GameSystems.Add(&sentences::g_Sentences);
 	g_GameSystems.Add(&g_MapCycleSystem);
 	g_GameSystems.Add(&g_EntityTemplates);
-	g_GameSystems.Add(&g_Bots);
 }
 
 void ServerLibrary::SetEntLogLevels(spdlog::level::level_enum level)
@@ -421,7 +396,6 @@ void ServerLibrary::CreateConfigDefinitions()
 
 			// Server configs only get common and command sections. All other configuration is handled elsewhere.
 			sections.push_back(std::make_unique<EchoSection<ServerConfigContext>>());
-			sections.push_back(std::make_unique<CommandsSection<ServerConfigContext>>());
 
 			return sections; }());
 
@@ -430,69 +404,19 @@ void ServerLibrary::CreateConfigDefinitions()
 			std::vector<std::unique_ptr<const GameConfigSection<ServerConfigContext>>> sections;
 
 			sections.push_back(std::make_unique<EchoSection<ServerConfigContext>>());
-			sections.push_back(std::make_unique<CommandsSection<ServerConfigContext>>(&g_CommandWhitelist));
 			sections.push_back(std::make_unique<CrosshairColorSection>());
 			sections.push_back(std::make_unique<SentencesSection>());
 			sections.push_back(std::make_unique<MaterialsSection>());
-			sections.push_back(std::make_unique<SkillSection>());
 			sections.push_back(std::make_unique<GlobalModelReplacementSection>());
 			sections.push_back(std::make_unique<GlobalSentenceReplacementSection>());
 			sections.push_back(std::make_unique<GlobalSoundReplacementSection>());
 			sections.push_back(std::make_unique<HudColorSection>());
-			sections.push_back(std::make_unique<SuitLightTypeSection>());
 			sections.push_back(std::make_unique<SpawnInventorySection>());
 			sections.push_back(std::make_unique<EntityTemplatesSection>());
 			sections.push_back(std::make_unique<EntityClassificationsSection>());
 			sections.push_back(std::make_unique<HudReplacementSection>());
 
 			return sections; }());
-}
-
-void ServerLibrary::DefineSkillVariables()
-{
-	// Gamemode variables
-	g_Skill.DefineVariable("coop_persistent_inventory_grace_period", 60, {.Minimum = -1});
-	g_Skill.DefineVariable("allow_monsters", 1, {.Minimum = 0, .Maximum = 1, .Type = SkillVarType::Integer});
-	g_Skill.DefineVariable("falldamagemode", 0,
-		{.Minimum = int(FallDamageMode::Fixed),
-			.Maximum = int(FallDamageMode::Progressive),
-			.Type = SkillVarType::Integer});
-
-	// Item variables
-	g_Skill.DefineVariable("healthcharger_recharge_time", -1,
-		{.Minimum = ChargerRechargeDelayNever, .Type = SkillVarType::Integer});
-	g_Skill.DefineVariable("hevcharger_recharge_time", -1,
-		{.Minimum = ChargerRechargeDelayNever, .Type = SkillVarType::Integer});
-
-	g_Skill.DefineVariable("weapon_respawn_time", ITEM_NEVER_RESPAWN_DELAY,
-		{.Minimum = -1, .Type = SkillVarType::Integer});
-	g_Skill.DefineVariable("ammo_respawn_time", ITEM_NEVER_RESPAWN_DELAY,
-		{.Minimum = -1, .Type = SkillVarType::Integer});
-	g_Skill.DefineVariable("pickupitem_respawn_time", ITEM_NEVER_RESPAWN_DELAY,
-		{.Minimum = -1, .Type = SkillVarType::Integer});
-
-	g_Skill.DefineVariable("weapon_instant_respawn", 0, {.Minimum = 0, .Maximum = 1, .Type = SkillVarType::Integer});
-	g_Skill.DefineVariable("allow_npc_item_dropping", 1, {.Minimum = 0, .Maximum = 1, .Type = SkillVarType::Integer});
-	g_Skill.DefineVariable("allow_player_weapon_dropping", 0, {.Minimum = 0, .Maximum = 1, .Type = SkillVarType::Integer});
-
-	// Weapon variables
-	g_Skill.DefineVariable("infinite_ammo", 0, {.Minimum = 0, .Maximum = 1, .Networked = true, .Type = SkillVarType::Integer});
-	g_Skill.DefineVariable("bottomless_magazines", 0, {.Minimum = 0, .Maximum = 1, .Networked = true, .Type = SkillVarType::Integer});
-
-	g_Skill.DefineVariable("chainsaw_melee", 0, {.Minimum = 0, .Maximum = 1, .Networked = true, .Type = SkillVarType::Integer});
-	g_Skill.DefineVariable("revolver_laser_sight", 0, {.Networked = true});
-	g_Skill.DefineVariable("smg_wide_spread", 0, {.Networked = true});
-	g_Skill.DefineVariable("shotgun_single_tight_spread", 0, {.Networked = true});
-	g_Skill.DefineVariable("shotgun_double_wide_spread", 0, {.Networked = true});
-	g_Skill.DefineVariable("crossbow_sniper_bolt", 0, {.Networked = true});
-	g_Skill.DefineVariable("gauss_charge_time", 4, {.Minimum = 0.1f, .Maximum = 10.f, .Networked = true});
-	g_Skill.DefineVariable("gauss_fast_ammo_use", 0, {.Networked = true});
-	g_Skill.DefineVariable("gauss_damage_radius", 2.5f, {.Minimum = 0});
-	g_Skill.DefineVariable("egon_narrow_ammo_per_second", 6, {.Minimum = 0});
-	g_Skill.DefineVariable("egon_wide_ammo_per_second", 10, {.Minimum = 0});
-	g_Skill.DefineVariable("grapple_fast", 0, {.Networked = true});
-	g_Skill.DefineVariable("m249_wide_spread", 0, {.Networked = true});
-	g_Skill.DefineVariable("shockrifle_fast", 0, {.Networked = true});
 }
 
 void ServerLibrary::LoadServerConfigFiles()
@@ -563,17 +487,6 @@ void ServerLibrary::LoadServerConfigFiles()
 	// Initialize file lists to their defaults.
 	context.SentencesFiles.push_back("sound/sentences.json");
 	context.MaterialsFiles.push_back("sound/materials.json");
-	context.SkillFiles.push_back("cfg/skill.json");
-
-	if (g_pGameRules->IsMultiplayer())
-	{
-		context.SkillFiles.push_back("cfg/skill_multiplayer.json");
-	}
-
-	if (g_pGameRules->IsCoOp())
-	{
-		context.SkillFiles.push_back("cfg/skill_coop.json");
-	}
 
 	context.EntityClassificationsFileName = "cfg/default_entity_classes.json";
 
@@ -594,18 +507,7 @@ void ServerLibrary::LoadServerConfigFiles()
 
 	sentences::g_Sentences.LoadSentences(context.SentencesFiles);
 	g_MaterialSystem.LoadMaterials(context.MaterialsFiles);
-	g_Skill.LoadSkillConfigFiles(context.SkillFiles);
-
-	// Override skill vars with cvars if they are enabled only.
-	if (sv_infinite_ammo.value != 0)
-	{
-		g_Skill.SetValue("infinite_ammo", sv_infinite_ammo.value);
-	}
-
-	if (sv_bottomless_magazines.value != 0)
-	{
-		g_Skill.SetValue("bottomless_magazines", sv_bottomless_magazines.value);
-	}
+	g_Cfg.LoadConfigFiles();
 
 	m_MapState->m_GlobalModelReplacement = g_ReplacementMaps.LoadMultiple(
 		context.GlobalModelReplacementFiles, {.CaseSensitive = false});

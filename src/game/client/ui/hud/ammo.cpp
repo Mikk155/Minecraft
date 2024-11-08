@@ -136,11 +136,6 @@ int WeaponsResource::CountAmmo(const AmmoType* type)
 	if (!type)
 		return 0;
 
-	if (g_Skill.GetValue("infinite_ammo") != 0)
-	{
-		return type->MaximumCapacity;
-	}
-
 	return riAmmo[type->Id];
 }
 
@@ -152,11 +147,6 @@ bool WeaponsResource::HasAmmo(WEAPON* p)
 	// weapons with no primary ammo or unlimited ammo can always be selected
 	if (!p->AmmoTypes[0] || p->AmmoTypes[0]->MaximumCapacity == WEAPON_NOCLIP)
 		return true;
-
-	if (g_Skill.GetValue("infinite_ammo") != 0)
-	{
-		return true;
-	}
 
 	return p->AmmoInMagazine > 0 ||
 		   0 != CountAmmo(p->AmmoTypes[0]) ||

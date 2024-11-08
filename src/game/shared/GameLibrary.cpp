@@ -18,7 +18,7 @@
 #include "AmmoTypeSystem.h"
 #include "GameLibrary.h"
 #include "ProjectInfoSystem.h"
-#include "skill.h"
+#include "config_system.h"
 #include "WeaponDataSystem.h"
 
 #include "entities/EntityClassificationSystem.h"
@@ -102,7 +102,7 @@ void GameLibrary::AddGameSystems()
 	g_GameSystems.Add(&g_ProjectInfo);
 	g_GameSystems.Add(&g_WeaponData);
 	g_GameSystems.Add(&g_AmmoTypes);
-	g_GameSystems.Add(&g_Skill);
+	g_GameSystems.Add(&g_Cfg);
 	g_GameSystems.Add(&g_HudReplacements);
 	g_GameSystems.Add(&g_EntityClassifications);
 }

@@ -29,11 +29,6 @@
 
 extern int giTeamplay;
 
-extern BEAM* pBeam;
-extern BEAM* pBeam2;
-extern TEMPENTITY* pFlare; // Vit_amiN
-
-
 /// USER-DEFINED SERVER MESSAGE HANDLERS
 
 void CHud::MsgFunc_ResetHUD(const char* pszName, BufferReader& reader)
@@ -74,10 +69,6 @@ void CHud::MsgFunc_InitHUD(const char* pszName, BufferReader& reader)
 	// TODO: needs to be called on every map change, not just when starting a new game
 	if (g_pParticleMan)
 		g_pParticleMan->ResetParticles();
-
-	// Probably not a good place to put this.
-	pBeam = pBeam2 = nullptr;
-	pFlare = nullptr; // Vit_amiN: clear egon's beam flare
 }
 
 
