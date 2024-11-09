@@ -649,7 +649,7 @@ private:
 //
 //-----------------------------------------------------
 //
-//#include "vgui/vgui_InventoryMenuPanel.h"
+#include "vgui/vgui_InventoryMenuPanel.h"
 
 struct HudSprite
 {
