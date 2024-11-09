@@ -201,6 +201,7 @@ void CInventoryMenu::MsgFunc_Inventory(const char* pszName, BufferReader& reader
 	{
 		case InventoryNetwork::Close:
 		{
+			// -MC Restore m_inventory objects
 			g_iVisibleMouse = m_fOn = false;
 			vgui::App::getInstance()->setCursorOveride(vgui::App::getInstance()->getScheme()->getCursor(vgui::Scheme::scu_arrow));
 			break;
@@ -223,6 +224,18 @@ void CInventoryMenu::MsgFunc_Inventory(const char* pszName, BufferReader& reader
 		}
 		case InventoryNetwork::Open:
 		{
+			for( size_t i = 0; i < m_inventory->size(); ++i )
+			{
+				if( auto name = m_inventory->at(i).classname; name != nullptr )
+				{
+					// i el slot del inventario
+					// name el nombre de tu estructura de informacion
+					// Que pueda contener el sprite y display name del item
+
+					// m_inventory->at(i).enchants < encantamientos, si hay alguno
+					// m_inventory->at(i).amount < cantidad de items
+				}
+			}
 			g_iVisibleMouse = m_fOn = true;
 
 			//reset
