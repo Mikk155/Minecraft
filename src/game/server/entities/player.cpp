@@ -1331,9 +1331,14 @@ void CBasePlayer::StartObserver(Vector vecPosition, Vector vecViewAngle)
 
 void CBasePlayer::PlayerUse()
 {
+	if( m_fLastOpenInventory > gpGlobals->time )
+		return;
+
     // Was use pressed or released?
-	if( IsObserver() || ( ( pev->button | m_afButtonPressed | m_afButtonReleased) & IN_USE) == 0 )
+	if( ( ( pev->button | m_afButtonPressed | m_afButtonReleased) & IN_USE) == 0 )
         return;
+
+	m_fLastOpenInventory = gpGlobals->time + 0.5f;
 
 	m_fOnInventory = !m_fOnInventory;
 
@@ -3324,8 +3329,14 @@ void CBasePlayer::ItemPreFrame()
 
 void CBasePlayer::ItemPostFrame()
 {
+	if( IsObserver() )
+		return;
+
 	// check if the player is using a tank
-	if (m_pTank != nullptr || m_flNextAttack > UTIL_WeaponTimeBase() )
+	if (m_pTank != nullptr )
+		return;
+
+	if( m_flNextAttack > UTIL_WeaponTimeBase() )
 		return;
 
 	PlayerUse();
