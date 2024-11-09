@@ -83,6 +83,5 @@ inline int gmsgFog = 0;
 inline int gmsgClientGibs = 0;
 
 inline int gmsgInventory = 0;
-inline int gmsgEffect = 0;
 
 void LinkUserMessages();

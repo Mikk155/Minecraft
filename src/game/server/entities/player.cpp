@@ -1329,8 +1329,6 @@ void CBasePlayer::StartObserver(Vector vecPosition, Vector vecViewAngle)
 	Observer_SetMode(m_iObserverLastMode);
 }
 
-#define PLAYER_SEARCH_RADIUS (float)64
-
 void CBasePlayer::PlayerUse()
 {
     // Was use pressed or released?
@@ -1339,11 +1337,42 @@ void CBasePlayer::PlayerUse()
 
 	m_fOnInventory = !m_fOnInventory;
 
-	MESSAGE_BEGIN(MSG_ONE, gmsgInventory, nullptr, this);
-	WRITE_BYTE((int)m_fOnInventory);
-	MESSAGE_END();
+	// Close the inventory
+	if( !m_fOnInventory )
+	{
+		MESSAGE_BEGIN( MSG_ONE, gmsgInventory, nullptr, this );
+			WRITE_BYTE( static_cast<int>(InventoryNetwork::Close) );
+		MESSAGE_END();
+		return;
+	}
 
-	// -MC Open inventory
+	for( size_t i = 0; i < inventory->size(); ++i )
+	{
+		if( inventory->at(i).pItem != nullptr )
+		{
+			MESSAGE_BEGIN( MSG_ONE, gmsgInventory, nullptr, this );
+				WRITE_BYTE( static_cast<int>(InventoryNetwork::Item) );
+				WRITE_BYTE( i );
+				WRITE_BYTE( inventory->at(i).amount );
+				WRITE_STRING( inventory->at(i).pItem->GetClassname() );
+			MESSAGE_END();
+			
+			/*
+				for enchants in pItem
+
+				MESSAGE_BEGIN( MSG_ONE, gmsgInventory, nullptr, this );
+					WRITE_BYTE( static_cast<int>(InventoryNetwork::Data) );
+					WRITE_BYTE( i );
+					WRITE_STRING( enchantname );
+				MESSAGE_END();
+			*/
+		}
+	}
+
+	// Open the inventory
+	MESSAGE_BEGIN( MSG_ONE, gmsgInventory, nullptr, this );
+		WRITE_BYTE( static_cast<int>(InventoryNetwork::Open) );
+	MESSAGE_END();
 }
 
 void CBasePlayer::Jump()
@@ -3296,13 +3325,10 @@ void CBasePlayer::ItemPreFrame()
 void CBasePlayer::ItemPostFrame()
 {
 	// check if the player is using a tank
-	if (m_pTank != nullptr)
+	if (m_pTank != nullptr || m_flNextAttack > UTIL_WeaponTimeBase() )
 		return;
 
-	if( m_flNextAttack <= UTIL_WeaponTimeBase() )
-		PlayerUse();
-	else
-		return;
+	PlayerUse();
 
 	ImpulseCommands();
 

@@ -24,14 +24,32 @@
 #define Unbreakable -100
 #define FUnbreakable( var ) ( var == Unbreakable )
 
+// Inventory networking enum
+enum class InventoryNetwork : int
+{
+	Close = 0,	// Close the inventory
+	Item,		// Receive a item
+	Data,		// Receive a data for an item
+	Open,		// Open the inventory
+};
+
 struct CInventory
 {
+	int amount;
+
+#ifndef CLIENT_DLL
 	CBaseEntity* pItem;
 	int max_stack;
-	int amount;
 
 	CInventory( CBaseEntity* pItem = nullptr, int max_stack = 64, int amount = 1 )
 		: pItem(pItem), max_stack(max_stack), amount(amount) {}
+#else
+	const char* classname;
+	std::vector<std::string_view> enchants;
+
+	CInventory( const char* classname = nullptr, int amount = 1, std::vector<std::string_view> enchants = {} )
+		: classname(classname), amount(amount), enchants(enchants) {}
+#endif
 };
 
 enum class InventorySlot : int

@@ -1,4 +1,4 @@
-//========= Copyright © 1996-2001, Valve LLC, All rights reserved. ============
+//========= Copyright ï¿½ 1996-2001, Valve LLC, All rights reserved. ============
 //
 // Purpose:
 //
@@ -16,6 +16,8 @@
 #include "cl_entity.h"
 #include "vgui_checkbutton2.h"
 #include "vgui_defaultinputsignal.h"
+
+#include "CMinecraft.h"
 
 class CInventoryMenu;
 class BufferReader;
@@ -38,6 +40,7 @@ public:
 	void MsgFunc_Inventory(const char* pszName, BufferReader& reader);
 
 private:
+	std::vector<CInventory>* m_inventory;
 	vgui::BitmapTGA* m_pInventoryMenu;
 	vgui::ImagePanel* m_pLocalLabel;
 	vgui::Panel** m_pParentPanel;

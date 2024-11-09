@@ -89,6 +89,5 @@ void LinkUserMessages()
 
 	gmsgClientGibs = REG_USER_MSG("ClientGibs", 18);
 
-	gmsgInventory = REG_USER_MSG("Inventory", 1);
-	gmsgEffect = REG_USER_MSG("EffectUpdate", -1);
+	gmsgInventory = REG_USER_MSG("Inventory", -1);
 }

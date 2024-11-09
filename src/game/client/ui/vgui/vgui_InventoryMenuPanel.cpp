@@ -31,6 +31,7 @@ CInventoryMenu* GetClientInventoryMenu()
 
 CInventoryMenu::CInventoryMenu()
 {
+	m_inventory = new std::vector<CInventory>(static_cast<int>(InventorySlot::Arrows) + 1);
 	m_pInventoryMenu = nullptr;
 }
 
@@ -41,6 +42,9 @@ CInventoryMenu::~CInventoryMenu()
 
 	delete m_pLocalLabel;
 	m_pLocalLabel = nullptr;
+
+	delete m_inventory;
+	m_inventory = nullptr;
 }
 
 int CInventoryMenu::Init(vgui::Panel** pParentPanel)
@@ -102,15 +106,38 @@ void CInventoryMenu::FreeBitmaps()
 
 void CInventoryMenu::MsgFunc_Inventory(const char* pszName, BufferReader& reader)
 {
-	g_iVisibleMouse = m_fOn = 0 != reader.ReadByte();
+	InventoryNetwork action = static_cast<InventoryNetwork>( reader.ReadByte() );
 
-	if (g_iVisibleMouse)
+	switch( action )
 	{
-		vgui::App::getInstance()->setCursorOveride(vgui::App::getInstance()->getScheme()->getCursor(vgui::Scheme::scu_arrow));
-	}
-	else
-	{
-		IN_ResetMouse();
-		vgui::App::getInstance()->setCursorOveride(vgui::App::getInstance()->getScheme()->getCursor(vgui::Scheme::scu_none));
+		case InventoryNetwork::Close:
+		{
+			g_iVisibleMouse = m_fOn = false;
+			vgui::App::getInstance()->setCursorOveride(vgui::App::getInstance()->getScheme()->getCursor(vgui::Scheme::scu_arrow));
+			break;
+		}
+		case InventoryNetwork::Item:
+		{
+			int index = reader.ReadByte();
+			m_inventory->at(index).amount = reader.ReadByte();
+			m_inventory->at(index).classname = reader.ReadString();
+			break;
+		}
+		case InventoryNetwork::Data:
+		{
+			int index = reader.ReadByte();
+			int level = reader.ReadByte();
+			const char* name = reader.ReadString();
+			std::string_view sv = g_Minecraft.format_level( name, level );
+			m_inventory->at(index).enchants.push_back( sv );
+			break;
+		}
+		case InventoryNetwork::Open:
+		{
+			g_iVisibleMouse = m_fOn = true;
+			IN_ResetMouse();
+			vgui::App::getInstance()->setCursorOveride(vgui::App::getInstance()->getScheme()->getCursor(vgui::Scheme::scu_none));
+			break;
+		}
 	}
 }
