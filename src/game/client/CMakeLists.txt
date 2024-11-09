@@ -194,7 +194,6 @@ target_sources(client PRIVATE
 	ui/hud/hud_update.cpp
 	ui/hud/HudSpriteConfigSystem.cpp
 	ui/hud/HudSpriteConfigSystem.h
-	ui/hud/inventory.cpp
 	ui/hud/menu.cpp
 	ui/hud/message.cpp
 	ui/hud/saytext.cpp

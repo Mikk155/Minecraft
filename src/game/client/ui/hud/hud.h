@@ -646,23 +646,6 @@ private:
 	float m_DrawEndTime{0};
 };
 
-/**
- *	@brief Dibujamos el hud de minecraft en la pantalla. wea hablar en ingles zzz
- */
-class CHudInventory : public CHudBase
-{
-public:
-	bool Init() override;
-	bool VidInit() override;
-	void Reset() override;
-	bool Draw(float flTime) override;
-	void MsgFunc_Inventory(const char* pszName, BufferReader& reader);
-
-private:
-	int m_HUD_inventory;
-	bool m_fOn;
-};
-
 //
 //-----------------------------------------------------
 //
@@ -785,8 +768,6 @@ public:
 	CHudProjectInfo m_ProjectInfo;
 	CHudDebugInfo m_DebugInfo;
 	CHudEntityInfo m_EntityInfo;
-
-	CHudInventory m_Inventory;
 
 	void Init();
 	void Shutdown();
