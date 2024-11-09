@@ -224,22 +224,17 @@ void CInventoryMenu::MsgFunc_Inventory(const char* pszName, BufferReader& reader
 		case InventoryNetwork::Open:
 		{
 			g_iVisibleMouse = m_fOn = true;
+
+			//reset
+			for (auto& pInvButton : m_pButtons)
+			{
+				pInvButton->m_pButton->setSelected(false);
+				pInvButton->m_pButton->setArmed(false);
+			}
+
 			IN_ResetMouse();
 			vgui::App::getInstance()->setCursorOveride(vgui::App::getInstance()->getScheme()->getCursor(vgui::Scheme::scu_none));
 			break;
 		}
-		vgui::App::getInstance()->setCursorOveride(vgui::App::getInstance()->getScheme()->getCursor(vgui::Scheme::scu_arrow));
-	}
-	else
-	{
-		//reset
-		for (auto& pInvButton : m_pButtons)
-		{
-			pInvButton->m_pButton->setSelected(false);
-			pInvButton->m_pButton->setArmed(false);
-		}
-
-		IN_ResetMouse();
-		vgui::App::getInstance()->setCursorOveride(vgui::App::getInstance()->getScheme()->getCursor(vgui::Scheme::scu_none));
 	}
 }
