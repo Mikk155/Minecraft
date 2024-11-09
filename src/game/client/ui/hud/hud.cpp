@@ -139,7 +139,7 @@ void CHud::Init()
 	m_ProjectInfo.Init();
 	m_DebugInfo.Init();
 	m_EntityInfo.Init();
-	//GetClientInventoryMenu()->Init((vgui::Panel**)&gViewPort);
+	GetClientInventoryMenu()->Init((vgui::Panel**)&gViewPort);
 	GetClientVoiceMgr()->Init(&g_VoiceStatusHelper, (vgui::Panel**)&gViewPort);
 
 	m_Menu.Init();
