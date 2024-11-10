@@ -45,9 +45,9 @@ struct CInventory
 		: pItem(pItem), max_stack(max_stack), amount(amount) {}
 #else
 	const char* classname;
-	std::vector<std::string_view> enchants;
+	std::vector<std::string> enchants;
 
-	CInventory( const char* classname = nullptr, int amount = 1, std::vector<std::string_view> enchants = {} )
+	CInventory( const char* classname = nullptr, int amount = 1, std::vector<std::string> enchants = {} )
 		: classname(classname), amount(amount), enchants(enchants) {}
 #endif
 };

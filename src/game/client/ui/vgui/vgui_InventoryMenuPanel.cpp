@@ -24,6 +24,8 @@
 #include <VGUI_RadioButton.h>
 #include <VGUI_TextImage.h>
 
+#include <fmt/format.h>
+
 void IN_ResetMouse();
 extern bool g_iVisibleMouse;
 
@@ -36,8 +38,8 @@ CInventoryMenu* GetClientInventoryMenu()
 
 CInventoryMenu::CInventoryMenu()
 {
-	m_inventory = new std::vector<CInventory>(static_cast<int>(InventorySlot::Arrows) + 1);
-	m_pInventoryMenu = nullptr;
+	//m_inventory = new std::vector<CInventory>(static_cast<int>(InventorySlot::Arrows) + 1);
+	//m_pInventoryMenu = nullptr;
 }
 
 CInventoryMenu::~CInventoryMenu()
@@ -48,8 +50,8 @@ CInventoryMenu::~CInventoryMenu()
 	delete m_pLocalLabel;
 	m_pLocalLabel = nullptr;
 
-	delete m_inventory;
-	m_inventory = nullptr;
+	delete m_pButtonSelected;
+	m_pButtonSelected = nullptr;
 }
 
 int CInventoryMenu::Init(vgui::Panel** pParentPanel)
@@ -59,6 +61,7 @@ int CInventoryMenu::Init(vgui::Panel** pParentPanel)
 	m_fOn = false;
 	m_pParentPanel = pParentPanel;
 	m_pLocalLabel = new vgui::ImagePanel(nullptr);
+	m_pButtonSelected = nullptr;
 
 	g_ClientUserMessages.RegisterHandler("Inventory", &CInventoryMenu::MsgFunc_Inventory, this);
 
@@ -68,6 +71,7 @@ int CInventoryMenu::Init(vgui::Panel** pParentPanel)
 void CInventoryMenu::Reset()
 {
 	m_fOn = false;
+	m_pButtonSelected = nullptr;
 }
 
 bool CInventoryMenu::VidInit()
@@ -161,25 +165,30 @@ bool CInventoryMenu::Draw(float flTime)
 
 	for (auto& pInvButton : m_pButtons)
 	{
-
-		if (pInvButton->m_pButton->isSelected())
-			pInvButton->m_pButton->setText("ON");
-		else
-			pInvButton->m_pButton->setText(std::string(std::to_string(pInvButton->x) + " " + std::to_string(pInvButton->y)).c_str());
-
 		pInvButton->m_pButton->setVisible(m_fOn);
 
-		if (pInvButton->m_pButton->isSelected())
+		if (pInvButton->m_pButton->isSelected() && pInvButton->m_pButton->wasMousePressed(MOUSE_LEFT))
 		{
-			if (pInvButton->m_pButton->wasMousePressed(MOUSE_LEFT))
-			{
-				pInvButton->m_pButton->setSelected(false);
-				pInvButton->m_pButton->setArmed(false);
+			pInvButton->m_pButton->setSelected(false);
+			pInvButton->m_pButton->setArmed(false);
 
-				//Aca ya se selecciono el espacio de inventario
+			// Alterna entre las dos selecciones
+			if (!m_pButtonSelected)
+			{
+				m_pButtonSelected = pInvButton; // Primer botón seleccionado
+			}
+			else
+			{
+				// Segundo botón seleccionado
+				const auto msg = fmt::format("echo swap {} {} to {} {} \n", m_pButtonSelected->x, m_pButtonSelected->y, pInvButton->x, pInvButton->y);
+				gEngfuncs.pfnClientCmd(msg.c_str());
+
+				// Reinicia para una nueva selección después de ejecutar el comando
+				m_pButtonSelected = nullptr;
 			}
 		}
 	}
+
 
 	return true;
 }
@@ -202,15 +211,15 @@ void CInventoryMenu::MsgFunc_Inventory(const char* pszName, BufferReader& reader
 		case InventoryNetwork::Close:
 		{
 			// -MC Restore m_inventory objects
-			g_iVisibleMouse = m_fOn = false;
+			g_iVisibleMouse = m_fOn = true;
 			vgui::App::getInstance()->setCursorOveride(vgui::App::getInstance()->getScheme()->getCursor(vgui::Scheme::scu_arrow));
 			break;
 		}
 		case InventoryNetwork::Item:
 		{
 			int index = reader.ReadByte();
-			m_inventory->at(index).amount = reader.ReadByte();
-			m_inventory->at(index).classname = reader.ReadString();
+			m_inventory.at(index)->amount = reader.ReadByte();
+			m_inventory.at(index)->classname = reader.ReadString();
 			break;
 		}
 		case InventoryNetwork::Data:
@@ -218,15 +227,14 @@ void CInventoryMenu::MsgFunc_Inventory(const char* pszName, BufferReader& reader
 			int index = reader.ReadByte();
 			int level = reader.ReadByte();
 			const char* name = reader.ReadString();
-			std::string_view sv = g_Minecraft.format_level( name, level );
-			m_inventory->at(index).enchants.push_back( sv );
+			m_inventory.at(index)->enchants.push_back(g_Minecraft.format_level(name, level));
 			break;
 		}
 		case InventoryNetwork::Open:
 		{
-			for( size_t i = 0; i < m_inventory->size(); ++i )
+			for( size_t i = 0; i < m_inventory.size(); ++i )
 			{
-				if( auto name = m_inventory->at(i).classname; name != nullptr )
+				if (auto name = m_inventory.at(i)->classname; name != nullptr)
 				{
 					// i el slot del inventario
 					// name el nombre de tu estructura de informacion
@@ -236,7 +244,7 @@ void CInventoryMenu::MsgFunc_Inventory(const char* pszName, BufferReader& reader
 					// m_inventory->at(i).amount < cantidad de items
 				}
 			}
-			g_iVisibleMouse = m_fOn = true;
+			g_iVisibleMouse = m_fOn = false;
 
 			//reset
 			for (auto& pInvButton : m_pButtons)
@@ -250,4 +258,6 @@ void CInventoryMenu::MsgFunc_Inventory(const char* pszName, BufferReader& reader
 			break;
 		}
 	}
+
+	m_pButtonSelected = nullptr;
 }

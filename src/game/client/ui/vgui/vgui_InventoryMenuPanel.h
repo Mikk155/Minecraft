@@ -56,15 +56,17 @@ public:
 	void MsgFunc_Inventory(const char* pszName, BufferReader& reader);
 
 private:
-	std::vector<CInventory>* m_inventory;
+	std::vector<CInventory*> m_inventory; //-M
+
 	vgui::BitmapTGA* m_pInventoryMenu;
 	vgui::ImagePanel* m_pLocalLabel;
 	vgui::Panel** m_pParentPanel;
 
 	std::vector<InventoryButton*> m_pButtons;
+	InventoryButton *m_pButtonSelected;
 	bool m_fOn;
+
 	int m_Inventory;
 };
 
-// Get the (global) voice manager.
 CInventoryMenu* GetClientInventoryMenu();
