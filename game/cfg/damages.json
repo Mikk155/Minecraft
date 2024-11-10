@@ -1,6 +1,0 @@
-{
-    // Burns the victim and apply 0.5 ♥ every second for effect_fire_time seconds.
-    "effect_fire_damage": 0.5,
-    // effect_fire_time * effect level so Fire II will double the value.
-    "effect_fire_time": 4.0
-}
