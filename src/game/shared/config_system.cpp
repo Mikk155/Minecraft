@@ -106,6 +106,7 @@ void ConfigurationSystem::LoadConfigFiles()
 	// -MC Merge all in one json, for the moment is just as for dev
 	LoadConfigFile( "cfg/player.json" );
 	LoadConfigFile( "cfg/mobs.json" );
+	LoadConfigFile( "cfg/damages.json" );
 #endif
 }
 
