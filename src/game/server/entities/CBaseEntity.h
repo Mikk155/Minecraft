@@ -107,7 +107,7 @@ struct DamageInfo
 	DamageInfo(
 		CBaseEntity* attacker = nullptr,
 		float damage = 0.0,
-		int bits = 0,
+		DMG bits = DMG::GENERIC,
 		CBaseEntity* weapon = nullptr,
 		CBaseEntity* inflictor = nullptr,
 		Vector direction = g_vecZero,
@@ -115,7 +115,7 @@ struct DamageInfo
 	) :
 	attacker(attacker),
 	damage(damage),
-	bits(bits),
+	bits((int)bits),
 	weapon(weapon),
 	inflictor(inflictor),
 	direction(direction),

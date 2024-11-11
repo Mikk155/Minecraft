@@ -652,6 +652,35 @@ void SV_CreateClientCommands()
 		// -MC drop current item in slot
 	} );
 
+/*
+error C3321: en este contexto no se espera ninguna lista de inicializadores
+error C2672: 'operator __surrogate_func': no se encontró una función sobrecargada que coincida 
+error C2780: 'auto SV_CreateClientCommands::<lambda_12>::operator ()(CBasePlayer *,const _T1 &) const': se esperan 2 argumentos; 1 proporcionados
+	g_ClientCommands.Create("cheat_effect", [](CBasePlayer* player, const CommandArgs& args)
+	{
+		if( args.Count() == 1 )
+		{
+			UTIL_ConsolePrint(player, "Usage: effect <effect_name> <optional:level> <optional:time> <optional:cooldown>\n");
+			return;
+		}
+
+		std::string_view name = std::string_view( args.Argument(1) );
+
+		if( !g_Minecraft.Effects.Exists( name ) )
+		{
+			UTIL_ConsolePrint(player, "Effect %s doesn't exists!\n", args.Argument(1) );
+			return;
+		}
+
+		float level = ( args.Count() > 2 ? atof(args.Argument(2)) : 1 );
+		float end = ( args.Count() > 3 ? atof(args.Argument(3)) : 5 );
+		float time = ( args.Count() > 4 ? atof(args.Argument(4)) : 0.0f );
+
+		CEffectsData effect( name, level, end, time, player );
+		player->AddEffect( name, effect );
+	}{.Flags = ClientCommandFlag::Cheat});
+*/
+
 	g_ClientCommands.Create("lastinv", [](CBasePlayer* player, const auto& args)
 		{ player->SelectLastItem(); });
 

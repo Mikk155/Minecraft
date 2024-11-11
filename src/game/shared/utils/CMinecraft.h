@@ -85,7 +85,8 @@ enum class DMG : int
 	LAVA	= (1 << 3 ),
 	FREEZE	= (1 << 4 ),	// frozen
 	FALL	= (1 << 5 ),	// fell too far
-	BLAST	= (1 << 6 ),	// explosive blast damage
+	// explosive blast damage
+	BLAST	= (1 << 6 ),
 	DROWN	= (1 << 14),	// Drowning
 	POISON	= (1 << 17)		// blood poisioning
 };
@@ -96,7 +97,8 @@ struct CLevelStruct
     std::string_view display_name;
     int max_level;
 
-    constexpr CLevelStruct(std::string_view name, std::string_view display_name, int max_level) : name(name), display_name(display_name), max_level(max_level) {}
+    constexpr CLevelStruct(std::string_view name, std::string_view display_name, int max_level)
+		: name(name), display_name(display_name), max_level(max_level) { }
 };
 
 struct CEffectsData
@@ -120,6 +122,7 @@ struct CEffectsData
 class CEffects
 {
 	public:
+		bool Exists(std::string_view effect_name);
 		constexpr static CLevelStruct fire{ "fire"sv, "Fire"sv, 2 };
 		constexpr static CLevelStruct speed{ "speed"sv, "Speed"sv, 2 };
 		constexpr static CLevelStruct slowness{ "slowness"sv, "Slowness"sv, 4 };
@@ -148,6 +151,20 @@ class CEffects
 		constexpr static CLevelStruct fatal_poison{ "fatal_poison"sv, "Fatal Poison"sv, 0 };
 		constexpr static CLevelStruct slow_falling{ "slow_falling"sv, "Slow Falling"sv, 0 };
 		constexpr static CLevelStruct darkness{ "darkness"sv, "Darkness"sv, 0 };
+	
+	private:
+
+		// -MC How to propertly set this automatically through CLevelStruct constructor?
+		std::vector< std::string_view > _effects_ = {
+			fire.name, speed.name, slowness.name, fire_resistance.name, haste.name, fatigue.name,
+			strength.name, instant_health.name, instant_damage.name, jump_boost.name,
+			nausea.name, regeneration.name, resistance.name, water_breathing.name,
+			invisibility.name, blindness.name, night_vision.name, weakness.name,
+			poison.name, wither.name, absorption.name, glowing.name,
+			levitation.name, luck.name, bad_luck.name,
+			fatal_poison.name, slow_falling.name,
+			darkness.name
+		};
 };
 
 class CEnchants
@@ -182,8 +199,6 @@ class CMinecraft final
 		static CEnchants Enchants;
 
 		static CEffects Effects;
-
-	private:
 };
 
 inline CEnchants CMinecraft::Enchants;

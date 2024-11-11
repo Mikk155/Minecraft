@@ -56,7 +56,6 @@ public:
 	void MsgFunc_Inventory(const char* pszName, BufferReader& reader);
 
 private:
-	std::vector<CInventory*> m_inventory; //-M
 
 	vgui::BitmapTGA* m_pInventoryMenu;
 	vgui::ImagePanel* m_pLocalLabel;

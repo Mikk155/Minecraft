@@ -879,24 +879,41 @@ public:
 
 	InventorySlot m_iActiveItem = InventorySlot::Hotbar1;
 
+    std::vector<CInventory*> inventory;
+
 	void InventorySelectSlot(int slot);
 	void InventorySwapSlot(int from, int to);
 	void InventoryDropItem(int slot);
 	void InventoryPostFrame();
 
+	std::unordered_map<std::string_view, CEffectsData*> effects = {};
+
+	void AddEffect(std::string_view effect_name, CEffectsData new_data);
+	void EffectsCheck();
 
     CBaseMonster()
     {
-        inventory = new std::vector<CInventory>(static_cast<int>(InventorySlot::Arrows) + 1);
+		int MAX_SLOTS = static_cast<int>( IsMonster() ? InventorySlot::MONSTER_MAX_SLOTS : InventorySlot::MAX_SLOTS );
+
+		for( int i = 0; i < MAX_SLOTS; i++ )
+		{
+            CInventory* pInventory = new CInventory();
+            inventory.push_back(pInventory);
+		}
     }
 
     ~CBaseMonster()
     {
-        delete inventory;
+        for( auto pInventory : inventory ) {
+            delete pInventory;
+        }
+        inventory.clear();
+
+        for( auto& [key, pEffect] : effects ) {
+            delete pEffect;
+        }
+        effects.clear();
     }
-
-    std::vector<CInventory>* inventory;
-
 };
 
 template <typename Callback>

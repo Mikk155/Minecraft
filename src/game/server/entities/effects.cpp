@@ -708,7 +708,7 @@ void CBeam::BeamDamage(TraceResult* ptr)
 			DamageInfo info(
 				this,
 				pev->dmg * (gpGlobals->time - pev->dmgtime),
-				DMG_ENERGYBEAM,
+				DMG::GENERIC,
 				nullptr,
 				nullptr,
 				(ptr->vecEndPos - pev->origin).Normalize(),

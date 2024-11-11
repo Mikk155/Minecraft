@@ -38,7 +38,6 @@ CInventoryMenu* GetClientInventoryMenu()
 
 CInventoryMenu::CInventoryMenu()
 {
-	//m_inventory = new std::vector<CInventory>(static_cast<int>(InventorySlot::Arrows) + 1);
 	//m_pInventoryMenu = nullptr;
 }
 
@@ -175,15 +174,15 @@ bool CInventoryMenu::Draw(float flTime)
 			// Alterna entre las dos selecciones
 			if (!m_pButtonSelected)
 			{
-				m_pButtonSelected = pInvButton; // Primer botón seleccionado
+				m_pButtonSelected = pInvButton; // Primer boton seleccionado
 			}
 			else
 			{
-				// Segundo botón seleccionado
+				// Segundo boton seleccionado
 				const auto msg = fmt::format("echo swap {} {} to {} {} \n", m_pButtonSelected->x, m_pButtonSelected->y, pInvButton->x, pInvButton->y);
 				gEngfuncs.pfnClientCmd(msg.c_str());
 
-				// Reinicia para una nueva selección después de ejecutar el comando
+				// Reinicia para una nueva seleccion despuos de ejecutar el comando
 				m_pButtonSelected = nullptr;
 			}
 		}
@@ -210,7 +209,7 @@ void CInventoryMenu::MsgFunc_Inventory(const char* pszName, BufferReader& reader
 	{
 		case InventoryNetwork::Close:
 		{
-			// -MC Restore m_inventory objects
+			// Aca limpia todos los objetos
 			g_iVisibleMouse = m_fOn = true;
 			vgui::App::getInstance()->setCursorOveride(vgui::App::getInstance()->getScheme()->getCursor(vgui::Scheme::scu_arrow));
 			break;
@@ -218,8 +217,8 @@ void CInventoryMenu::MsgFunc_Inventory(const char* pszName, BufferReader& reader
 		case InventoryNetwork::Item:
 		{
 			int index = reader.ReadByte();
-			m_inventory.at(index)->amount = reader.ReadByte();
-			m_inventory.at(index)->classname = reader.ReadString();
+//			Cantidad de objetos reader.ReadByte();
+//			Nombre del objeto reader.ReadString();
 			break;
 		}
 		case InventoryNetwork::Data:
@@ -227,23 +226,13 @@ void CInventoryMenu::MsgFunc_Inventory(const char* pszName, BufferReader& reader
 			int index = reader.ReadByte();
 			int level = reader.ReadByte();
 			const char* name = reader.ReadString();
-			m_inventory.at(index)->enchants.push_back(g_Minecraft.format_level(name, level));
+//			Encantamientos en este item g_Minecraft.format_level(name, level)
 			break;
 		}
 		case InventoryNetwork::Open:
 		{
-			for( size_t i = 0; i < m_inventory.size(); ++i )
-			{
-				if (auto name = m_inventory.at(i)->classname; name != nullptr)
-				{
-					// i el slot del inventario
-					// name el nombre de tu estructura de informacion
-					// Que pueda contener el sprite y display name del item
+			/* Aca lee los objetos que recibiste */
 
-					// m_inventory->at(i).enchants < encantamientos, si hay alguno
-					// m_inventory->at(i).amount < cantidad de items
-				}
-			}
 			g_iVisibleMouse = m_fOn = false;
 
 			//reset
