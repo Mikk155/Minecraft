@@ -40,3 +40,9 @@ std::string CMinecraft::format_level( const char* str1, int num )
 		return fmt::format( "{} {}", str1, level( num ) );
 	return std::string( str1 );
 }
+
+
+bool CEffects::Exists(std::string_view effect_name)
+{
+    return std::find( _effects_.begin(), _effects_.end(), effect_name ) != _effects_.end();
+}

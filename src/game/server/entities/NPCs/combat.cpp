@@ -915,7 +915,7 @@ void RadiusDamage(Vector vecSrc, CBaseEntity* inflictor, CBaseEntity* attacker, 
 					DamageInfo info(
 						inflictor,
 						flAdjustedDamage,
-						bitsDamageType,
+						DMG::BLAST,
 						nullptr,
 						nullptr,
 						(tr.vecEndPos - vecSrc).Normalize(),
@@ -1089,6 +1089,19 @@ void CBaseEntity::TraceAttack(DamageInfo* info)
 
 void CBaseMonster::TraceAttack(DamageInfo* info)
 {
+	if( FBitSet( info->bits, (int)DMG::LAVA ) )
+	{
+		// -MC call on for depending pev->waterlevel
+		DamageInfo new_info(
+			info->attacker,
+			g_Cfg.GetValue( "effect_fire_damage"sv, 0.5 ),
+			DMG::FIRE,
+			info->weapon,
+			info->inflictor
+		);
+		TraceAttack(&new_info);
+	}
+
 	if (0 != pev->takedamage)
 	{
 		m_LastHitGroup = info->tr->iHitgroup;
@@ -1247,12 +1260,12 @@ void CBaseMonster::InventorySelectSlot(int slot)
 
 void CBaseMonster::InventorySwapSlot(int from, int to)
 {
-	std::swap((*inventory)[ from ], (*inventory)[ to ]);
+	std::swap( inventory[ from ], inventory[ to ] );
 }
 
 void CBaseMonster::InventoryDropItem(int slot)
 {
-	if( auto pItem = inventory->at(slot).pItem; pItem != nullptr )
+	if( auto pItem = inventory.at(slot)->pItem; pItem != nullptr )
 	{
 		// -MC Drop logic
 		pItem = nullptr;
@@ -1261,8 +1274,8 @@ void CBaseMonster::InventoryDropItem(int slot)
 
 void CBaseMonster::InventoryPostFrame()
 {
-	auto m_RightHandSlot = inventory->at(static_cast<int>(m_iActiveItem)).pItem;
-	auto m_LeftHandSlot = inventory->at(static_cast<int>(InventorySlot::LeftHand)).pItem;
+	auto m_RightHandSlot = inventory.at(static_cast<int>(m_iActiveItem))->pItem;
+	auto m_LeftHandSlot = inventory.at(static_cast<int>(InventorySlot::LeftHand))->pItem;
 
 	if( FBitSet( pev->button, IN_ATTACK2 ) )
 	{
@@ -1310,5 +1323,61 @@ void CBaseMonster::InventoryPostFrame()
 		}
 
 		ClearBits( pev->button, IN_ATTACK );
+	}
+}
+
+void CBaseMonster::AddEffect(std::string_view effect_name, CEffectsData new_data)
+{
+	CEffectsData* data;
+
+	if( effects.find( effect_name ) != effects.end() )
+	{
+		data = effects[ effect_name ];
+
+		// Greater levels will have priority
+		if( new_data.level > data->level )
+		{
+			data = &new_data;
+		}
+		else if( new_data.level == data->level )
+		{
+			// Greater time will update time and attacker
+			if( new_data.end == data->end )
+			{
+				data->end = new_data.end;
+				data->attacker = new_data.attacker;
+			}
+		}
+	}
+	else
+	{
+		// Doesn't exists, create one.
+		data = &new_data;
+	}
+	// -MC Update client data.
+	effects[ effect_name ] = data;
+
+	if( effect_name == g_Minecraft.Effects.absorption.name )
+	{
+		float flValue = 0.5 * data->level;
+		if( flValue > pev->armorvalue )
+			pev->armorvalue = flValue;
+	}
+}
+
+void CBaseMonster::EffectsCheck()
+{
+	CEffectsData* data;
+
+	if( effects.find( g_Minecraft.Effects.fire.display_name ) != effects.end() )
+	{
+		data = effects[ g_Minecraft.Effects.fire.display_name ];
+
+		if( data->last_time <= gpGlobals->time )
+		{
+			DamageInfo info( data->attacker, g_Cfg.GetValue( "effect_fire_damage"sv, 0.5 ), DMG::FIRE );
+			TraceAttack(&info);
+			data->last_time = gpGlobals->time + ( g_Cfg.GetValue( "effect_fire_time"sv, 4.0f ) * data->level );
+		}
 	}
 }

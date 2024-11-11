@@ -221,7 +221,7 @@ void CGrenade::BounceTouch(CBaseEntity* pOther)
 			DamageInfo info(
 				owner,
 				1,
-				DMG_CLUB,
+				DMG::BLAST,
 				nullptr,
 				nullptr,
 				gpGlobals->v_forward,

@@ -1065,5 +1065,5 @@ void CBaseEntity::StopSound(int channel, const char* sample)
 
 void CBaseEntity::effect_fire(int level, CBaseEntity* inflictor, CBaseEntity* attacker)
 {
-	TakeDamage(inflictor, attacker, 0.5, DMG_MC_FIRE);
+	//TakeDamage(inflictor, attacker, 0.5, DMG_MC_FIRE);
 }

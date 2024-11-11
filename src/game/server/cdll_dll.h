@@ -136,10 +136,7 @@ constexpr int WEAPON_NOCLIP = -1;
 #define DMG_CRUSH (1 << 0)		 // crushed by falling or moving object
 #define DMG_BULLET (1 << 1)		 // shot
 #define DMG_SLASH (1 << 2)		 // cut, clawed, stabbed
-
 #define DMG_BURN (1 << 3)		 // heat burned
-#define DMG_MC_FIRE (1 << 3)
-
 #define DMG_FREEZE (1 << 4)		 // frozen
 #define DMG_FALL (1 << 5)		 // fell too far
 #define DMG_BLAST (1 << 6)		 // explosive blast damage

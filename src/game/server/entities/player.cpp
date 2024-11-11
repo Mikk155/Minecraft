@@ -1351,17 +1351,17 @@ void CBasePlayer::PlayerUse()
 		return;
 	}
 
-	for( size_t i = 0; i < inventory->size(); ++i )
+	for( size_t i = 0; i < inventory.size(); ++i )
 	{
-		if( inventory->at(i).pItem != nullptr )
+		if( auto pItem = inventory.at(i)->pItem; pItem != nullptr )
 		{
 			MESSAGE_BEGIN( MSG_ONE, gmsgInventory, nullptr, this );
 				WRITE_BYTE( static_cast<int>(InventoryNetwork::Item) );
 				WRITE_BYTE( i );
-				WRITE_BYTE( inventory->at(i).amount );
-				WRITE_STRING( inventory->at(i).pItem->GetClassname() );
+				WRITE_BYTE( (int)pItem->pev->health );
+				WRITE_STRING( pItem->GetClassname() );
 			MESSAGE_END();
-			
+
 			/*
 				for enchants in pItem
 
