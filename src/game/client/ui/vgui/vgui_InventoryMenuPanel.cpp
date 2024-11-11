@@ -24,8 +24,6 @@
 #include <VGUI_RadioButton.h>
 #include <VGUI_TextImage.h>
 
-#include <fmt/format.h>
-
 void IN_ResetMouse();
 extern bool g_iVisibleMouse;
 
@@ -44,8 +42,8 @@ CInventoryMenu::CInventoryMenu()
 
 CInventoryMenu::~CInventoryMenu()
 {
-	delete m_pInventoryMenu;
-	m_pInventoryMenu = nullptr;
+	//delete m_pInventoryMenu;
+	//m_pInventoryMenu = nullptr;
 
 	delete m_pLocalLabel;
 	m_pLocalLabel = nullptr;
@@ -78,54 +76,32 @@ bool CInventoryMenu::VidInit()
 {
 	CInventoryMenu::FreeBitmaps();
 
-	int idx = 0, idy = 0;
-	int start_x = 16, start_y = 16;
-	int size_x = 32, size_y = 32;
-	int space_x = 4, space_y = 4;
+	InventorySize invSizeLeft {"mc/{}/inventory_left.tga", "640", 166, 214};
+	InventorySize invSizeRight{"mc/{}/inventory_right.tga", "640", 352, 198};
 
 	if (ScreenWidth < 640) 
 	{
-		if (m_pInventoryMenu = vgui_LoadTGA("gfx/vgui/320_inventory.tga", false); m_pInventoryMenu)
-			m_pInventoryMenu->setColor(vgui::Color(255, 255, 255, 1));
-
-		m_Inventory = gHUD.GetSpriteIndex("320inventory");
-
-		start_x /= 2;
-		start_y /= 2;
-		size_x /= 2;
-		size_y /= 2;
-		space_x /= 2;
-		space_y /= 2;
+		invSizeLeft.resize(320); 
+		invSizeRight.resize(320); 
 	}
-	else
-	{
-		if (m_pInventoryMenu = vgui_LoadTGA("gfx/vgui/640_inventory.tga", false); m_pInventoryMenu)
-			m_pInventoryMenu->setColor(vgui::Color(255, 255, 255, 1));
 
-		m_Inventory = gHUD.GetSpriteIndex("640inventory");
-	}
+	if (m_pInventoryLeft = vgui_LoadTGA(invSizeLeft.getPath(), false); m_pInventoryLeft)
+		m_pInventoryLeft->setColor(vgui::Color(255, 255, 255, 1));
+
+	if (m_pInventoryRight = vgui_LoadTGA(invSizeRight.getPath(), false); m_pInventoryRight)
+		m_pInventoryRight->setColor(vgui::Color(255, 255, 255, 1));
 
 	//Obtengo el alto y largo de hud.json 
-	Rect rect = gHUD.GetSpriteRect(m_Inventory);
-	m_pLocalLabel->setVisible(false);
-	m_pLocalLabel->setParent(*m_pParentPanel);
-	m_pLocalLabel->setImage(m_pInventoryMenu);
-	m_pLocalLabel->setBounds((ScreenWidth / 2) - rect.right / 2, (ScreenHeight / 2) - rect.bottom / 2, rect.right, rect.bottom);
+	//Rect rect = gHUD.GetSpriteRect(m_Inventory);
+	//m_pLocalLabel->setVisible(false);
+	//m_pLocalLabel->setParent(*m_pParentPanel);
+	//m_pLocalLabel->setImage(m_pInventoryLeft);
+	//m_pLocalLabel->setBounds((ScreenWidth / 2) - rect.right / 2, (ScreenHeight / 2) - rect.bottom / 2, rect.right, rect.bottom);
 
-	auto createButton = [](int posX, int posY, int sizeX, int sizeY, int x, int y, vgui::Panel** parentPanel, std::vector<InventoryButton*>& m_pButtons)
-	{
-		vgui::Button* m_pButton = new CommandButton("", posX, posY, sizeX, sizeY);
-		m_pButton->setVisible(false);
-		m_pButton->setParent(*parentPanel);
-		m_pButton->setFgColor(Scheme::sc_primary1);
-		m_pButton->setBgColor(0, 0, 0, 0);
-
-		m_pButtons.push_back(new InventoryButton(x, y, m_pButton));
-	};
-
+	/*
 	for (int y = 0; y < 4; y++)
 	{
-		createButton(((ScreenWidth / 2) - rect.right / 2) + start_x, ((ScreenHeight / 2) - rect.bottom / 2) + start_y, size_x, size_y, idx, idy, m_pParentPanel, m_pButtons);
+		CreateButton(((ScreenWidth / 2) - rect.right / 2) + start_x, ((ScreenHeight / 2) - rect.bottom / 2) + start_y, size_x, size_y, idx, idy, m_pParentPanel);
 		start_y += size_y + space_y;
 		idy++;
 	}
@@ -136,7 +112,7 @@ bool CInventoryMenu::VidInit()
 	{
 		for (int x = 0; x <= 8; x++)
 		{
-			createButton(((ScreenWidth / 2) - rect.right / 2) + start_x + (size_x + space_x) * x, ((ScreenHeight / 2) - rect.bottom / 2) + start_y, size_x, size_y, idx, idy, m_pParentPanel, m_pButtons);
+			CreateButton(((ScreenWidth / 2) - rect.right / 2) + start_x + (size_x + space_x) * x, ((ScreenHeight / 2) - rect.bottom / 2) + start_y, size_x, size_y, idx, idy, m_pParentPanel);
 			idx++;
 		}
 
@@ -149,9 +125,10 @@ bool CInventoryMenu::VidInit()
 
 	for (int x = 0; x <= 8; x++)
 	{
-		createButton(((ScreenWidth / 2) - rect.right / 2) + start_x + (size_x + space_x) * x, ((ScreenHeight / 2) - rect.bottom / 2) + start_y, size_x, size_y, idx, idy, m_pParentPanel, m_pButtons);
+		CreateButton(((ScreenWidth / 2) - rect.right / 2) + start_x + (size_x + space_x) * x, ((ScreenHeight / 2) - rect.bottom / 2) + start_y, size_x, size_y, idx, idy, m_pParentPanel);
 		idx++;
 	}
+	*/
 
 	return true;
 }
@@ -163,6 +140,7 @@ bool CInventoryMenu::Draw(float flTime)
 
 	m_pLocalLabel->setVisible(m_fOn);
 
+	/*
 	for (auto& pInvButton : m_pButtons)
 	{
 		pInvButton->m_pButton->setVisible(m_fOn);
@@ -172,31 +150,40 @@ bool CInventoryMenu::Draw(float flTime)
 			pInvButton->m_pButton->setSelected(false);
 			pInvButton->m_pButton->setArmed(false);
 
-			// Alterna entre las dos selecciones
 			if (!m_pButtonSelected)
 			{
-				m_pButtonSelected = pInvButton; // Primer botón seleccionado
+				m_pButtonSelected = pInvButton;
 			}
 			else
 			{
-				// Segundo botón seleccionado
 				const auto msg = fmt::format("echo swap {} {} to {} {} \n", m_pButtonSelected->x, m_pButtonSelected->y, pInvButton->x, pInvButton->y);
 				gEngfuncs.pfnClientCmd(msg.c_str());
 
-				// Reinicia para una nueva selección después de ejecutar el comando
 				m_pButtonSelected = nullptr;
 			}
 		}
 	}
-
+	*/
 
 	return true;
 }
 
+InventoryButton* CInventoryMenu::CreateButton(int posX, int posY, int sizeX, int sizeY, int x, int y, vgui::Panel** parentPanel)
+{
+	vgui::Button* m_pButton = new CommandButton("", posX, posY, sizeX, sizeY);
+	m_pButton->setVisible(false);
+	m_pButton->setParent(*parentPanel);
+	m_pButton->setFgColor(Scheme::sc_primary1);
+	m_pButton->setBgColor(0, 0, 0, 0);
+
+	return new InventoryButton{x, y, m_pButton};
+}
+
 void CInventoryMenu::FreeBitmaps()
 {
-	delete m_pInventoryMenu;
-	m_pInventoryMenu = nullptr;
+	delete m_pInventoryLeft, m_pInventoryRight;
+	m_pInventoryLeft = nullptr;
+	m_pInventoryRight = nullptr;
 
 	if (m_pLocalLabel)
 		m_pLocalLabel->setImage(nullptr);

@@ -13,6 +13,7 @@
 #include "VGUI_BitmapTGA.h"
 
 #include "CMinecraft.h"
+#include <fmt/format.h>
 
 class CInventoryMenu;
 class BufferReader;
@@ -26,15 +27,42 @@ namespace vgui
 	class TextPanel;
 }
 
-class InventoryButton
+struct InventoryButton
 {
-public:
 	int x, y;
 	vgui::Button* m_pButton;
 
-	InventoryButton(int x, int y, vgui::Button* m_pButton)
-		: x(x), y(y), m_pButton(m_pButton)
+};
+
+struct InventorySize
+{
+	std::string path; 
+	std::string resolution;
+	int wide, tall;
+	int dx, dy;
+
+	bool resize(int mult)
 	{
+		if (mult % 320 == 0)
+		{
+			int factor = std::stoi(resolution) / mult;
+			wide /= factor;
+			tall /= factor;
+			resolution = std::to_string(mult);
+		}
+		else
+		{
+			wide *= mult;
+			tall *= mult;
+			resolution = std::to_string(std::stoi(resolution) * mult);
+		}
+
+		return true;
+	}
+
+	const char* getPath()
+	{
+		return fmt::format(path.c_str(), resolution).c_str();
 	}
 };
 
@@ -44,7 +72,6 @@ public:
 	CInventoryMenu();
 	virtual ~CInventoryMenu();
 
-	// CHudBase overrides.
 public:
 	virtual int Init(vgui::Panel** pParentPanel);;
 	bool VidInit() override;
@@ -53,12 +80,13 @@ public:
 
 public:
 	void FreeBitmaps();
+	InventoryButton* CreateButton(int posX, int posY, int sizeX, int sizeY, int x, int y, vgui::Panel** parentPanel);
 	void MsgFunc_Inventory(const char* pszName, BufferReader& reader);
 
 private:
 	std::vector<CInventory*> m_inventory; //-M
 
-	vgui::BitmapTGA* m_pInventoryMenu;
+	vgui::BitmapTGA* m_pInventoryLeft,* m_pInventoryRight;
 	vgui::ImagePanel* m_pLocalLabel;
 	vgui::Panel** m_pParentPanel;
 
