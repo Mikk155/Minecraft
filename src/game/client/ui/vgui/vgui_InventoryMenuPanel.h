@@ -14,6 +14,7 @@
 
 #include "CMinecraft.h"
 #include <fmt/format.h>
+#include <string>
 
 class CInventoryMenu;
 class BufferReader;
@@ -36,7 +37,8 @@ struct InventoryButton
 
 struct InventorySize
 {
-	std::string path; 
+	std::string path;
+	std::string fileName;
 	std::string resolution;
 	int wide, tall;
 	int dx, dy;
@@ -56,13 +58,12 @@ struct InventorySize
 			tall *= mult;
 			resolution = std::to_string(std::stoi(resolution) * mult);
 		}
-
 		return true;
 	}
 
-	const char* getPath()
+	std::string getPath() const
 	{
-		return fmt::format(path.c_str(), resolution).c_str();
+		return fmt::format("{}{}/{}", path, resolution, fileName);
 	}
 };
 
