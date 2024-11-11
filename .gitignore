@@ -18,3 +18,7 @@ build*
 
 # Local build of FGD
 game/fgd*
+/.claudiaideconfig
+/.gitignore
+/.gitignore
+/.gitignore
