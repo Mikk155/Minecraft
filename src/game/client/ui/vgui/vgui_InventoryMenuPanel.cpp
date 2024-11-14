@@ -181,21 +181,18 @@ bool CInventoryMenu::Draw(float flTime)
 	{
 		pInvButton->setVisible(m_fOn);
 
-		if (pInvButton->isArmed())
+		if (pInvButton->isArmed() && pInvButton->wasMouseReleased(MOUSE_LEFT))
 		{
-			if (pInvButton->wasMousePressed(MOUSE_LEFT))
+			//pInvButton->setSelected(false);
+			//pInvButton->setArmed(false);
+
+			if (m_pButtonSelected)
 			{
-				pInvButton->setSelected(false);
-				pInvButton->setArmed(false);
-
-				if (m_pButtonSelected)
-				{
-					const auto msg = fmt::format("echo swap {} to {} \n", m_pButtonSelected->getSlot(), pInvButton->getSlot());
-					gEngfuncs.pfnClientCmd(msg.c_str());
-				}
-
-				m_pButtonSelected = (m_pButtonSelected) ? nullptr : pInvButton;
+				const auto msg = fmt::format("echo swap {} to {} \n", m_pButtonSelected->getSlot(), pInvButton->getSlot());
+				gEngfuncs.pfnClientCmd(msg.c_str());
 			}
+
+			m_pButtonSelected = (m_pButtonSelected) ? nullptr : pInvButton;
 		}
 	}
 
