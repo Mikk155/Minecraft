@@ -650,6 +650,9 @@ public:
 	void SendScoreInfoAll();
 
 	void ToggleCheat(Cheat cheat);
+
+    // Don't direct use, this is entirely managed by env_sky entity.
+    int m_iSkyEnvironment = 0;
 };
 
 inline void CBasePlayer::SetWeaponBit(int id)

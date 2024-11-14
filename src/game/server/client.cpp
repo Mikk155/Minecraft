@@ -42,6 +42,8 @@
 
 #include "ctf/ctf_goals.h"
 
+#include "CClientEnvSky.h"
+
 unsigned int g_ulFrameCount;
 
 /**
@@ -176,6 +178,8 @@ void ClientPutInServer(edict_t* pEntity)
 	pPlayer->pev->iuser1 = 0;	// disable any spec modes
 	pPlayer->pev->iuser2 = 0;
 	*/
+
+	SetClientEnvironmentSky(pPlayer);
 
 	pPlayer->m_Connected = true;
 	pPlayer->m_ConnectTime = gpGlobals->time;

@@ -3875,29 +3875,6 @@ void CBasePlayer::UpdateClientData()
 			}
 		}
 
-		//! New
-		{
-			// g-cont. found env sky and send message all players
-			CBaseEntity* pSky = UTIL_FindEntityByClassname(NULL, "env_sky");
-			if (!FNullEnt(pSky))
-			{
-				MESSAGE_BEGIN(MSG_ONE, gmsgSetSky, nullptr, this);
-				WRITE_BYTE(1);					  // mode
-				WRITE_COORD(pSky->pev->origin.x); // view position
-				WRITE_COORD(pSky->pev->origin.y);
-				WRITE_COORD(pSky->pev->origin.z);
-				MESSAGE_END();
-
-				// g-cont. found all skyents
-				edict_t* pent = UTIL_EntitiesInPVS(pSky->edict());
-				while (!FNullEnt(pent))
-				{
-					SetBits(pent->v.flags, FL_IMMUNE_WATER); // hack
-					pent = pent->v.chain;
-				}
-			}
-		}
-
 		if (g_pGameRules->IsMultiplayer())
 		{
 			RefreshCustomHUD(this);
