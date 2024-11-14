@@ -15,20 +15,20 @@
 
 #include "CMinecraft.h"
 
-std::string_view CMinecraft::level( int num )
+std::string CMinecraft::level( int num )
 {
 	switch( num )
 	{
-		case 1: return "I"sv;
-		case 2: return "II"sv;
-		case 3: return "III"sv;
-		case 4: return "IV"sv;
-		case 5: return "V"sv;
-		case 6: return "VI"sv;
-		case 7: return "VII"sv;
-		case 8: return "VIII"sv;
-		case 9: return "IX"sv;
-		case 10: return "X"sv;
+		case 1: return "I";
+		case 2: return "II";
+		case 3: return "III";
+		case 4: return "IV";
+		case 5: return "V";
+		case 6: return "VI";
+		case 7: return "VII";
+		case 8: return "VIII";
+		case 9: return "IX";
+		case 10: return "X";
 	}
 
 	return std::to_string( num );
@@ -41,8 +41,15 @@ std::string CMinecraft::format_level( const char* str1, int num )
 	return std::string( str1 );
 }
 
-
 bool CEffects::Exists(std::string_view effect_name)
 {
     return std::find( _effects_.begin(), _effects_.end(), effect_name ) != _effects_.end();
+}
+
+CInventory::~CInventory()
+{
+	if( pItem != nullptr )
+	{
+		// pItem->DropItem();
+	}
 }

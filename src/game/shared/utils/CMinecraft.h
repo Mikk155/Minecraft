@@ -45,13 +45,7 @@ struct CInventory
 
 	CInventory( CBaseEntity* pItem = nullptr ) : pItem(pItem) {}
 
-    ~CInventory()
-	{
-		if( pItem != nullptr )
-		{
-			// pItem->DropItem();
-		}
-	}
+    ~CInventory() {}
 };
 
 enum class InventorySlot : int
@@ -190,9 +184,9 @@ class CMinecraft final
 
 		/**
 		*	@brief Converts the given integer to the roman value
-		*	@param num if greater than 10, it will return a simple conversion from the string.
+		*	@param num if greater than 10, it will return a simple conversion to string.
 		*/
-		std::string_view level(int num);
+		std::string level(int num);
 		// Returns a formatted string using level(int num)
 		std::string format_level(const char* str1, int num = 0);
 
