@@ -45,7 +45,7 @@ struct CInventory
 
 	CInventory( CBaseEntity* pItem = nullptr ) : pItem(pItem) {}
 
-    ~CInventory() {}
+    ~CInventory();
 };
 
 enum class InventorySlot : int
