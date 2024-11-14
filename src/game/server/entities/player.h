@@ -588,8 +588,12 @@ public:
 	void SendScoreInfoAll();
 
 	void ToggleCheat(Cheat cheat);
+
 	void ActionRightHand(bool* bHandled = nullptr) override;
 	void ActionLeftHand() override;
+
+	void InventorySwapSlot(int from, int to);
+	void InventoryDeploy();
 };
 
 inline void CBasePlayer::SetWeaponBit(int id)

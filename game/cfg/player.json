@@ -12,5 +12,7 @@
     // cooldown when using the right click to interact with anything
     "player_interaction_time": 0.2,
     // Distance to interact with anything (In blocks)
-    "player_interaction_distance": 3
+    "player_interaction_distance": 3,
+    // cooldown when the player deploys
+    "player_deploy_time": 0.2
 }

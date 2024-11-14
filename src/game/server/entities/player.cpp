@@ -4231,6 +4231,38 @@ void CBasePlayer::ActionLeftHand()
 	// -MC Punch
 }
 
+void CBasePlayer::InventorySwapSlot(int from, int to)
+{
+	BaseClass::InventorySwapSlot(from, to);
+
+	if( m_iActiveItem == static_cast<InventorySlot>(from) || m_iActiveItem == static_cast<InventorySlot>(to) )
+		InventoryDeploy();
+}
+
+void CBasePlayer::InventoryDeploy()
+{
+	auto pItem = inventory.at((int)m_iActiveItem)->pItem;
+
+	if( pItem != nullptr )
+	{
+		const char* name = pItem->GetClassname();
+
+		pev->viewmodel = MAKE_STRING( g_Cfg.GetValue( fmt::format( "{}_view_model", name ), ""sv ).c_str() );
+		pev->weaponmodel = MAKE_STRING( g_Cfg.GetValue( fmt::format( "{}_player_model", name ), ""sv ).c_str() );
+
+		pev->weaponanim = 0;
+
+		MESSAGE_BEGIN(MSG_ONE, SVC_WEAPONANIM, nullptr, this);
+			WRITE_BYTE(0); // sequence number
+			WRITE_BYTE(0); // weaponmodel bodygroup.
+		MESSAGE_END();
+
+		// -MC Send skin https://discord.com/channels/291678871856742400/529986135896883211/1306627727918633042
+
+		m_ActionRightHand = m_ActionLeftHand = gpGlobals->time + g_Cfg.GetValue( "player_deploy_time"sv, 0.2f );
+	}
+}
+
 static edict_t* SV_TestEntityPosition(CBaseEntity* ent)
 {
 	// Need to use this trace function so the engine checks the hull during collision tests.
