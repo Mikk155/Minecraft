@@ -17,7 +17,6 @@
 
 #include "CBaseAnimating.h"
 
-class CBasePlayerAmmo;
 class CBasePlayerWeapon;
 class CItem;
 
@@ -51,7 +50,6 @@ class IItemVisitor
 public:
 	virtual ~IItemVisitor() = default;
 
-	virtual void Visit(CBasePlayerAmmo* ammo) = 0;
 	virtual void Visit(CBasePlayerWeapon* weapon) = 0;
 	virtual void Visit(CItem* pickupItem) = 0;
 };

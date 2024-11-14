@@ -141,8 +141,6 @@ target_sources(server PRIVATE
 	entities/ctf/CTFSpawn.h
 	
 	entities/items/airtank.cpp
-	entities/items/CAmmoAll.cpp
-	entities/items/CAmmoGeneric.cpp
 	entities/items/CWeaponBox.cpp
 	entities/items/CWeaponBox.h
 	entities/items/ggrenade.cpp

@@ -319,9 +319,5 @@ CBasePlayerWeapon* CBasePlayerWeapon::GetItemToRespawn(const Vector& respawnPoin
 ItemAddResult CBasePlayerWeapon::Apply(CBasePlayer* player) { return ItemAddResult::NotAdded; }
 void CBasePlayerWeapon::PostRestore() {}
 
-bool CBasePlayerAmmo::KeyValue(KeyValueData* pkvd) { return false; }
-void CBasePlayerAmmo::Spawn() {}
-bool CBasePlayerAmmo::AddAmmo(CBasePlayer* player) { return false; }
-
 void CSoundEnt::InsertSound(int iType, const Vector& vecOrigin, int iVolume, float flDuration) {}
 void RadiusDamage(Vector vecSrc, CBaseEntity* inflictor, CBaseEntity* attacker, float flDamage, float flRadius, int bitsDamageType, EntityClassification iClassIgnore) {}

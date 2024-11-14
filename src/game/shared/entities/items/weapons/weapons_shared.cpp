@@ -51,12 +51,6 @@ DEFINE_FIELD(m_pPlayer, FIELD_CLASSPTR),
 	DEFINE_FUNCTION(CallDoRetireWeapon),
 	END_DATAMAP();
 
-// m_AmmoName isn't saved here because it's initialized by all derived classes.
-// Classes that let level designers set the name should also save it.
-BEGIN_DATAMAP(CBasePlayerAmmo)
-DEFINE_FIELD(m_AmmoAmount, FIELD_INTEGER),
-	END_DATAMAP();
-
 void FindHullIntersection(const Vector& vecSrc, TraceResult& tr, const Vector& mins, const Vector& maxs, CBaseEntity* pEntity)
 {
 	int i, j, k;

@@ -34,10 +34,6 @@
 class ItemRespawnTimeVisitor final : public IItemVisitor
 {
 public:
-	void Visit(CBasePlayerAmmo* ammo) override
-	{
-		RespawnTime = ITEM_NEVER_RESPAWN_DELAY;
-	}
 
 	void Visit(CBasePlayerWeapon* weapon) override
 	{
@@ -70,10 +66,6 @@ public:
 	{
 	}
 
-	void Visit(CBasePlayerAmmo* ammo) override
-	{
-	}
-
 	void Visit(CBasePlayerWeapon* weapon) override
 	{
 		if (WEAPON_NONE != weapon->m_iId && (weapon->iFlags() & ITEM_FLAG_LIMITINWORLD) != 0)
@@ -102,8 +94,6 @@ public:
 		  Player(player)
 	{
 	}
-
-	void Visit(CBasePlayerAmmo* ammo) override {}
 
 	void Visit(CBasePlayerWeapon* weapon) override
 	{
