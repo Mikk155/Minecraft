@@ -181,10 +181,9 @@ bool CInventoryMenu::Draw(float flTime)
 	{
 		pInvButton->setVisible(m_fOn);
 
-		if (pInvButton->isArmed() && pInvButton->wasMouseReleased(MOUSE_LEFT))
+		if (pInvButton->isSelected() && pInvButton->wasMousePressed(MOUSE_LEFT))
 		{
-			//pInvButton->setSelected(false);
-			//pInvButton->setArmed(false);
+			pInvButton->setSelected(false);
 
 			if (m_pButtonSelected)
 			{
