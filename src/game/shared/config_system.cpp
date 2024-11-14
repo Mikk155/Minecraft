@@ -152,7 +152,7 @@ float ConfigurationSystem::GetValue(std::string_view name, float defaultValue, C
     return defaultValue;
 }
 
-std::string_view ConfigurationSystem::GetValue(std::string_view name, const std::string& defaultValue, CBaseEntity* pEntity) const
+std::string ConfigurationSystem::GetValue(std::string_view name, std::string_view defaultValue, CBaseEntity* pEntity) const
 {
 #ifndef CLIENT_DLL
 	if( pEntity != nullptr && pEntity->m_config != nullptr && pEntity->m_config->contains( name ) && (*pEntity->m_config)[ name ].is_string() )
@@ -172,7 +172,7 @@ std::string_view ConfigurationSystem::GetValue(std::string_view name, const std:
 		m_list_logged->push_back(name);
 	}
 
-    return defaultValue;
+    return std::string( defaultValue );
 }
 
 void ConfigurationSystem::SetValue(std::string_view name, float value, CBaseEntity* pEntity)

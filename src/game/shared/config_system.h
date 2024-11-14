@@ -55,7 +55,7 @@ class ConfigurationSystem final : public IGameSystem
 		 *	@brief Get a value from a key-value pair configuration
 		*	@param CBaseEntity The entity to check first for its custom config before the global config
 		*/
-		std::string_view GetValue(std::string_view name, const std::string&  defaultValue = nullptr, CBaseEntity* pEntity = nullptr) const;
+		std::string GetValue(std::string_view name, std::string_view  defaultValue = nullptr, CBaseEntity* pEntity = nullptr) const;
 		/**
 		 *	@brief Get a value from a key-value pair configuration
 		*	@param CBaseEntity The entity to set the value instead of the global config, This only happens if the key already exists in the entity.
