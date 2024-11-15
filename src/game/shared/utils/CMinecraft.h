@@ -37,17 +37,6 @@ enum class InventoryNetwork : int
 	Open
 };
 
-struct CInventory
-{
-	CBaseEntity* pItem;
-
-	// CBaseItem* GetItem() { return cast<> }
-
-	CInventory( CBaseEntity* pItem = nullptr ) : pItem(pItem) {}
-
-    ~CInventory();
-};
-
 enum class InventorySlot : int
 {
 	LeftHand = 0,
@@ -63,6 +52,7 @@ enum class InventorySlot : int
 	// Inventory slots for player
 	FirstItemSlot = 16, /* ... ... */ LastItemSlot = 42,
 
+	InvalidAddSlot = 13,
 	MAX_SLOTS = 43
 };
 

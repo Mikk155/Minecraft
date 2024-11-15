@@ -569,7 +569,7 @@ void SV_CreateClientCommands()
 	g_ClientCommands.Create("give", [](CBasePlayer* player, const auto& args)
 		{
 			string_t iszItem = ALLOC_STRING(args.Argument(1)); // Make a copy of the classname
-			player->GiveNamedItem(STRING(iszItem)); },
+			player->InventoryAddItem(STRING(iszItem)); },
 		{.Flags = ClientCommandFlag::Cheat});
 
 	g_ClientCommands.Create("fov", [](CBasePlayer* player, const auto& args)

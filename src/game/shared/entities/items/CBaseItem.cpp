@@ -17,11 +17,8 @@
 #include "CBaseItem.h"
 
 BEGIN_DATAMAP(CBaseItem)
-DEFINE_FIELD(m_RespawnDelay, FIELD_FLOAT),
-	DEFINE_FIELD(m_FallMode, FIELD_INTEGER),
-	DEFINE_FIELD(m_StayVisibleDuringRespawn, FIELD_BOOLEAN),
+	DEFINE_FIELD(m_RespawnDelay, FIELD_FLOAT),
 	DEFINE_FIELD(m_IsRespawning, FIELD_BOOLEAN),
-	DEFINE_FIELD(m_FlashOnRespawn, FIELD_BOOLEAN),
 	DEFINE_FIELD(m_PlayPickupSound, FIELD_BOOLEAN),
 	DEFINE_FIELD(m_TriggerOnSpawn, FIELD_STRING),
 	DEFINE_FIELD(m_TriggerOnDespawn, FIELD_STRING),
@@ -29,7 +26,7 @@ DEFINE_FIELD(m_RespawnDelay, FIELD_FLOAT),
 	DEFINE_FUNCTION(ItemTouch),
 	DEFINE_FUNCTION(Materialize),
 	DEFINE_FUNCTION(AttemptToMaterialize),
-	END_DATAMAP();
+END_DATAMAP();
 
 bool CBaseItem::KeyValue(KeyValueData* pkvd)
 {
@@ -42,26 +39,6 @@ bool CBaseItem::KeyValue(KeyValueData* pkvd)
 			m_RespawnDelay = ITEM_NEVER_RESPAWN_DELAY;
 		}
 
-		return true;
-	}
-	else if (FStrEq(pkvd->szKeyName, "stay_visible_during_respawn"))
-	{
-		m_StayVisibleDuringRespawn = atoi(pkvd->szValue) != 0;
-		return true;
-	}
-	else if (FStrEq(pkvd->szKeyName, "flash_on_respawn"))
-	{
-		m_FlashOnRespawn = atoi(pkvd->szValue) != 0;
-		return true;
-	}
-	else if (FStrEq(pkvd->szKeyName, "play_pickup_sound"))
-	{
-		m_PlayPickupSound = atoi(pkvd->szValue) != 0;
-		return true;
-	}
-	else if (FStrEq(pkvd->szKeyName, "fall_mode"))
-	{
-		m_FallMode = std::clamp(static_cast<ItemFallMode>(atoi(pkvd->szValue)), ItemFallMode::Fall, ItemFallMode::Float);
 		return true;
 	}
 	else if (FStrEq(pkvd->szKeyName, "trigger_on_spawn"))
@@ -80,14 +57,7 @@ bool CBaseItem::KeyValue(KeyValueData* pkvd)
 
 void CBaseItem::SetupItem(const Vector& mins, const Vector& maxs)
 {
-	if (m_FallMode == ItemFallMode::Float)
-	{
-		pev->movetype = MOVETYPE_FLY;
-	}
-	else
-	{
-		pev->movetype = MOVETYPE_TOSS;
-	}
+	pev->movetype = MOVETYPE_TOSS;
 
 	pev->solid = SOLID_TRIGGER;
 
@@ -96,15 +66,7 @@ void CBaseItem::SetupItem(const Vector& mins, const Vector& maxs)
 
 	SetTouch(&CBaseItem::ItemTouch);
 
-	// Floating items immediately materialize
-	if (m_FallMode == ItemFallMode::Float)
-	{
-		SetThink(&CBaseItem::Materialize);
-	}
-	else
-	{
-		SetThink(&CBaseItem::FallThink);
-	}
+	SetThink(&CBaseItem::FallThink);
 
 	pev->nextthink = gpGlobals->time + 0.1;
 
@@ -141,8 +103,6 @@ void CBaseItem::Spawn()
 void CBaseItem::FallThink()
 {
 #ifndef CLIENT_DLL
-	// Float mode never uses this method
-	ASSERT(m_FallMode != ItemFallMode::Float);
 
 	if ((pev->flags & FL_ONGROUND) != 0)
 	{
@@ -169,68 +129,17 @@ void CBaseItem::FallThink()
 void CBaseItem::ItemTouch(CBaseEntity* pOther)
 {
 #ifndef CLIENT_DLL
-	// if it's not a player, ignore
-	if (auto player = ToBasePlayer(pOther); player)
+	// if it's not a npc or player, ignore
+	if( auto monster = dynamic_cast<CBaseMonster*>(pOther); monster )
 	{
-		AddToPlayer(player);
+		InventoryAddItem(monster);
 	}
 #endif
 }
 
-ItemAddResult CBaseItem::AddToPlayer(CBasePlayer* player)
+ItemAddResult CBaseItem::InventoryAddItem(CBaseMonster* monster)
 {
-#ifndef CLIENT_DLL
-	if (player->IsObserver())
-	{
-		return ItemAddResult::NotAdded;
-	}
-
-	// ok, a player is touching this item, but can he have it?
-	if (!g_pGameRules->CanHaveItem(player, this))
-	{
-		return ItemAddResult::NotAdded;
-	}
-
-	// Try to add it.
-	const ItemAddResult result = Apply(player);
-
-	if (result == ItemAddResult::NotAdded)
-	{
-		return result;
-	}
-
-	// player grabbed the item.
-	g_pGameRules->PlayerGotItem(player, this);
-
-	if (g_pGameRules->ItemShouldRespawn(this))
-	{
-		Respawn();
-	}
-	else
-	{
-		// Consumables get removed. Inventory items reconfigure themselves.
-		if (GetType() == ItemType::Consumable)
-		{
-			SetTouch(nullptr);
-			// Make invisible immediately.
-			pev->effects |= EF_NODRAW;
-			UTIL_Remove(this);
-		}
-	}
-
-	// Do this after doing the above so the respawned item exists and state changes have occurred.
-	SUB_UseTargets(player, USE_TOGGLE, 0);
-
-	if (!FStringNull(m_TriggerOnDespawn))
-	{
-		// Fire with USE_OFF so targets can be controlled more easily.
-		FireTargets(STRING(m_TriggerOnDespawn), player, this, USE_OFF, 0);
-	}
-
-	return result;
-#else
 	return ItemAddResult::NotAdded;
-#endif
 }
 
 CBaseItem* CBaseItem::GetItemToRespawn(const Vector& respawnPoint)
@@ -250,11 +159,6 @@ CBaseItem* CBaseItem::Respawn()
 		// not a typo! We want to know when the item the player just picked up should respawn! This new entity we created is the replacement,
 		// but when it should respawn is based on conditions belonging to the item that was taken.
 		const float respawnTime = g_pGameRules->ItemRespawnTime(this);
-
-		if (respawnTime > gpGlobals->time && !m_StayVisibleDuringRespawn)
-		{
-			newItem->pev->effects |= EF_NODRAW;
-		}
 
 		newItem->m_IsRespawning = true;
 
@@ -282,11 +186,6 @@ void CBaseItem::Materialize()
 
 		pev->effects &= ~EF_NODRAW;
 
-		if (m_FlashOnRespawn)
-		{
-			pev->effects |= EF_MUZZLEFLASH;
-		}
-
 		m_IsRespawning = false;
 	}
 
@@ -309,21 +208,9 @@ void CBaseItem::AttemptToMaterialize()
 
 	if (time == 0)
 	{
-		switch (m_FallMode)
-		{
-		case ItemFallMode::Float:
-			Materialize();
-			break;
-
-			// Fall first, then materialize (plays clatter sound)
-		case ItemFallMode::Fall:
-			pev->flags &= ~FL_ONGROUND;
-			SetThink(&CBaseItem::FallThink);
-			pev->nextthink = gpGlobals->time + 0.1;
-			break;
-
-		default: ASSERT(!"Invalid fall mode in CBaseItem::AttemptToMaterialize");
-		}
+		pev->flags &= ~FL_ONGROUND;
+		SetThink(&CBaseItem::FallThink);
+		pev->nextthink = gpGlobals->time + 0.1;
 		return;
 	}
 

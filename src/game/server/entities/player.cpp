@@ -1353,7 +1353,7 @@ void CBasePlayer::PlayerUse()
 
 	for( size_t i = 0; i < inventory.size(); ++i )
 	{
-		if( auto pItem = inventory.at(i)->pItem; pItem != nullptr )
+		if( auto pItem = inventory.at(i); pItem != nullptr )
 		{
 			MESSAGE_BEGIN( MSG_ONE, gmsgInventory, nullptr, this );
 				WRITE_BYTE( static_cast<int>(InventoryNetwork::Item) );
@@ -2613,7 +2613,7 @@ void CBasePlayer::Spawn()
 	}
 
 	if( !HasWeapons() )
-		GiveNamedItem( "minecraft_weapon_item"sv );
+		GiveNamedItem( "minecraft_weapon"sv );
 }
 
 void CBasePlayer::Precache()
@@ -2903,7 +2903,7 @@ CBaseItem* CBasePlayer::GiveNamedItem(std::string_view className, std::optional<
 		}
 	}
 
-	if (entity->AddToPlayer(this) != ItemAddResult::Added)
+	if (entity->InventoryAddItem(this) != ItemAddResult::Added)
 	{
 		g_engfuncs.pfnRemoveEntity(entity->edict());
 		return nullptr;
@@ -3155,7 +3155,7 @@ ItemAddResult CBasePlayer::AddPlayerWeapon(CBasePlayerWeapon* weapon)
 					m_pActiveWeapon->UpdateItemInfo();
 
 				weapon->Kill();
-				return ItemAddResult::AddedAsDuplicate;
+				return ItemAddResult::Added;
 			}
 
 			return ItemAddResult::NotAdded;
@@ -4241,7 +4241,7 @@ void CBasePlayer::InventorySwapSlot(int from, int to)
 
 void CBasePlayer::InventoryDeploy()
 {
-	auto pItem = inventory.at((int)m_iActiveItem)->pItem;
+	auto pItem = inventory.at((int)m_iActiveItem);
 
 	if( pItem != nullptr )
 	{

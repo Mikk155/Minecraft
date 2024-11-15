@@ -45,11 +45,3 @@ bool CEffects::Exists(std::string_view effect_name)
 {
     return std::find( _effects_.begin(), _effects_.end(), effect_name ) != _effects_.end();
 }
-
-CInventory::~CInventory()
-{
-	if( pItem != nullptr )
-	{
-		// pItem->DropItem();
-	}
-}

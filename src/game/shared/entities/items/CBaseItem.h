@@ -26,17 +26,14 @@ enum class ItemType
 	Consumable		   //!< This item will be consumed on use.
 };
 
-enum class ItemFallMode
-{
-	Fall = 0, //!< MOVETYPE_TOSS with fall-to-ground logic
-	Float,	  //!< MOVETYPE_FLY with no falling logic
-};
-
 enum class ItemAddResult
 {
 	NotAdded,
 	Added,
-	AddedAsDuplicate //!< Ammo extracted and marked for removal.
+	// all items has been filled in another, This entity instance will soon remove
+	Filled,
+	// Some items were filled in another but we didn't find a empty slot to pickup all
+	NotAllAdded
 };
 
 constexpr float ITEM_DEFAULT_RESPAWN_DELAY = -2;
@@ -89,7 +86,7 @@ public:
 	/**
 	 *	@brief Tries to given this item to the player.
 	 */
-	ItemAddResult AddToPlayer(CBasePlayer* player);
+	ItemAddResult InventoryAddItem(CBaseMonster* player);
 
 	/**
 	 *	@brief make an item visible and tangible.
@@ -120,13 +117,8 @@ public:
 	float m_RespawnDelay = ITEM_DEFAULT_RESPAWN_DELAY;
 
 protected:
-	ItemFallMode m_FallMode = ItemFallMode::Fall;
-
-	bool m_StayVisibleDuringRespawn = false;
 
 	bool m_IsRespawning = false;
-
-	bool m_FlashOnRespawn = true;
 
 	bool m_PlayPickupSound = true;
 
@@ -139,4 +131,9 @@ protected:
 	 *	@brief Target to trigger when this entity despawns (waiting to respawn, being removed)
 	 */
 	string_t m_TriggerOnDespawn;
+
+	public:
+
+		const int max_items = 64;
+		int items = 1;
 };

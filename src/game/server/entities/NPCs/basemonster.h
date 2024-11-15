@@ -879,8 +879,9 @@ public:
 
 	InventorySlot m_iActiveItem = InventorySlot::Hotbar1;
 
-    std::vector<CInventory*> inventory;
+    std::vector<CBaseItem*> inventory;
 
+	CBaseItem* InventoryAddItem(std::string_view className, std::optional<int> defaultAmmo = std::nullopt);
 	void InventorySelectSlot(int slot);
 	void InventorySwapSlot(int from, int to);
 	void InventoryDropItem(int slot);
@@ -897,15 +898,14 @@ public:
 
 		for( int i = 0; i < MAX_SLOTS; i++ )
 		{
-            CInventory* pInventory = new CInventory();
-            inventory.push_back(pInventory);
+            inventory.push_back(nullptr);
 		}
     }
 
     ~CBaseMonster()
     {
-        for( auto pInventory : inventory ) {
-            delete pInventory;
+        for( auto pItem : inventory ) {
+//			pItem->DropItem();
         }
         inventory.clear();
 

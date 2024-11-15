@@ -333,9 +333,6 @@ CBasePlayerWeapon* CBasePlayerWeapon::GetItemToRespawn(const Vector& respawnPoin
 
 	newWeapon->m_RespawnDelay = m_RespawnDelay;
 
-	newWeapon->m_FallMode = m_FallMode;
-	newWeapon->m_StayVisibleDuringRespawn = m_StayVisibleDuringRespawn;
-	newWeapon->m_FlashOnRespawn = m_FlashOnRespawn;
 	newWeapon->m_PlayPickupSound = m_PlayPickupSound;
 
 	newWeapon->m_TriggerOnSpawn = m_TriggerOnSpawn;

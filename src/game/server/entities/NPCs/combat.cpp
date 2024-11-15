@@ -1251,6 +1251,43 @@ void CBaseMonster::MakeDamageBloodDecal(int cCount, float flNoise, TraceResult* 
 	}
 }
 
+CBaseItem* CBaseMonster::InventoryAddItem(std::string_view className, std::optional<int> defaultAmmo)
+{
+	auto entity = g_ItemDictionary->Create(className);
+
+	if( FNullEnt(entity) )
+	{
+		CBaseEntity::Logger->debug("nullptr Ent in InventoryAddItem!");
+		return nullptr;
+	}
+
+	CBaseItem* pItem = dynamic_cast<CBaseItem*>(entity);
+
+	if( !pItem || pItem == nullptr )
+	{
+		CBaseEntity::Logger->debug("nullptr CBaseItem in InventoryAddItem!");
+		return nullptr;
+	}
+
+	entity->pev->origin = pev->origin;
+	entity->m_RespawnDelay = ITEM_NEVER_RESPAWN_DELAY;
+
+	DispatchSpawn(entity->edict());
+
+	if( defaultAmmo != std::nullopt )
+	{
+		entity->items = *defaultAmmo;
+	}
+
+	if( entity->InventoryAddItem(this) != ItemAddResult::Added )
+	{
+		g_engfuncs.pfnRemoveEntity(entity->edict());
+		return nullptr;
+	}
+
+	return entity;
+}
+
 void CBaseMonster::InventorySelectSlot(int slot)
 {
 	m_iActiveItem = static_cast<InventorySlot>(
@@ -1265,7 +1302,7 @@ void CBaseMonster::InventorySwapSlot(int from, int to)
 
 void CBaseMonster::InventoryDropItem(int slot)
 {
-	if( auto pItem = inventory.at(slot)->pItem; pItem != nullptr )
+	if( auto pItem = inventory.at(slot); pItem != nullptr )
 	{
 		// -MC Drop logic
 		pItem = nullptr;
@@ -1274,8 +1311,8 @@ void CBaseMonster::InventoryDropItem(int slot)
 
 void CBaseMonster::InventoryPostFrame()
 {
-	auto m_RightHandSlot = inventory.at(static_cast<int>(m_iActiveItem))->pItem;
-	auto m_LeftHandSlot = inventory.at(static_cast<int>(InventorySlot::LeftHand))->pItem;
+	auto m_RightHandSlot = inventory.at(static_cast<int>(m_iActiveItem));
+	auto m_LeftHandSlot = inventory.at(static_cast<int>(InventorySlot::LeftHand));
 
 	if( FBitSet( pev->button, IN_ATTACK2 ) )
 	{
