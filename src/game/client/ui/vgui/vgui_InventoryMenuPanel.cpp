@@ -87,12 +87,6 @@ bool CInventoryMenu::VidInit()
 	InventorySize invSizeRight{"gfx/vgui", "inventory_right.tga", "640", {352, 198}, {14, 14}, 26, 2};
 	int button[2] = {36, 36};
 
-	if (ScreenWidth < 640)
-	{
-		invSizeLeft.resize(320);
-		invSizeRight.resize(320);
-	}
-
 	if (m_pInventoryLeft = vgui_LoadTGA(invSizeLeft.getPath().c_str(), false); m_pInventoryLeft)
 		m_pInventoryLeft->setColor(vgui::Color(255, 255, 255, 1));
 

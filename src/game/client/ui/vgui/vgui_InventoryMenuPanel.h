@@ -32,32 +32,6 @@ public:
 	int borderThickness;
 
 public:
-	bool resize(float mult)
-	{
-		if ((int)mult % 320 == 0)
-		{
-			int factor = std::stoi(resolution) / mult;
-			size[0] /= factor;
-			size[1] /= factor;
-			start[0] /= factor;
-			start[1] /= factor;
-			space /= factor;
-			borderThickness /= factor;
-			resolution = std::to_string(mult);
-		}
-		else
-		{
-			size[0] *= mult;
-			size[1] *= mult;
-			start[0] *= mult;
-			start[1] *= mult;
-			space *= mult;
-			borderThickness *= mult;
-			resolution = std::to_string(std::stoi(resolution) * mult);
-		}
-		return true;
-	}
-
 	int getMidWide(int max1, int min1 = 0, int minWide = 0) const
 	{
 		return ((max1 - min1) / 2) - ((getWide() - minWide) / 2);
