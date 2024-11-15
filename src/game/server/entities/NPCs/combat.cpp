@@ -1089,7 +1089,7 @@ void CBaseEntity::TraceAttack(DamageInfo* info)
 
 void CBaseMonster::TraceAttack(DamageInfo* info)
 {
-	if( FBitSet( info->bits, (int)DMG::LAVA ) )
+	if( FBitSet( info->bits, DMG::LAVA ) )
 	{
 		// -MC call on for depending pev->waterlevel
 		DamageInfo new_info(
@@ -1363,9 +1363,9 @@ void CBaseMonster::InventoryPostFrame()
 	}
 }
 
+/*
 void CBaseMonster::AddEffect(std::string_view effect_name, CEffectsData new_data)
 {
-	/*
 	CEffectsData* data;
 
 	if( effects.find( effect_name ) != effects.end() )
@@ -1401,12 +1401,10 @@ void CBaseMonster::AddEffect(std::string_view effect_name, CEffectsData new_data
 		if( flValue > pev->armorvalue )
 			pev->armorvalue = flValue;
 	}
-	*/
 }
 
 void CBaseMonster::EffectsCheck()
 {
-	/*
 	CEffectsData* data;
 
 	if( effects.find( g_Minecraft.Effects.fire.display_name ) != effects.end() )
@@ -1420,5 +1418,5 @@ void CBaseMonster::EffectsCheck()
 			data->last_time = gpGlobals->time + ( g_Cfg.GetValue( "effect_fire_time"sv, 4.0f ) * data->level );
 		}
 	}
-	*/
 }
+*/

@@ -136,4 +136,7 @@ protected:
 
 		const int max_items = 64;
 		int items = 1;
+		bool unbreakable = false;
+		int durability;
+		int max_durability;
 };

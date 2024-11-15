@@ -116,7 +116,7 @@ enum class InventorySlot : int
 /**
 *	@brief DMG Bits enum.
 */
-enum class DMG : int
+enum DMG : int
 {
     /**
     *	@brief Generic damage.

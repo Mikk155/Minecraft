@@ -13,4 +13,23 @@
  *
  ****/
 
-#include "CMinecraft.h"
+#pragma once
+
+#include "MC_MacroData.h"
+
+class CEnchants : public MCMacroData
+{
+	public:
+
+		std::string sharpness;
+		std::string bane_of_arthropods;
+		std::string smite;
+		std::string fire_aspect;
+		std::string life_steal;
+		std::string critical_chance;
+		std::string knockback;
+		std::string sweeping_edge;
+		std::string looting;
+
+		CEnchants();
+};

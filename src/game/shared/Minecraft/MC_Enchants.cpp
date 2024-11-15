@@ -13,4 +13,17 @@
  *
  ****/
 
-#include "CMinecraft.h"
+#include "MC_Enchants.h"
+
+CEnchants::CEnchants()
+{
+	MCMacroDataRegister(*this, sharpness, 5);
+	MCMacroDataRegister(*this, bane_of_arthropods, 5);
+	MCMacroDataRegister(*this, smite, 5);
+	MCMacroDataRegister(*this, fire_aspect, 2);
+	MCMacroDataRegister(*this, life_steal, 5);
+	MCMacroDataRegister(*this, critical_chance, 7);
+	MCMacroDataRegister(*this, knockback, 2);
+	MCMacroDataRegister(*this, sweeping_edge, 3);
+	MCMacroDataRegister(*this, looting, 3);
+}
