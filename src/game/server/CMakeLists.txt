@@ -8,6 +8,7 @@ target_include_directories(server PRIVATE
 	${CMAKE_CURRENT_SOURCE_DIR}
 	entities
 	entities/items
+	../shared/Minecraft
 	../shared/entities
 	../shared/entities/items/weapons
 	entities/NPCs

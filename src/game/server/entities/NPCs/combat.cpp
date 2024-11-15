@@ -915,7 +915,7 @@ void RadiusDamage(Vector vecSrc, CBaseEntity* inflictor, CBaseEntity* attacker, 
 					DamageInfo info(
 						inflictor,
 						flAdjustedDamage,
-						DMG::BLAST,
+						DMG::GENERIC,
 						nullptr,
 						nullptr,
 						(tr.vecEndPos - vecSrc).Normalize(),
@@ -1365,6 +1365,7 @@ void CBaseMonster::InventoryPostFrame()
 
 void CBaseMonster::AddEffect(std::string_view effect_name, CEffectsData new_data)
 {
+	/*
 	CEffectsData* data;
 
 	if( effects.find( effect_name ) != effects.end() )
@@ -1394,16 +1395,18 @@ void CBaseMonster::AddEffect(std::string_view effect_name, CEffectsData new_data
 	// -MC Update client data.
 	effects[ effect_name ] = data;
 
-	if( effect_name == g_Minecraft.Effects.absorption.name )
+	if( effect_name == "g_Minecraft.Effects.absorption.name" )
 	{
 		float flValue = 0.5 * data->level;
 		if( flValue > pev->armorvalue )
 			pev->armorvalue = flValue;
 	}
+	*/
 }
 
 void CBaseMonster::EffectsCheck()
 {
+	/*
 	CEffectsData* data;
 
 	if( effects.find( g_Minecraft.Effects.fire.display_name ) != effects.end() )
@@ -1417,4 +1420,5 @@ void CBaseMonster::EffectsCheck()
 			data->last_time = gpGlobals->time + ( g_Cfg.GetValue( "effect_fire_time"sv, 4.0f ) * data->level );
 		}
 	}
+	*/
 }

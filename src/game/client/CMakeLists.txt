@@ -43,6 +43,7 @@ target_include_directories(client PRIVATE
 	../server/entities
 	../server/entities/NPCs
 	../server/gamerules
+	../shared/Minecraft
 	../shared/entities
 	../shared/entities/items/weapons
 	${CMAKE_CURRENT_SOURCE_DIR}

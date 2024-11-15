@@ -760,12 +760,12 @@ bool CBaseEntity::TakeDamage(CBaseEntity* inflictor, CBaseEntity* attacker, floa
 			}
 		}
 
-		if( !FUnbreakable( inflictor->durability ) ) {
+		/*if( !FUnbreakable( inflictor->durability ) ) {
 			inflictor->durability--;
 		if( inflictor->durability <= 0 )
 		// -MC Break sound
 			UTIL_Remove( inflictor );
-		}
+		}*/
 
 		pev->dmg_inflictor = inflictor->edict();
 		pev->dmg_take += flDamage;

@@ -9,7 +9,10 @@ function(add_game_shared_sources target)
 			${CMAKE_CURRENT_FUNCTION_LIST_DIR}/ProjectInfoSystem.cpp
 			${CMAKE_CURRENT_FUNCTION_LIST_DIR}/ProjectInfoSystem.h
 			${CMAKE_CURRENT_FUNCTION_LIST_DIR}/voice_common.h
-			
+
+			${CMAKE_CURRENT_FUNCTION_LIST_DIR}/Minecraft/MC_ConstDefs.h
+			${CMAKE_CURRENT_FUNCTION_LIST_DIR}/Minecraft/CMinecraft.cpp
+			${CMAKE_CURRENT_FUNCTION_LIST_DIR}/Minecraft/CMinecraft.h
 			${CMAKE_CURRENT_FUNCTION_LIST_DIR}/entities/ehandle.cpp
 			${CMAKE_CURRENT_FUNCTION_LIST_DIR}/entities/ehandle.h
 			${CMAKE_CURRENT_FUNCTION_LIST_DIR}/entities/EntityClassificationSystem.cpp
@@ -78,8 +81,6 @@ function(add_game_shared_sources target)
 			${CMAKE_CURRENT_FUNCTION_LIST_DIR}/utils/JSONSystem.h
 			${CMAKE_CURRENT_FUNCTION_LIST_DIR}/utils/LogSystem.cpp
 			${CMAKE_CURRENT_FUNCTION_LIST_DIR}/utils/LogSystem.h
-			${CMAKE_CURRENT_FUNCTION_LIST_DIR}/utils/CMinecraft.cpp
-			${CMAKE_CURRENT_FUNCTION_LIST_DIR}/utils/CMinecraft.h
 			${CMAKE_CURRENT_FUNCTION_LIST_DIR}/utils/PrecacheList.cpp
 			${CMAKE_CURRENT_FUNCTION_LIST_DIR}/utils/PrecacheList.h
 			${CMAKE_CURRENT_FUNCTION_LIST_DIR}/utils/ReplacementMaps.cpp

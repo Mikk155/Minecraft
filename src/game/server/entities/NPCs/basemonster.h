@@ -894,12 +894,7 @@ public:
 
     CBaseMonster()
     {
-		int MAX_SLOTS = static_cast<int>( IsMonster() ? InventorySlot::MONSTER_MAX_SLOTS : InventorySlot::MAX_SLOTS );
-
-		for( int i = 0; i < MAX_SLOTS; i++ )
-		{
-            inventory.push_back(nullptr);
-		}
+		inventory.resize(static_cast<size_t>(InventorySlot::MAX_SLOTS), nullptr);
     }
 
     ~CBaseMonster()

@@ -635,8 +635,8 @@ public:
 	// Insert in here minecraft:effect enchantments level
 	string_t enchant_value[32];
 
-	int durability = Unbreakable;
-	int max_durability = Unbreakable;
+	int durability = 0;
+	int max_durability = 0;
 
 	// Whatever a player can interact with this by using ActionRightHand
 	int m_IsUseAble;
