@@ -37,6 +37,19 @@ enum class InventoryNetwork : int
 	Open
 };
 
+// Skin values for items
+enum class SkinForItemType : int
+{
+	Wood = 0,
+	Stone,
+	Iron,
+	Gold,
+	Diamond,
+	Netherite,
+	Leather = 0,
+	Chainmail
+};
+
 enum class InventorySlot : int
 {
 	LeftHand = 0,
