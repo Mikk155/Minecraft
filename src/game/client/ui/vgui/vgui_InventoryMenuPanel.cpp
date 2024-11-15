@@ -17,6 +17,7 @@
 //
 #include "hud.h"
 #include "vgui_TeamFortressViewport.h"
+//#include <SDL2/SDL_mouse.h>
 
 #include <vgui_loadtga.h>
 #include <VGUI_App.h>
@@ -177,6 +178,12 @@ bool CInventoryMenu::Draw(float flTime)
 	m_pLabelInventoryLeft->setVisible(m_fOn);
 	m_pLabelInventoryRight->setVisible(m_fOn);
 
+	if (m_fOn && !g_iVisibleMouse)
+	{
+		g_iVisibleMouse = true;
+		ConsolePrint("Pressed");
+	}
+
 	for (auto& pInvButton : m_pButtons)
 	{
 		pInvButton->setVisible(m_fOn);
@@ -226,13 +233,6 @@ void CInventoryMenu::MsgFunc_Inventory(const char* pszName, BufferReader& reader
 
 	switch( action )
 	{
-		case InventoryNetwork::Close:
-		{
-			// Aca limpia todos los objetos
-			g_iVisibleMouse = m_fOn = true;
-			vgui::App::getInstance()->setCursorOveride(vgui::App::getInstance()->getScheme()->getCursor(vgui::Scheme::scu_arrow));
-			break;
-		}
 		case InventoryNetwork::Item:
 		{
 			int index = reader.ReadByte();
@@ -248,21 +248,26 @@ void CInventoryMenu::MsgFunc_Inventory(const char* pszName, BufferReader& reader
 //			Encantamientos en este item g_Minecraft.format_level(name, level)
 			break;
 		}
-		case InventoryNetwork::Open:
+		case InventoryNetwork::Close:
 		{
-			/* Aca lee los objetos que recibiste */
-
-			g_iVisibleMouse = m_fOn = false;
-
-			//reset
 			for (auto& pInvButton : m_pButtons)
 			{
 				pInvButton->setSelected(false);
 				pInvButton->setArmed(false);
 			}
 
-			IN_ResetMouse();
+			//IN_ResetMouse();
+			//SDL_ShowCursor(m_fOn = false);
+			g_iVisibleMouse = m_fOn = false;
 			vgui::App::getInstance()->setCursorOveride(vgui::App::getInstance()->getScheme()->getCursor(vgui::Scheme::scu_none));
+
+			break;
+		}
+		case InventoryNetwork::Open:
+		{
+			//SDL_ShowCursor(m_fOn = true);
+			g_iVisibleMouse = m_fOn = true;
+			vgui::App::getInstance()->setCursorOveride(vgui::App::getInstance()->getScheme()->getCursor(vgui::Scheme::scu_arrow));
 			break;
 		}
 	}
