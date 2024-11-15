@@ -4,14 +4,16 @@
 # Minecraft assets
 src/game/1.21-Template*
 
-# vs and vscode folders
-.vs*
+# workspaces
+.vs/*
+.vscode/*
 
 # Build directory for project solution
 build*
 
 # Don't ignore
 !build.bat
+!.vscode/settings.json
 
 # Python cache for utilities
 *.pyc
