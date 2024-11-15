@@ -139,6 +139,104 @@ void CBaseItem::ItemTouch(CBaseEntity* pOther)
 
 ItemAddResult CBaseItem::InventoryAddItem(CBaseMonster* monster)
 {
+#ifndef CLIENT_DLL
+
+	// Don't add item to dead mobs
+	if( !monster->IsAlive() )
+	{
+		return ItemAddResult::NotAdded;
+	}
+
+	if( auto player = ToBasePlayer(monster->edict()); player != nullptr )
+	{
+		// Don't add items to observer players
+		if( player->IsObserver() )
+		{
+			return ItemAddResult::NotAdded;
+		}
+	}
+
+	// Only add items to valid inventory slots
+	auto IsValidSlot = []( size_t index, const char* classname ) -> bool
+	{
+		InventorySlot Try = static_cast<InventorySlot>(index);
+
+		if( Try == InventorySlot::LeftHand )
+			return false;
+		if( Try >= InventorySlot::ArmorHelmet && Try <= InventorySlot::ArmorBoots )
+			return false;
+		if( Try == InventorySlot::Arrows && !strstr( classname, "minecraft_arrow" ) )
+			return false;
+
+		return true;
+	};
+
+	// We can only carry one item of this. find a empty slot
+	if( max_items == 1 )
+	{
+		for( size_t i = 0; i < monster->inventory.size(); ++i )
+		{
+			if( !IsValidSlot(i, GetClassname()) )
+				continue;
+
+			if( auto pItem = monster->inventory.at(i); !pItem || pItem == nullptr )
+			{
+				monster->inventory.at(i) = this;
+				return ItemAddResult::Added;
+			}
+		}
+		return ItemAddResult::NotAdded;
+	}
+
+	InventorySlot EmptySlot = InventorySlot::InvalidAddSlot;
+
+	bool SomeFilled = false;
+
+	// Find stackable items and track a empty slot
+    for( size_t i = 0; i < monster->inventory.size(); ++i )
+	{
+		if( !IsValidSlot(i, GetClassname()) )
+			continue;
+
+		if( auto pItem = monster->inventory.at(i); pItem != nullptr )
+		{
+			// Fill items if they're the same.
+			if( FStrEq( pItem->GetClassname(), GetClassname() ) )
+			{
+				if( pItem->items < pItem->max_items )
+				{
+					int diff = std::min( items, pItem->max_items - pItem->items );
+					pItem->items += diff;
+					items -= diff;
+
+					// All filled!
+					if( items <= 0 ) {
+						return ItemAddResult::Filled;
+					}
+
+					SomeFilled = true;
+				}
+			}
+		}
+		else if( EmptySlot == InventorySlot::InvalidAddSlot )
+		{
+			EmptySlot = static_cast<InventorySlot>(i);
+		}
+	}
+
+	if( EmptySlot != InventorySlot::InvalidAddSlot )
+	{
+		monster->inventory.at((int)EmptySlot) = this;
+		return ItemAddResult::Added;
+	}
+
+	if( SomeFilled )
+	{
+		return ItemAddResult::NotAllAdded;
+	}
+
+#endif
+
 	return ItemAddResult::NotAdded;
 }
 
