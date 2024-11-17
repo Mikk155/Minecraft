@@ -151,6 +151,9 @@ target_sources(server PRIVATE
 	entities/items/nuclearbomb.cpp
 	entities/items/weapons/weapons.cpp
 
+	entities/NPCs/mobs/zombie.cpp
+	entities/NPCs/mobs/zombie.h
+
 	entities/NPCs/basemonster.h
 	entities/NPCs/combat.cpp
 	entities/NPCs/defaultai.cpp
@@ -233,7 +236,8 @@ target_sources(server PRIVATE
 	
 	../../public/interface.cpp
 	../../public/interface.h
-	../../public/steam/steamtypes.h "entities/NPCs/zombie.cpp")
+	../../public/steam/steamtypes.h
+)
 
 add_game_shared_sources(server)
 

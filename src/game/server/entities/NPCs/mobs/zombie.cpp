@@ -13,50 +13,7 @@
  *
  ****/
 
-#include "cbase.h"
-
-enum ZOMBIE_SKIN
-{
-	ZOMBIE_NORMAL = 0,
-	ZOMBIE_DROWNED_OUT_LAYER,
-	ZOMBIE_VILLAGER,
-	ZOMBIE_DROWNED,
-	ZOMBIE_HUSK
-};
-
-enum ZOMBIE_ANIMATIONS
-{
-	ZOMBIE_ATTACK_RIGHT = 0x01,
-	ZOMBIE_ATTACK_LEFT = 0x02,
-	ZOMBIE_ATTACK_BOTH = 0x03,
-
-};
-
-class CZombie : public CBaseMonster
-{
-public:
-	void OnCreate() override;
-	void Spawn() override;
-	void Precache() override;
-	void SetYawSpeed() override;
-	void HandleAnimEvent(MonsterEvent_t* pEvent) override;
-	int IgnoreConditions() override;
-
-	bool HasAlienGibs() override;
-
-	//Sonidos
-	void PainSound() override;
-	void IdleSound() override;
-	void AttackSound();
-
-	//No hay ataques a larga distancia
-	bool CheckRangeAttack1(float flDot, float flDist) override;
-	bool CheckRangeAttack2(float flDot, float flDist) override;
-	bool TakeDamage(CBaseEntity* inflictor, CBaseEntity* attacker, float flDamage, int bitsDamageType) override;
-
-protected:
-	void ZombieSlashAttack(float damage, const Vector& punchAngle, const Vector& velocity);
-};
+#include "zombie.h"
 
 LINK_ENTITY_TO_CLASS(monster_zombie, CZombie);
 
@@ -67,7 +24,7 @@ void CZombie::OnCreate()
 	pev->health = 100;
 	pev->model = MAKE_STRING("models/zombie.mdl");
 
-	SetClassification("alien_monster");
+	SetClassification("monsters");
 }
 
 void CZombie::SetYawSpeed()
