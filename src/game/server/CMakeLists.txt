@@ -233,7 +233,7 @@ target_sources(server PRIVATE
 	
 	../../public/interface.cpp
 	../../public/interface.h
-	../../public/steam/steamtypes.h)
+	../../public/steam/steamtypes.h "entities/NPCs/zombie.cpp")
 
 add_game_shared_sources(server)
 

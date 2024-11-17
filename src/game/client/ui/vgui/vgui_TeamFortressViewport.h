@@ -358,6 +358,42 @@ public:
 		Button::paint();
 	}
 };
+
+class InventoryButton : public CommandButton
+{
+private:
+	int slot;
+	int borderThickness;
+
+public:
+	InventoryButton(int x, int y, int wide, int tall, int borderThickness, int slot)
+		: CommandButton("", x, y, wide, tall),
+		  borderThickness(borderThickness),
+		  slot(slot)
+	{
+	}
+
+	virtual void paintBackground()
+	{
+		if (isArmed())
+		{
+			// Dibujamos el alrededor blanco
+			drawSetColor(255, 255, 255, 125);
+			drawFilledRect(borderThickness, borderThickness, _size[0] - borderThickness, _size[1] - borderThickness);
+		}
+	}
+
+	virtual void paint()
+	{
+		Button::paint();
+	}
+
+	int getSlot() const
+	{
+		return slot;
+	}
+};
+
 //============================================================
 // Command Menus
 class CCommandMenu : public Panel
