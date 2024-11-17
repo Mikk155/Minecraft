@@ -3,8 +3,11 @@ name: CI/CD
 # Artifacts in this repo are removed in 3 days since they're generated
 on:
   push:
-    paths:
-      - 'src/game/**'
+    tags:
+      - "*"
+  pull_request:
+    branches:
+      - "**"
 
 env:
   BUILD_TYPE: Release
