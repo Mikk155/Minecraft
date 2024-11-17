@@ -172,12 +172,6 @@ bool CInventoryMenu::Draw(float flTime)
 	m_pLabelInventoryLeft->setVisible(m_fOn);
 	m_pLabelInventoryRight->setVisible(m_fOn);
 
-	if (m_fOn && !g_iVisibleMouse)
-	{
-		g_iVisibleMouse = true;
-		ConsolePrint("Pressed");
-	}
-
 	for (auto& pInvButton : m_pButtons)
 	{
 		pInvButton->setVisible(m_fOn);
@@ -250,16 +244,13 @@ void CInventoryMenu::MsgFunc_Inventory(const char* pszName, BufferReader& reader
 				pInvButton->setArmed(false);
 			}
 
-			//IN_ResetMouse();
-			//SDL_ShowCursor(m_fOn = false);
+			IN_ResetMouse();
 			g_iVisibleMouse = m_fOn = false;
 			vgui::App::getInstance()->setCursorOveride(vgui::App::getInstance()->getScheme()->getCursor(vgui::Scheme::scu_none));
-
 			break;
 		}
 		case InventoryNetwork::Open:
 		{
-			//SDL_ShowCursor(m_fOn = true);
 			g_iVisibleMouse = m_fOn = true;
 			vgui::App::getInstance()->setCursorOveride(vgui::App::getInstance()->getScheme()->getCursor(vgui::Scheme::scu_arrow));
 			break;
