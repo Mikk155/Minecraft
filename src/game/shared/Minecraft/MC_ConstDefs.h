@@ -149,12 +149,20 @@ enum DMG : int
 	SLASH	= ( 1 << 0 ),
 
     /**
-    *	@brief Displays fire on the HUD.
+    *	@brief Apply effect fire I to the victim
     */
 	FIRE	= ( 1 << 1 ),
 
     /**
-    *	@brief Apply effect fire I to the victim
+    *	@brief Apply effect fire II to the victim
     */
-	LAVA	= ( 1 << 2 )
+	LAVA	= ( 1 << 2 ),
+
+
+
+
+    /**
+    *	@brief Show hud effect
+    */
+	HUD_FIRE = ( 1 << 6 )
 };

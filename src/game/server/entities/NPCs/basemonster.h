@@ -888,12 +888,8 @@ public:
 	void InventoryDropItem(int slot);
 	void InventoryPostFrame();
 
-/*
-	std::unordered_map<std::string_view, CEffectsData*> effects = {};
-
-	void AddEffect(std::string_view effect_name, CEffectsData new_data);
-	void EffectsCheck();
-*/
+	std::unordered_map<std::string_view, EffectInfo*> effects;
+	void EffectsSchedule();
 
     CBaseMonster()
     {
@@ -907,12 +903,7 @@ public:
         }
         inventory.clear();
 
-/*
-        for( auto& [key, pEffect] : effects ) {
-            delete pEffect;
-        }
-        effects.clear();
-*/
+		g_Minecraft.Effects.RemoveAll(this)
     }
 };
 

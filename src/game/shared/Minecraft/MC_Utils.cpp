@@ -13,13 +13,9 @@
  *
  ****/
 
-#include "MC_MacroData.h"
+#include "MC_Utils.h"
 
-MCMacroData::MCMacroData()
-{
-}
-
-std::string MCMacroData::level( int num )
+std::string CMCUtils::level( int num )
 {
 	switch( num )
 	{
@@ -38,23 +34,18 @@ std::string MCMacroData::level( int num )
 	return std::to_string( num );
 }
 
-// We're going to use this or titles?
-std::string MCMacroData::format_level( const char* str1, std::optional<int> num )
+HITGROUP CMCUtils::GetHitGroup(int hitgroup)
 {
-	if( num != std::nullopt )
-		return fmt::format( "{} {}", str1, level( num.value() ) );
-	return std::string( str1 );
-}
-
-bool MCMacroData::Exists(std::string name)
-{
-	return data.find( name ) != data.end();
-}
-
-int MCMacroData::GetLevel(std::string name, std::optional<int> num)
-{
-	if( !Exists(name) || num == std::nullopt )
-		return 1;
-
-	return std::clamp( num.value(), 0, data.value(name,1) );
+      switch( hitgroup )
+      {
+            case HITGROUP::Head:
+            return HITGROUP::HELMET;
+            case HITGROUP::Chest:
+            return HITGROUP::CHEST;
+            case HITGROUP::Legs:
+            return HITGROUP::LEGS;
+            case HITGROUP::Feet:
+            return HITGROUP::BOOTS;
+      }
+      return HITGROUP::NONE;
 }

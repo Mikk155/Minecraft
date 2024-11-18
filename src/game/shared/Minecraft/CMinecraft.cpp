@@ -15,18 +15,3 @@
 
 #include "CMinecraft.h"
 
-HITGROUP CMinecraft::GetHitGroup(int hitgroup)
-{
-	switch( hitgroup )
-	{
-		case HITGROUP::Head:
-            return HITGROUP::HELMET;
-		case HITGROUP::Chest:
-            return HITGROUP::CHEST;
-		case HITGROUP::Legs:
-            return HITGROUP::LEGS;
-		case HITGROUP::Feet:
-            return HITGROUP::BOOTS;
-    }
-    return HITGROUP::NONE;
-}

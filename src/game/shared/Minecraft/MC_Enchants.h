@@ -15,9 +15,9 @@
 
 #pragma once
 
-#include "MC_MacroData.h"
+#include "entities/cbase.h"
 
-class CEnchants : public MCMacroData
+class CEnchants
 {
 	public:
 

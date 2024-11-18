@@ -1006,16 +1006,13 @@ bool CBaseMonster::TakeDamage(DamageInfo* info)
 {
 	if( FBitSet( info->bits, DMG::LAVA ) )
 	{
-		// -MC call on for depending pev->waterlevel
-		DamageInfo new_info(
-			info->attacker,
-			g_Cfg.GetValue( "effect_fire_damage"sv, 0.5 ),
-			DMG::FIRE,
-			info->hitgroups,
-			info->weapon,
-			info->inflictor
-		);
-		TraceAttack(&new_info);
+		g_Minecraft.Effects.Add(this, g_Minecraft.Effects.fire(2), EffectInfo( g_Minecraft.Effects.fire(0),
+			g_Cfg.GetValue( "effect_fire_time"sv, 4.0, info->attacker ) * 2, 2, info->attacker ) );
+	}
+	if( FBitSet( info->bits, DMG::FIRE ) )
+	{
+		g_Minecraft.Effects.Add(this, g_Minecraft.Effects.fire(1), EffectInfo( g_Minecraft.Effects.fire(0),
+			g_Cfg.GetValue( "effect_fire_time"sv, 4.0, info->attacker ), 2, info->attacker ) );
 	}
 
 	if( info->damage <= 0.0 )
@@ -1074,6 +1071,28 @@ void CBaseMonster::TraceAttack(DamageInfo* info)
 	}
 
 	TakeDamage(info);
+}
+
+void CBaseMonster::EffectsSchedule()
+{
+	for( auto it = effects.begin(); it != effects.end(); )
+	{
+		if( it->second->time < gpGlobals->time )
+		{
+			if( it->second->time > 0 )
+				it->second->time = gpGlobals->time + it->second->cooldown;
+		}
+
+		if( it->second->duration < gpGlobals->time )
+		{
+			delete it->second;
+			it = effects.erase(it);
+		}
+		else
+		{
+			++it;
+		}
+	}
 }
 
 void CBaseEntity::TraceBleed(float flDamage, Vector vecDir, TraceResult* ptr, int bitsDamageType)

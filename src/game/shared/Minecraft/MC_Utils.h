@@ -13,8 +13,19 @@
  *
  ****/
 
-#include "MC_Enchants.h"
+#pragma once
 
-CEnchants::CEnchants()
+#include "CMinecraft.h"
+
+class CMCUtils
 {
-}
+	public:
+
+		/**
+		*	@brief Converts the given integer to the roman value
+		*	@param num if greater than 10, it will return a simple conversion to string.
+		*/
+		std::string level(int num);
+
+		HITGROUP GetHitGroup(int hitgroup);
+};

@@ -23,6 +23,7 @@
 
 #include "MC_Effects.h"
 #include "MC_Enchants.h"
+#include "MC_Utils.h"
 
 /**
  *	@brief Minecraft
@@ -32,11 +33,11 @@ class CMinecraft final
 	public:
 		static CEffects Effects;
 		static CEnchants Enchants;
-
-		HITGROUP GetHitGroup(int hitgroup);
+		static CMCUtils Utils;
 };
 
 inline CEffects CMinecraft::Effects;
 inline CEnchants CMinecraft::Enchants;
+inline CMCUtils CMinecraft::Utils;
 
 inline CMinecraft g_Minecraft;
