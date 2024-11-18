@@ -31,7 +31,7 @@ public:
 	/**
 	 *	@brief changes sequences when shot
 	 */
-	bool TakeDamage(CBaseEntity* inflictor, CBaseEntity* attacker, float flDamage, int bitsDamageType) override;
+	bool TakeDamage(DamageInfo* info) override;
 	void OnCreate() override;
 	void Spawn() override;
 	void Think() override;
@@ -141,8 +141,9 @@ void CCycler::Use(CBaseEntity* pActivator, CBaseEntity* pCaller, USE_TYPE useTyp
 		pev->framerate = 0.0;
 }
 
-bool CCycler::TakeDamage(CBaseEntity* inflictor, CBaseEntity* attacker, float flDamage, int bitsDamageType)
+bool CCycler::TakeDamage(DamageInfo* info)
 {
+/*
 	if (m_animate)
 	{
 		pev->sequence++;
@@ -163,7 +164,7 @@ bool CCycler::TakeDamage(CBaseEntity* inflictor, CBaseEntity* attacker, float fl
 		pev->framerate = 0;
 		CBaseEntity::Logger->debug("sequence: {}, frame {:.0f}", pev->sequence, pev->frame);
 	}
-
+*/
 	return false;
 }
 
@@ -177,7 +178,7 @@ public:
 	void Think() override;
 	void Use(CBaseEntity* pActivator, CBaseEntity* pCaller, USE_TYPE useType, float value) override;
 	int ObjectCaps() override { return (CBaseEntity::ObjectCaps() | FCAP_IMPULSE_USE); }
-	bool TakeDamage(CBaseEntity* inflictor, CBaseEntity* attacker, float flDamage, int bitsDamageType) override;
+	bool TakeDamage(DamageInfo* info) override;
 	void Animate(float frames);
 
 	inline bool ShouldAnimate() { return m_animate && m_maxFrame > 1.0; }
@@ -227,7 +228,7 @@ void CCyclerSprite::Use(CBaseEntity* pActivator, CBaseEntity* pCaller, USE_TYPE 
 	CBaseEntity::Logger->debug("Sprite: {}", STRING(pev->model));
 }
 
-bool CCyclerSprite::TakeDamage(CBaseEntity* inflictor, CBaseEntity* attacker, float flDamage, int bitsDamageType)
+bool CCyclerSprite::TakeDamage(DamageInfo* info)
 {
 	if (m_maxFrame > 1.0)
 	{

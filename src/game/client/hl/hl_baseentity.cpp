@@ -59,7 +59,6 @@ void CBaseEntity::SetSize(const Vector& min, const Vector& max)
 }
 
 bool CBaseEntity::GiveHealth(float flHealth, int bitsDamageType) { return true; }
-bool CBaseEntity::TakeDamage(CBaseEntity* inflictor, CBaseEntity* attacker, float flDamage, int bitsDamageType) { return true; }
 CBaseEntity* CBaseEntity::GetNextTarget() { return nullptr; }
 void CBaseEntity::SetObjectCollisionBox() {}
 bool CBaseEntity::Intersects(CBaseEntity* pOther) { return false; }
@@ -198,6 +197,7 @@ void CBaseAnimating::SetBodygroup(int iGroup, int iValue) {}
 int CBaseAnimating::GetBodygroup(int iGroup) const { return 0; }
 Vector CBaseMonster::GetGunPosition() { return g_vecZero; }
 void CBaseEntity::TraceAttack(DamageInfo* info) {}
+bool CBaseEntity::TakeDamage(DamageInfo* info) { return true; }
 void CBaseEntity::TraceBleed(float flDamage, Vector vecDir, TraceResult* ptr, int bitsDamageType) {}
 void CBaseMonster::MakeDamageBloodDecal(int cCount, float flNoise, TraceResult* ptr, const Vector& vecDir) {}
 bool CBaseMonster::FGetNodeRoute(Vector vecDest) { return true; }
@@ -218,6 +218,7 @@ void CBaseMonster::MonsterInitDead() {}
 bool CBaseMonster::BBoxFlat() { return true; }
 bool CBaseMonster::GetEnemy() { return false; }
 void CBaseMonster::TraceAttack(DamageInfo* info) {}
+bool CBaseMonster::TakeDamage(DamageInfo* info) { return false; }
 CBaseEntity* CBaseMonster::DropItem(const char* pszItemName, const Vector& vecPos, const Vector& vecAng) { return nullptr; }
 bool CBaseMonster::ShouldFadeOnDeath() { return false; }
 void CBaseMonster::RadiusDamage(CBaseEntity* inflictor, CBaseEntity* attacker, float flDamage, int bitsDamageType, EntityClassification iClassIgnore) {}
@@ -242,8 +243,6 @@ void CBaseMonster::StartFollowing(CBaseEntity* pLeader) {}
 int TrainSpeed(int iSpeed, int iMax) { return 0; }
 void CBasePlayer::DeathSound() {}
 bool CBasePlayer::GiveHealth(float flHealth, int bitsDamageType) { return false; }
-void CBasePlayer::TraceAttack(DamageInfo* info) {}
-bool CBasePlayer::TakeDamage(CBaseEntity* inflictor, CBaseEntity* attacker, float flDamage, int bitsDamageType) { return false; }
 void CBasePlayer::PackDeadPlayerItems() {}
 void CBasePlayer::RemoveAllItems(bool removeSuit) {}
 void CBasePlayer::SetAnimation(PLAYER_ANIM playerAnim) {}

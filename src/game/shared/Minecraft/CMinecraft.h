@@ -32,6 +32,8 @@ class CMinecraft final
 	public:
 		static CEffects Effects;
 		static CEnchants Enchants;
+
+		HITGROUP GetHitGroup(int hitgroup);
 };
 
 inline CEffects CMinecraft::Effects;

@@ -1151,7 +1151,7 @@ void CBaseMonster::StartTask(const Task_t* pTask)
 	}
 	case TASK_SMALL_FLINCH:
 	{
-		m_IdealActivity = GetSmallFlinchActivity();
+		m_IdealActivity = ACT_FLINCH_CHEST;
 		break;
 	}
 	case TASK_DIE:

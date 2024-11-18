@@ -114,6 +114,26 @@ enum class InventorySlot : int
 };
 
 /**
+*	@brief Hit Groups Bits enum.
+*/
+enum HITGROUP : int
+{
+    /**
+    *	@brief Generic. This ignores armor deductions and damage multiplications.
+    */
+    NONE = 0,
+    HELMET = ( 1 << 0 ),
+    CHEST = ( 1 << 1 ),
+    LEGS = ( 1 << 2 ),
+    BOOTS = ( 1 << 3 ),
+
+    /**
+    *	@brief These results are used for TraceResult->Hitgroup and will be converted to the above bits
+    */
+    Feet = 0, Legs, Chest, Head
+};
+
+/**
 *	@brief DMG Bits enum.
 */
 enum DMG : int

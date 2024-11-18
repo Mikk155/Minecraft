@@ -47,12 +47,12 @@ bool CZombie::CheckRangeAttack2(float flDot, float flDist)
 	return false;
 }
 
-bool CZombie::TakeDamage(CBaseEntity* inflictor, CBaseEntity* attacker, float flDamage, int bitsDamageType)
+bool CZombie::TakeDamage(DamageInfo* info)
 {
 	if (IsAlive())
 		PainSound();
 
-	return CBaseMonster::TakeDamage(inflictor, attacker, flDamage, bitsDamageType);
+	return CBaseMonster::TakeDamage(info);
 }
 
 void CZombie::PainSound()

@@ -63,7 +63,7 @@ public:
 	 *	@brief Special takedamage for func_breakable.
 	 *	Allows us to make exceptions that are breakable-specific
 	 */
-	bool TakeDamage(CBaseEntity* inflictor, CBaseEntity* attacker, float flDamage, int bitsDamageType) override;
+	bool TakeDamage(DamageInfo* info) override;
 	// To spark when hit
 	void TraceAttack(DamageInfo* info) override;
 

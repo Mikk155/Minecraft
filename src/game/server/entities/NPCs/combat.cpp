@@ -421,46 +421,7 @@ Activity CBaseMonster::GetDeathActivity()
 	UTIL_MakeVectors(pev->angles);
 	flDot = DotProduct(gpGlobals->v_forward, g_vecAttackDir * -1);
 
-	switch (m_LastHitGroup)
-	{
-		// try to pick a region-specific death.
-	case HITGROUP_HEAD:
-		deathActivity = ACT_DIE_HEADSHOT;
-		break;
-
-	case HITGROUP_STOMACH:
-		deathActivity = ACT_DIE_GUTSHOT;
-		break;
-
-	case HITGROUP_GENERIC:
-		// try to pick a death based on attack direction
-		fTriedDirection = true;
-
-		if (flDot > 0.3)
-		{
-			deathActivity = ACT_DIEFORWARD;
-		}
-		else if (flDot <= -0.3)
-		{
-			deathActivity = ACT_DIEBACKWARD;
-		}
-		break;
-
-	default:
-		// try to pick a death based on attack direction
-		fTriedDirection = true;
-
-		if (flDot > 0.3)
-		{
-			deathActivity = ACT_DIEFORWARD;
-		}
-		else if (flDot <= -0.3)
-		{
-			deathActivity = ACT_DIEBACKWARD;
-		}
-		break;
-	}
-
+	deathActivity = ACT_DIEFORWARD;
 
 	// can we perform the prescribed death?
 	if (LookupActivity(deathActivity) == ACTIVITY_NOT_AVAILABLE)
@@ -514,54 +475,6 @@ Activity CBaseMonster::GetDeathActivity()
 	}
 
 	return deathActivity;
-}
-
-Activity CBaseMonster::GetSmallFlinchActivity()
-{
-	Activity flinchActivity;
-	bool fTriedDirection;
-	float flDot;
-
-	fTriedDirection = false;
-	UTIL_MakeVectors(pev->angles);
-	flDot = DotProduct(gpGlobals->v_forward, g_vecAttackDir * -1);
-
-	switch (m_LastHitGroup)
-	{
-		// pick a region-specific flinch
-	case HITGROUP_HEAD:
-		flinchActivity = ACT_FLINCH_HEAD;
-		break;
-	case HITGROUP_STOMACH:
-		flinchActivity = ACT_FLINCH_STOMACH;
-		break;
-	case HITGROUP_LEFTARM:
-		flinchActivity = ACT_FLINCH_LEFTARM;
-		break;
-	case HITGROUP_RIGHTARM:
-		flinchActivity = ACT_FLINCH_RIGHTARM;
-		break;
-	case HITGROUP_LEFTLEG:
-		flinchActivity = ACT_FLINCH_LEFTLEG;
-		break;
-	case HITGROUP_RIGHTLEG:
-		flinchActivity = ACT_FLINCH_RIGHTLEG;
-		break;
-	case HITGROUP_GENERIC:
-	default:
-		// just get a generic flinch.
-		flinchActivity = ACT_SMALL_FLINCH;
-		break;
-	}
-
-
-	// do we have a sequence for the ideal activity?
-	if (LookupActivity(flinchActivity) == ACTIVITY_NOT_AVAILABLE)
-	{
-		flinchActivity = ACT_SMALL_FLINCH;
-	}
-
-	return flinchActivity;
 }
 
 void CBaseMonster::BecomeDead()
@@ -912,6 +825,7 @@ void RadiusDamage(Vector vecSrc, CBaseEntity* inflictor, CBaseEntity* attacker, 
 				if (tr.flFraction != 1.0)
 				{
 					ClearMultiDamage();
+/*
 					DamageInfo info(
 						inflictor,
 						flAdjustedDamage,
@@ -922,11 +836,12 @@ void RadiusDamage(Vector vecSrc, CBaseEntity* inflictor, CBaseEntity* attacker, 
 						&tr
 					);
 					pEntity->TraceAttack(&info);
+*/
 					ApplyMultiDamage(inflictor, attacker);
 				}
 				else
 				{
-					pEntity->TakeDamage(inflictor, attacker, flAdjustedDamage, bitsDamageType);
+					//pEntity->TakeDamage(inflictor, attacker, flAdjustedDamage, bitsDamageType);
 				}
 			}
 		}
@@ -964,7 +879,7 @@ CBaseEntity* CBaseMonster::CheckTraceHullAttack(float flDist, int iDamage, int i
 
 		if (iDamage > 0)
 		{
-			pEntity->TakeDamage(this, this, iDamage, iDmgType);
+			//pEntity->TakeDamage(this, this, iDamage, iDmgType);
 		}
 
 		return pEntity;
@@ -1087,7 +1002,7 @@ void CBaseEntity::TraceAttack(DamageInfo* info)
 	*/
 }
 
-void CBaseMonster::TraceAttack(DamageInfo* info)
+bool CBaseMonster::TakeDamage(DamageInfo* info)
 {
 	if( FBitSet( info->bits, DMG::LAVA ) )
 	{
@@ -1096,41 +1011,69 @@ void CBaseMonster::TraceAttack(DamageInfo* info)
 			info->attacker,
 			g_Cfg.GetValue( "effect_fire_damage"sv, 0.5 ),
 			DMG::FIRE,
+			info->hitgroups,
 			info->weapon,
 			info->inflictor
 		);
 		TraceAttack(&new_info);
 	}
 
-	if (0 != pev->takedamage)
-	{
-		m_LastHitGroup = info->tr->iHitgroup;
+	if( info->damage <= 0.0 )
+		return false;
 
-		switch (info->tr->iHitgroup)
-		{
-		case HITGROUP_GENERIC:
-			break;
-		case HITGROUP_HEAD:
-			info->damage *= g_Cfg.GetValue( "mob_damage_deduction_head"sv, 3 );
-			break;
-		case HITGROUP_CHEST:
-			info->damage *= g_Cfg.GetValue( "mob_damage_deduction_chest"sv, 2 );
-			break;
-		case HITGROUP_STOMACH:
-			info->damage *= g_Cfg.GetValue( "mob_damage_deduction_stomach"sv, 2 );
-			break;
-		case HITGROUP_LEFTARM:
-		case HITGROUP_RIGHTARM:
-			info->damage *= g_Cfg.GetValue( "mob_damage_deduction_arm"sv, 1 );
-			break;
-		case HITGROUP_LEFTLEG:
-		case HITGROUP_RIGHTLEG:
-			info->damage *= g_Cfg.GetValue( "mob_damage_deduction_leg"sv, 1 );
-			break;
-		default:
-			break;
-		}
+	pev->health -= info->damage;
+
+	if( pev->health <= 0.0 )
+	{
+		pev->health = 0;
+		Killed( info->attacker, GIB_NEVER );
 	}
+	return true;
+}
+
+void CBaseMonster::TraceAttack(DamageInfo* info)
+{
+	if( pev->takedamage == DAMAGE_NO || FBitSet( pev->flags, FL_GODMODE ) || !IsAlive() )
+		return;
+
+	HITGROUP HitGroup = static_cast<HITGROUP>(info->hitgroups);
+
+	if( HitGroup != HITGROUP::NONE )
+	{
+		auto TraceHitgroup = [] (
+			CBaseMonster* monster,
+			DamageInfo* info,
+			InventorySlot slot,
+			std::string_view svgroup,
+			float multiplier,
+			HITGROUP hitgroup
+		) -> void
+		{
+			info->damage *= g_Cfg.GetValue(
+				fmt::format( "{}_damage_multiplier_{}",
+					( monster->IsPlayer() ? "player"sv : "mob"sv ), svgroup ), multiplier );
+
+			if( auto armor = monster->inventory.at(static_cast<size_t>(slot)); armor != nullptr )
+			{
+				armor->TraceAttack(info);
+			}
+			info->hitgroups = hitgroup;
+		};
+
+		if( FBitSet( info->hitgroups, HITGROUP::HELMET ) )
+			TraceHitgroup(this, info, InventorySlot::ArmorHelmet, "helmet"sv, 3, HITGROUP::HELMET);
+
+		if( FBitSet( info->hitgroups, HITGROUP::CHEST ) )
+			TraceHitgroup(this, info, InventorySlot::ArmorChest, "chest"sv, 2, HITGROUP::CHEST);
+
+		if( FBitSet( info->hitgroups, HITGROUP::LEGS ) )
+			TraceHitgroup(this, info, InventorySlot::ArmorLegs, "legs"sv, 1.5, HITGROUP::LEGS);
+
+		if( FBitSet( info->hitgroups, HITGROUP::BOOTS ) )
+			TraceHitgroup(this, info, InventorySlot::ArmorBoots, "boots"sv, 1, HITGROUP::BOOTS);
+	}
+
+	TakeDamage(info);
 }
 
 void CBaseEntity::TraceBleed(float flDamage, Vector vecDir, TraceResult* ptr, int bitsDamageType)

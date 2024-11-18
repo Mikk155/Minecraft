@@ -306,7 +306,6 @@ public:
 	virtual void PostThink();
 	Vector GetGunPosition() override;
 	bool GiveHealth(float flHealth, int bitsDamageType) override;
-	void TraceAttack(DamageInfo* info) override;
 
 	/**
 	 *	@brief NOTE: each call to TakeDamage with bitsDamageType set to
@@ -314,7 +313,6 @@ public:
 	 *	Thus the ongoing effects of poison, radiation etc are implemented
 	 *	with subsequent calls to TakeDamage using DMG_GENERIC.
 	 */
-	bool TakeDamage(CBaseEntity* inflictor, CBaseEntity* attacker, float flDamage, int bitsDamageType) override;
 	void Killed(CBaseEntity* attacker, int iGib) override;
 	Vector BodyTarget(const Vector& posSrc) override { return Center() + pev->view_ofs * RANDOM_FLOAT(0.5, 1.1); } // position to shoot at
 	bool IsAlive() override { return (pev->deadflag == DEAD_NO) && pev->health > 0; }

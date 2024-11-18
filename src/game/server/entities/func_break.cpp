@@ -409,10 +409,10 @@ void CBreakable::BreakTouch(CBaseEntity* pOther)
 		if (flDamage >= pev->health)
 		{
 			SetTouch(nullptr);
-			TakeDamage(pOther, pOther, flDamage, DMG_CRUSH);
+			//TakeDamage(pOther, pOther, flDamage, DMG_CRUSH);
 
 			// do a little damage to player if we broke glass or computer
-			pOther->TakeDamage(this, this, flDamage / 4, DMG_SLASH);
+			//pOther->TakeDamage(this, this, flDamage / 4, DMG_SLASH);
 		}
 	}
 
@@ -448,6 +448,7 @@ void CBreakable::Use(CBaseEntity* pActivator, CBaseEntity* pCaller, USE_TYPE use
 
 void CBreakable::TraceAttack(DamageInfo* info)
 {
+/*
 	// random spark if this is a 'computer' object
 	if (RANDOM_LONG(0, 1))
 	{
@@ -477,10 +478,12 @@ void CBreakable::TraceAttack(DamageInfo* info)
 	}
 
 	CBaseDelay::TraceAttack(info);
+*/
 }
 
-bool CBreakable::TakeDamage(CBaseEntity* inflictor, CBaseEntity* attacker, float flDamage, int bitsDamageType)
+bool CBreakable::TakeDamage(DamageInfo* info)
 {
+/*
 	Vector vecTemp;
 
 	// if Attacker == Inflictor, the attack was a melee or other instant-hit attack.
@@ -527,7 +530,7 @@ bool CBreakable::TakeDamage(CBaseEntity* inflictor, CBaseEntity* attacker, float
 	// Don't play shard noise if cbreakable actually died.
 
 	DamageSound();
-
+*/
 	return true;
 }
 
@@ -763,7 +766,7 @@ public:
 	inline float MaxSpeed() { return m_maxSpeed; }
 
 	// breakables use an overridden takedamage
-	bool TakeDamage(CBaseEntity* inflictor, CBaseEntity* attacker, float flDamage, int bitsDamageType) override;
+	bool TakeDamage(DamageInfo* info) override;
 
 	int DamageDecal(int bitsDamageType) override;
 
@@ -953,10 +956,10 @@ void CPushable::StopPushSound()
 }
 #endif
 
-bool CPushable::TakeDamage(CBaseEntity* inflictor, CBaseEntity* attacker, float flDamage, int bitsDamageType)
+bool CPushable::TakeDamage(DamageInfo* info)
 {
-	if ((pev->spawnflags & SF_PUSH_BREAKABLE) != 0)
-		return CBreakable::TakeDamage(inflictor, attacker, flDamage, bitsDamageType);
+	//if ((pev->spawnflags & SF_PUSH_BREAKABLE) != 0)
+	//	return CBreakable::TakeDamage(inflictor, attacker, flDamage, bitsDamageType);
 
 	return true;
 }

@@ -705,6 +705,7 @@ void CBeam::BeamDamage(TraceResult* ptr)
 		if (pHit)
 		{
 			ClearMultiDamage();
+/*
 			DamageInfo info(
 				this,
 				pev->dmg * (gpGlobals->time - pev->dmgtime),
@@ -715,6 +716,7 @@ void CBeam::BeamDamage(TraceResult* ptr)
 				ptr
 			);
 			pHit->TraceAttack(&info);
+*/
 			ApplyMultiDamage(this, this);
 			if ((pev->spawnflags & SF_BEAM_DECALS) != 0)
 			{

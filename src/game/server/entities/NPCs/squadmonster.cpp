@@ -505,8 +505,9 @@ const Schedule_t* CSquadMonster::GetScheduleOfType(int iType)
 	}
 }
 
-bool CSquadMonster::TakeDamage(CBaseEntity* inflictor, CBaseEntity* attacker, float flDamage, int bitsDamageType)
+bool CSquadMonster::TakeDamage(DamageInfo* info)
 {
+/*
 	if (flDamage >= pev->max_health)
 	{
 		auto squadLeader = MySquadLeader();
@@ -565,6 +566,6 @@ bool CSquadMonster::TakeDamage(CBaseEntity* inflictor, CBaseEntity* attacker, fl
 			}
 		}
 	}
-
-	return CBaseMonster::TakeDamage(inflictor, attacker, flDamage, bitsDamageType);
+*/
+	return CBaseMonster::TakeDamage(info);
 }

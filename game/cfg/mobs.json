@@ -1,7 +1,6 @@
 {
-    "mob_damage_deduction_head": 3,
-    "mob_damage_deduction_chest": 2,
-    "mob_damage_deduction_stomach": 2,
-    "mob_damage_deduction_arm": 1,
-    "mob_damage_deduction_leg": 1
+    "mob_damage_multiplier_helmet": 3,
+    "mob_damage_multiplier_chest": 2,
+    "mob_damage_multiplier_legs": 1.5,
+    "mob_damage_multiplier_boots": 1
 }

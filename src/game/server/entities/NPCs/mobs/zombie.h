@@ -52,7 +52,7 @@ public:
 	//No hay ataques a larga distancia
 	bool CheckRangeAttack1(float flDot, float flDist) override;
 	bool CheckRangeAttack2(float flDot, float flDist) override;
-	bool TakeDamage(CBaseEntity* inflictor, CBaseEntity* attacker, float flDamage, int bitsDamageType) override;
+	bool TakeDamage(DamageInfo* info) override;
 
 protected:
 	void ZombieSlashAttack(float damage, const Vector& punchAngle, const Vector& velocity);

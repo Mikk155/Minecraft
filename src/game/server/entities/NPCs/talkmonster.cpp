@@ -1003,8 +1003,9 @@ void CTalkMonster::SetAnswerQuestion(CTalkMonster* pSpeaker)
 	m_hTalkTarget = (CBaseMonster*)pSpeaker;
 }
 
-bool CTalkMonster::TakeDamage(CBaseEntity* inflictor, CBaseEntity* attacker, float flDamage, int bitsDamageType)
+bool CTalkMonster::TakeDamage(DamageInfo* info)
 {
+/*
 	if (IsAlive())
 	{
 		// if player damaged this entity, have other friends talk about it
@@ -1022,7 +1023,8 @@ bool CTalkMonster::TakeDamage(CBaseEntity* inflictor, CBaseEntity* attacker, flo
 			}
 		}
 	}
-	return CBaseMonster::TakeDamage(inflictor, attacker, flDamage, bitsDamageType);
+*/
+	return CBaseMonster::TakeDamage(info);
 }
 
 const Schedule_t* CTalkMonster::GetScheduleOfType(int Type)

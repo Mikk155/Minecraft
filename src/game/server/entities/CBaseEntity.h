@@ -96,30 +96,27 @@ void FireTargets(const char* targetName, CBaseEntity* pActivator, CBaseEntity* p
 
 struct DamageInfo
 {
-	CBaseEntity* attacker;
+	CBaseMonster* attacker;
 	float damage;
 	int bits;
-	CBaseEntity* weapon;
+	int hitgroups;
+	CBaseItem* weapon;
 	CBaseEntity* inflictor;
-	Vector direction;
-	TraceResult* tr;
 
 	DamageInfo(
-		CBaseEntity* attacker = nullptr,
-		float damage = 0.0,
+		CBaseMonster* attacker,
+		float damage,
 		DMG bits = DMG::GENERIC,
-		CBaseEntity* weapon = nullptr,
-		CBaseEntity* inflictor = nullptr,
-		Vector direction = g_vecZero,
-		TraceResult* tr = nullptr
+		int hitgroups = HITGROUP::NONE,
+		CBaseItem* weapon = nullptr,
+		CBaseEntity* inflictor = nullptr
 	) :
 	attacker(attacker),
 	damage(damage),
 	bits((int)bits),
+	hitgroups(hitgroups),
 	weapon(weapon),
-	inflictor(inflictor),
-	direction(direction),
-	tr(tr)
+	inflictor(inflictor)
 	{}
 };
 
@@ -333,7 +330,7 @@ public:
 	 *	@param flDamage Damage done
 	 *	@param bitsDamageType indicates type of damage inflicted, ie: DMG_CRUSH
 	 */
-	virtual bool TakeDamage(CBaseEntity* inflictor, CBaseEntity* attacker, float flDamage, int bitsDamageType);
+	virtual bool TakeDamage(DamageInfo* info);
 
 	virtual bool GiveHealth(float flHealth, int bitsDamageType);
 	virtual void Killed(CBaseEntity* attacker, int iGib);
@@ -640,9 +637,6 @@ public:
 
 	virtual bool IsArthropod() { return false; }
 	virtual bool IsUndead() { return false; }
-
-	// Various effect handlers, wrote this way so specific classes can override
-	void effect_fire(int level, CBaseEntity* inflictor, CBaseEntity* attacker);
 
 	// Configuration file, This overrides g_Cfg.
     std::unique_ptr<json> m_config;

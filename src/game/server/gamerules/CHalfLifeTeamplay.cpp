@@ -239,7 +239,7 @@ void CHalfLifeTeamplay::ChangePlayerTeam(CBasePlayer* pPlayer, const char* pTeam
 		m_DisableDeathMessages = true;
 		m_DisableDeathPenalty = true;
 
-		pPlayer->TakeDamage(CBaseEntity::World, CBaseEntity::World, 900, damageFlags);
+		//pPlayer->TakeDamage(CBaseEntity::World, CBaseEntity::World, 900, damageFlags);
 
 		m_DisableDeathMessages = false;
 		m_DisableDeathPenalty = false;

@@ -218,6 +218,7 @@ void CGrenade::BounceTouch(CBaseEntity* pOther)
 		{
 			TraceResult tr = UTIL_GetGlobalTrace();
 			ClearMultiDamage();
+/*
 			DamageInfo info(
 				owner,
 				1,
@@ -228,6 +229,7 @@ void CGrenade::BounceTouch(CBaseEntity* pOther)
 				&tr
 			);
 			pOther->TraceAttack(&info);
+*/
 			ApplyMultiDamage(this, owner);
 		}
 		m_flNextAttack = gpGlobals->time + 1.0; // debounce
