@@ -6,15 +6,10 @@ on:
       - main
     paths:
       - 'docs/*.md'
-      - '.github/workflows/wiki.*'
-
-env:
-  USER: ${{github.repository_owner}}
-  REPOSITORY: Minecraft
 
 jobs:
   wiki_update:
-    name: wiku_update
+    name: Update Wiki
     runs-on: windows-latest
     steps:
     - name: Checkout
@@ -28,13 +23,12 @@ jobs:
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
-        pip install --no-cache-dir -r .github/workflows/wiki.txt
+        pip install --no-cache-dir -r scripts/update_wiki/requirements.txt
         pip install --upgrade pip
 
     - name: Update Wiki
       id: generated
       env:
         TOKEN: ${{ secrets.TOKEN }}
-        USER: ${{ env.USER }}
-        REPOSITORY: ${{ env.REPOSITORY }}
-      run: python3 .github/workflows/wiki.py
+        REPOSITORY: ${{ github.repository }}
+      run: python3 scripts/update_wiki/main.py

@@ -1,13 +1,18 @@
-from git import Repo
 import os
 import shutil
-from env import env
+from git import Repo
 
-repo_url = 'https://{}@github.com/{}/{}.wiki.git'.format( env.token, env.user, env.repository );
+user: str = os.getenv[ "REPOSITORY" ].split( '/' )[0];
+
+repository: str = os.getenv[ "REPOSITORY" ].split( '/' )[1];
+
+token: str = os.getenv[ "TOKEN" ];
+
+repo_url = f'https://{token}@github.com/{user}/{repository}.wiki.git';
 
 abs = os.path.abspath("");
 
-clone_dir = '{}/../{}-wiki/'.format( abs, env.repository );
+clone_dir: str = f'{abs}/../{repository}-wiki/';
 
 if not os.path.exists( clone_dir ):
 
@@ -21,9 +26,9 @@ for file in os.listdir( clone_dir ):
 
         continue;
 
-    if not os.path.exists( '{}/docs/{}'.format( abs, file ) ):
+    if not os.path.exists( f'{abs}/docs/{file}' ):
 
-        os.remove( '{}/{}'.format( clone_dir, file ) );
+        os.remove( f'{clone_dir}/{file}' );
 
 shutil.copytree( "docs/", clone_dir, dirs_exist_ok=True );
 
