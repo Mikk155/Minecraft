@@ -17,6 +17,7 @@
 
 class CBaseEntity;
 class CBasePlayer;
+class CBaseMonster;
 struct edict_t;
 
 /**
@@ -30,3 +31,6 @@ CBasePlayer* ToBasePlayer(CBaseEntity* entity);
  *	In debug builds the type is checked to make sure it's a player.
  */
 CBasePlayer* ToBasePlayer(edict_t* entity);
+
+CBaseMonster* ToBaseMonster(CBaseEntity* entity);
+CBaseMonster* ToBaseMonster(edict_t* entity);
