@@ -64,6 +64,7 @@ jobs:
           file: Linux-x86.zip
           token: ${{ secrets.TOKEN }}
           tag_name: ${{ github.ref_name }}
+          draft: false
 
   win32:
     name: Win32
@@ -111,6 +112,7 @@ jobs:
           file: Win32.zip
           token: ${{ secrets.TOKEN }}
           tag_name: ${{ github.ref_name }}
+          draft: false
 
   assets:
     name: Game assets
@@ -140,3 +142,4 @@ jobs:
         default_release_name: "${{env.game}}: ${{env.mod}}"
         default_release_body_path: changelog.md
         tag_name: ${{ github.ref_name }}
+        draft: false
