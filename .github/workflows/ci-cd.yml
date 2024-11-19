@@ -108,13 +108,13 @@ jobs:
       uses: actions/checkout@v4
 
     - name: Rename mod folder
-      run: Rename-Item -Path game -NewName minecraft
+      run: Rename-Item -Path game -NewName ${{env.mod}}
 
     - name: Zip mod assets
-      run: Compress-Archive -Path minecraft -DestinationPath minecraft.zip
+      run: Compress-Archive -Path ${{env.mod}} -DestinationPath ${{env.mod}}.zip
 
     - name: Upload Artifact
       uses: actions/upload-artifact@v4
       with:
         name: game-assets
-        path: minecraft.zip
+        path: ${{env.mod}}.zip
