@@ -227,12 +227,10 @@ install(TARGETS server
 	LIBRARY DESTINATION dlls
 )
 
-if( NOT CMAKE_BUILD_TYPE )
 install(DIRECTORY game/
-	DESTINATION .
-	FILES_MATCHING PATTERN "*"
+    DESTINATION .
+    FILES_MATCHING PATTERN "*"
 )
-endif()
 
 #==========================================================
 # CMake doesn't currently support installing imported libraries of type UNKNOWN.
