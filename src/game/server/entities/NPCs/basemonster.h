@@ -903,7 +903,7 @@ public:
         }
         inventory.clear();
 
-		g_Minecraft.Effects.RemoveAll(this)
+		g_Minecraft.Effects.RemoveAll(this);
     }
 };
 

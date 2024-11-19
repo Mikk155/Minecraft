@@ -15,22 +15,22 @@
 
 #pragma once
 
-#include "entities/cbase.h"
+#include "CMinecraft.h"
 
 struct EffectInfo
 {
 	std::string_view effect_id;
-	float duration;
-	int level;
-	CBaseMonster* attacker;
-	float cooldown;
+	float duration = 0;
+	int level = 0;
+	CBaseEntity* attacker = nullptr;
+	float cooldown = 0;
 	float time = 0;
 
 	EffectInfo(
 		std::string_view effect_id,
 		float duration,
 		int level = 0,
-		CBaseMonster* attacker = nullptr,
+		CBaseEntity* attacker = nullptr,
 		float cooldown = 0
 	) :
 	effect_id(effect_id),
@@ -48,9 +48,9 @@ class CEffects
 
 	public:
 
-		void RemoveAll(CBaseMonster* entity);
-		void Remove(CBaseMonster* entity, std::string_view effect_name);
-		void Add(CBaseMonster* entity, std::string_view effect_name, const EffectInfo&& effect);
+		void RemoveAll(CBaseEntity* entity);
+		void Remove(CBaseEntity* entity, std::string_view effect_name);
+		void Add(CBaseEntity* entity, std::string_view effect_name, const EffectInfo&& effect);
 
 		std::string_view fire(int i){return stv("fire"sv,i);}
 		std::string_view speed(int i){return stv("speed"sv,i);}

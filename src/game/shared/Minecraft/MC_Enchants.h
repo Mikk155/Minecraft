@@ -15,7 +15,7 @@
 
 #pragma once
 
-#include "entities/cbase.h"
+#include "CMinecraft.h"
 
 class CEnchants
 {

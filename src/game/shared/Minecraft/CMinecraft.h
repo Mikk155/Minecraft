@@ -19,6 +19,8 @@
 
 #pragma once
 
+#include "../../server/entities/cbase.h"
+
 #include "MC_ConstDefs.h"
 
 #include "MC_Effects.h"
