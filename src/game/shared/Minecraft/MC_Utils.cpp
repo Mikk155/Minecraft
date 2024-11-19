@@ -49,3 +49,28 @@ HITGROUP CMCUtils::GetHitGroup(int hitgroup)
       }
       return HITGROUP::NONE;
 }
+
+std::string CMCUtils::get_message(const char* message)
+{
+	std::string new_msg;
+
+#ifdef CLIENT_DLL
+
+    const char* dot = strchr( message, '.' );
+
+    if( dot )
+	{
+    	int i = std::atoi( dot + 1 );
+
+    	std::string b( message, dot );
+
+    	std::string r = CMCUtils::level(i);
+
+		// -MC Open client_message_t (b) and replace pMessage with this.
+		new_msg = fmt::format( "{} {}", b, r );
+	}
+
+#endif
+
+	return new_msg;
+}

@@ -27,5 +27,7 @@ class CMCUtils
 		*/
 		std::string level(int num);
 
+		std::string CMCUtils::get_message(const char* message);
+
 		HITGROUP GetHitGroup(int hitgroup);
 };
