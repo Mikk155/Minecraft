@@ -1006,13 +1006,15 @@ bool CBaseMonster::TakeDamage(DamageInfo* info)
 {
 	if( FBitSet( info->bits, DMG::LAVA ) )
 	{
-		g_Minecraft.Effects.Add(this, g_Minecraft.Effects.fire(2), EffectInfo( g_Minecraft.Effects.fire(0),
-			g_Cfg.GetValue( "effect_fire_time"sv, 4.0, info->attacker ) * 2, 2, info->attacker ) );
+		float time = gpGlobals->time + ( g_Cfg.GetValue( "effect_fire_time"sv, 4.0, info->attacker ) * 2 );
+		g_Minecraft.Effects.Add(this, g_Minecraft.Effects.fire(2),
+			EffectInfo( g_Minecraft.Effects.fire(0), time, 2, info->attacker ) );
 	}
 	if( FBitSet( info->bits, DMG::FIRE ) )
 	{
-		g_Minecraft.Effects.Add(this, g_Minecraft.Effects.fire(1), EffectInfo( g_Minecraft.Effects.fire(0),
-			g_Cfg.GetValue( "effect_fire_time"sv, 4.0, info->attacker ), 2, info->attacker ) );
+		float time = gpGlobals->time + g_Cfg.GetValue( "effect_fire_time"sv, 4.0, info->attacker );
+		g_Minecraft.Effects.Add(this, g_Minecraft.Effects.fire(1),
+			EffectInfo( g_Minecraft.Effects.fire(0), time, 2, info->attacker ) );
 	}
 
 	if( info->damage <= 0.0 )
