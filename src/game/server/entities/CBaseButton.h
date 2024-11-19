@@ -90,7 +90,7 @@ public:
 	void ButtonBackHome();
 
 	void ButtonUse(CBaseEntity* pActivator, CBaseEntity* pCaller, USE_TYPE useType, float value);
-	bool TakeDamage(CBaseEntity* inflictor, CBaseEntity* attacker, float flDamage, int bitsDamageType) override;
+	bool TakeDamage(DamageInfo* info) override;
 
 	enum BUTTON_CODE
 	{

@@ -644,8 +644,9 @@ bool CBaseEntity::GiveHealth(float flHealth, int bitsDamageType)
 	return true;
 }
 
-bool CBaseEntity::TakeDamage(CBaseEntity* inflictor, CBaseEntity* attacker, float flDamage, int bitsDamageType)
+bool CBaseEntity::TakeDamage(DamageInfo* info)
 {
+/*
 	Vector vecTemp;
 
 	if( pev->takedamage == DAMAGE_NO || !IsAlive() || FBitSet( pev->flags, FL_GODMODE ) )
@@ -767,6 +768,12 @@ bool CBaseEntity::TakeDamage(CBaseEntity* inflictor, CBaseEntity* attacker, floa
 			UTIL_Remove( inflictor );
 		}*/
 
+
+
+
+/*
+
+
 		pev->dmg_inflictor = inflictor->edict();
 		pev->dmg_take += flDamage;
 	}
@@ -870,7 +877,7 @@ bool CBaseEntity::TakeDamage(CBaseEntity* inflictor, CBaseEntity* attacker, floa
 		Killed(attacker, GIB_NORMAL);
 		return false;
 	}
-
+*/
 	return true;
 }
 
@@ -1061,9 +1068,4 @@ void CBaseEntity::EmitAmbientSound(const Vector& vecOrigin, const char* samp, fl
 void CBaseEntity::StopSound(int channel, const char* sample)
 {
 	sound::g_ServerSound.EmitSound(this, channel, sample, 0, 0, SND_STOP, PITCH_NORM);
-}
-
-void CBaseEntity::effect_fire(int level, CBaseEntity* inflictor, CBaseEntity* attacker)
-{
-	//TakeDamage(inflictor, attacker, 0.5, DMG_MC_FIRE);
 }

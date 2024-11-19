@@ -165,5 +165,5 @@ public:
 	MONSTERSTATE GetIdealState() override;
 	const Schedule_t* GetScheduleOfType(int iType) override;
 
-	bool TakeDamage(CBaseEntity* inflictor, CBaseEntity* attacker, float flDamage, int bitsDamageType) override;
+	bool TakeDamage(DamageInfo* info) override;
 };

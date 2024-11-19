@@ -109,8 +109,8 @@ static CBaseEntity* EntTrySelectSpawnPoint(CBasePlayer* pPlayer)
 			while ((ent = UTIL_FindEntityInSphere(ent, pSpot->pev->origin, 128)) != nullptr)
 			{
 				// if ent is a client, kill em (unless they are ourselves)
-				if (ent->IsPlayer() && ent != pPlayer)
-					ent->TakeDamage(CBaseEntity::World, CBaseEntity::World, 300, DMG_GENERIC);
+				//if (ent->IsPlayer() && ent != pPlayer)
+					//ent->TakeDamage(CBaseEntity::World, CBaseEntity::World, 300, DMG_GENERIC);
 			}
 			return pSpot;
 		}
@@ -165,8 +165,8 @@ static CBaseEntity* EntTrySelectSpawnPoint(CBasePlayer* pPlayer)
 			while ((ent = UTIL_FindEntityInSphere(ent, pSpot->pev->origin, 128)) != nullptr)
 			{
 				// if ent is a client, kill em (unless they are ourselves)
-				if (ent->IsPlayer() && ent != pPlayer)
-					ent->TakeDamage(CBaseEntity::World, CBaseEntity::World, 300, DMG_GENERIC);
+				//if (ent->IsPlayer() && ent != pPlayer)
+					//ent->TakeDamage(CBaseEntity::World, CBaseEntity::World, 300, DMG_GENERIC);
 			}
 			return pSpot;
 		}

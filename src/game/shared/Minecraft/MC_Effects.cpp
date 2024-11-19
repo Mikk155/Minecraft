@@ -15,34 +15,65 @@
 
 #include "MC_Effects.h"
 
+void CEffects::RemoveAll(CBaseEntity* entity)
+{
+	if( auto monster = ToBaseMonster(entity); monster != nullptr )
+	{
+		for( auto& [key, effect] : monster->effects)
+		{
+			delete effect;
+		}
+		monster->effects.clear();
+	}
+}
+
+void CEffects::Remove(CBaseEntity* entity, std::string_view effect_name)
+{
+	if( auto monster = ToBaseMonster(entity); monster != nullptr )
+	{
+		auto it = monster->effects.find( effect_name );
+
+		if( it != monster->effects.end() )
+		{
+			delete it->second;
+			monster->effects.erase(it);
+		}
+	}
+}
+
+void CEffects::Add(CBaseEntity* entity, std::string_view effect_name, const EffectInfo&& effect)
+{
+	if( auto monster = ToBaseMonster(entity); monster != nullptr )
+	{
+		if( auto player = ToBasePlayer(entity); player != nullptr )
+		{
+/*
+			MESSAGE_BEGIN( MSG_BROADCAST, gmsgEffect, nullptr, player );
+				WRITE_STRING( std::string( effect.effect_id ).c_str() );
+				WRITE_BYTE( effect.level );
+				WRITE_COORD( effect.duration );
+			MESSAGE_END();
+*/
+		}
+
+		effect.duration = gpGlobals->time + effect.duration;
+
+		if( auto it = monster->effects.find( effect_name ); it != monster->effects.end() )
+		{
+			if( it->second->duration < effect.duration )
+			{
+				it->second->duration = effect.duration;
+				it->second->attacker = effect.attacker;
+				return;
+			}
+			delete it->second;
+			monster->effects.erase(it);
+		}
+
+		monster->effects[ effect_name ] = new EffectInfo( std::move(effect) );
+	}
+}
+
 CEffects::CEffects()
 {
-	MCMacroDataRegister(*this, fire, 2);
-	MCMacroDataRegister(*this, speed, 2);
-	MCMacroDataRegister(*this, slowness, 4);
-	MCMacroDataRegister(*this, fire_resistance, 0);
-	MCMacroDataRegister(*this, haste, 0);
-	MCMacroDataRegister(*this, fatigue, 0);
-	MCMacroDataRegister(*this, strength, 0);
-	MCMacroDataRegister(*this, instant_health, 0);
-	MCMacroDataRegister(*this, instant_damage, 0);
-	MCMacroDataRegister(*this, jump_boost, 0);
-	MCMacroDataRegister(*this, nausea, 0);
-	MCMacroDataRegister(*this, regeneration, 0);
-	MCMacroDataRegister(*this, resistance, 0);
-	MCMacroDataRegister(*this, water_breathing, 0);
-	MCMacroDataRegister(*this, invisibility, 0);
-	MCMacroDataRegister(*this, blindness, 0);
-	MCMacroDataRegister(*this, night_vision, 0);
-	MCMacroDataRegister(*this, weakness, 0);
-	MCMacroDataRegister(*this, poison, 0);
-	MCMacroDataRegister(*this, wither, 0);
-	MCMacroDataRegister(*this, absorption, 0);
-	MCMacroDataRegister(*this, glowing, 0);
-	MCMacroDataRegister(*this, levitation, 0);
-	MCMacroDataRegister(*this, luck, 0);
-	MCMacroDataRegister(*this, bad_luck, 0);
-	MCMacroDataRegister(*this, fatal_poison, 0);
-	MCMacroDataRegister(*this, slow_falling, 0);
-	MCMacroDataRegister(*this, darkness, 0);
 }

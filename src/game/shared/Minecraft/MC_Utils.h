@@ -13,33 +13,21 @@
  *
  ****/
 
-/**
- *	@file Minecraft
- */
-
 #pragma once
 
-#include "../../server/entities/cbase.h"
+#include "CMinecraft.h"
 
-#include "MC_ConstDefs.h"
-
-#include "MC_Effects.h"
-#include "MC_Enchants.h"
-#include "MC_Utils.h"
-
-/**
- *	@brief Minecraft
- */
-class CMinecraft final
+class CMCUtils
 {
 	public:
-		static CEffects Effects;
-		static CEnchants Enchants;
-		static CMCUtils Utils;
+
+		/**
+		*	@brief Converts the given integer to the roman value
+		*	@param num if greater than 10, it will return a simple conversion to string.
+		*/
+		std::string level(int num);
+
+		std::string CMCUtils::get_message(const char* message);
+
+		HITGROUP GetHitGroup(int hitgroup);
 };
-
-inline CEffects CMinecraft::Effects;
-inline CEnchants CMinecraft::Enchants;
-inline CMCUtils CMinecraft::Utils;
-
-inline CMinecraft g_Minecraft;

@@ -333,8 +333,9 @@ bool CBaseButton::KeyValue(KeyValueData* pkvd)
 	return CBaseToggle::KeyValue(pkvd);
 }
 
-bool CBaseButton::TakeDamage(CBaseEntity* inflictor, CBaseEntity* attacker, float flDamage, int bitsDamageType)
+bool CBaseButton::TakeDamage(DamageInfo* info)
 {
+/*
 	BUTTON_CODE code = ButtonResponseToTouch();
 
 	if (code == BUTTON_NOTHING)
@@ -357,7 +358,7 @@ bool CBaseButton::TakeDamage(CBaseEntity* inflictor, CBaseEntity* attacker, floa
 	}
 	else // code == BUTTON_ACTIVATE
 		ButtonActivate();
-
+*/
 	return false;
 }
 
@@ -1061,7 +1062,7 @@ class CButtonTarget : public CBaseEntity
 public:
 	void Spawn() override;
 	void Use(CBaseEntity* pActivator, CBaseEntity* pCaller, USE_TYPE useType, float value) override;
-	bool TakeDamage(CBaseEntity* inflictor, CBaseEntity* attacker, float flDamage, int bitsDamageType) override;
+	bool TakeDamage(DamageInfo* info) override;
 	int ObjectCaps() override;
 };
 
@@ -1099,9 +1100,9 @@ int CButtonTarget::ObjectCaps()
 		return caps;
 }
 
-bool CButtonTarget::TakeDamage(CBaseEntity* inflictor, CBaseEntity* attacker, float flDamage, int bitsDamageType)
+bool CButtonTarget::TakeDamage(DamageInfo* info)
 {
-	Use(Instance(attacker), this, USE_TOGGLE, 0);
+	//Use(Instance(attacker), this, USE_TOGGLE, 0);
 
 	return true;
 }

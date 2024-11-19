@@ -295,18 +295,6 @@ protected:
 private:
 	ScopedClientCommand m_SpectateCommand;
 	ScopedClientCommand m_SpecModeCommand;
-
-protected:
-	std::vector<CBaseEntity*> m_pEffectList;
-	void m_pEffectShedule();
-public:
-	void InsertToEffectSchedule( CBaseEntity* pEntity )
-	{
-		if( std::find( m_pEffectList.begin(), m_pEffectList.end(), pEntity ) == m_pEffectList.end() )
-		{
-			m_pEffectList.push_back(pEntity);
-		}
-	};
 };
 
 /**

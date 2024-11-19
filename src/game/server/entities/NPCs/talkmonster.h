@@ -108,7 +108,7 @@ public:
 	void OnCreate() override;
 
 	void Precache() override;
-	bool TakeDamage(CBaseEntity* inflictor, CBaseEntity* attacker, float flDamage, int bitsDamageType) override;
+	bool TakeDamage(DamageInfo* info) override;
 	void Touch(CBaseEntity* pOther) override;
 	void Killed(CBaseEntity* attacker, int iGib) override;
 	bool CanPlaySentence(bool fDisregardState) override;

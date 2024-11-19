@@ -34,3 +34,22 @@ CBasePlayer* ToBasePlayer(edict_t* entity)
 {
 	return ToBasePlayer(GET_PRIVATE<CBaseEntity>(entity));
 }
+
+CBaseMonster* ToBaseMonster(CBaseEntity* entity)
+{
+	if (!entity || !entity->IsMonster())
+	{
+		return nullptr;
+	}
+
+#if DEBUG
+	assert(dynamic_cast<CBaseMonster*>(entity) != nullptr);
+#endif
+
+	return static_cast<CBaseMonster*>(entity);
+}
+
+CBaseMonster* ToBaseMonster(edict_t* entity)
+{
+	return ToBaseMonster(GET_PRIVATE<CBaseEntity>(entity));
+}

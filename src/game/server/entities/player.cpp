@@ -242,294 +242,8 @@ Vector CBasePlayer::GetGunPosition()
 	return origin;
 }
 
-void CBasePlayer::TraceAttack(DamageInfo* info)
-{
-	if (0 != pev->takedamage)
-	{
-		m_LastHitGroup = info->tr->iHitgroup;
-
-		switch (info->tr->iHitgroup)
-		{
-		case HITGROUP_GENERIC:
-			break;
-		case HITGROUP_HEAD:
-			info->damage *= g_Cfg.GetValue( "player_damage_deduction_head"sv, 3 );
-			break;
-		case HITGROUP_CHEST:
-			info->damage *= g_Cfg.GetValue( "player_damage_deduction_chest"sv, 3 );
-			break;
-		case HITGROUP_STOMACH:
-			info->damage *= g_Cfg.GetValue( "player_damage_deduction_stomach"sv, 2 );
-			break;
-		case HITGROUP_LEFTARM:
-		case HITGROUP_RIGHTARM:
-			info->damage *= g_Cfg.GetValue( "player_damage_deduction_arm"sv, 1 );
-			break;
-		case HITGROUP_LEFTLEG:
-		case HITGROUP_RIGHTLEG:
-			info->damage *= g_Cfg.GetValue( "player_damage_deduction_leg"sv, 1 );
-			break;
-		default:
-			break;
-		}
-
-		//SpawnBlood(ptr->vecEndPos, BloodColor(), flDamage); // a little surface blood.
-		//TraceBleed(flDamage, vecDir, ptr, bitsDamageType);
-		//AddMultiDamage(attacker, this, flDamage, bitsDamageType);
-	}
-}
-
 #define ARMOR_RATIO 0.2 // Armor Takes 80% of the damage
 #define ARMOR_BONUS 0.5 // Each Point of Armor is work 1/x points of health
-
-bool CBasePlayer::TakeDamage(CBaseEntity* inflictor, CBaseEntity* attacker, float flDamage, int bitsDamageType)
-{
-	// have suit diagnose the problem - ie: report damage type
-	int bitsDamage = bitsDamageType;
-	bool ffound = true;
-	bool fmajor;
-	bool fcritical;
-	bool fTookDamage;
-	bool ftrivial;
-	float flRatio;
-	float flBonus;
-	float flHealthPrev = pev->health;
-
-	flBonus = ARMOR_BONUS;
-	flRatio = ARMOR_RATIO;
-
-	if ((bitsDamageType & DMG_BLAST) != 0 && g_pGameRules->IsMultiplayer())
-	{
-		// blasts damage armor more.
-		flBonus *= 2;
-	}
-
-	// Already dead
-	if (!IsAlive())
-		return false;
-	// go take the damage first
-
-
-	CBaseEntity* pAttacker = CBaseEntity::Instance(attacker);
-
-	if (auto attackerPlayer = ToBasePlayer(pAttacker); attackerPlayer)
-	{
-		// TODO: this is a pretty bad way to handle damage increase
-		if ((attackerPlayer->m_iItems & CTFItem::Acceleration) != 0)
-		{
-			flDamage *= 1.6;
-
-			EmitSound(CHAN_STATIC, "turret/tu_ping.wav", VOL_NORM, ATTN_NORM);
-		}
-		if (m_pFlag)
-		{
-			m_nLastShotBy = attackerPlayer->entindex();
-			m_flLastShotTime = gpGlobals->time;
-		}
-	}
-
-	if (!g_pGameRules->FPlayerCanTakeDamage(this, pAttacker))
-	{
-		// Refuse the damage
-		return false;
-	}
-
-	// keep track of amount of damage last sustained
-	m_lastDamageAmount = flDamage;
-
-	// Armor.
-	if (0 != pev->armorvalue && (bitsDamageType & (DMG_FALL | DMG_DROWN)) == 0) // armor doesn't protect against fall or drown damage!
-	{
-		float flNew = flDamage * flRatio;
-
-		float flArmor;
-
-		flArmor = (flDamage - flNew) * flBonus;
-
-		// Does this use more armor than we have?
-		if (flArmor > pev->armorvalue)
-		{
-			flArmor = pev->armorvalue;
-			flArmor *= (1 / flBonus);
-			flNew = flDamage - flArmor;
-			if (!m_bInfiniteArmor)
-				pev->armorvalue = 0;
-		}
-		else if (!m_bInfiniteArmor)
-			pev->armorvalue -= flArmor;
-
-		flDamage = flNew;
-	}
-
-	// this cast to INT is critical!!! If a player ends up with 0.5 health, the engine will get that
-	// as an int (zero) and think the player is dead! (this will incite a clientside screentilt, etc)
-	fTookDamage = CBaseMonster::TakeDamage(inflictor, attacker, (int)flDamage, bitsDamageType);
-
-	// reset damage time countdown for each type of time based damage player just sustained
-
-	{
-		for (int i = 0; i < CDMG_TIMEBASED; i++)
-			if ((bitsDamageType & (DMG_PARALYZE << i)) != 0)
-				m_rgbTimeBasedDamage[i] = 0;
-	}
-
-	// tell director about it
-	MESSAGE_BEGIN(MSG_SPEC, SVC_DIRECTOR);
-	WRITE_BYTE(9);						// command length in bytes
-	WRITE_BYTE(DRC_CMD_EVENT);			// take damage event
-	WRITE_SHORT(entindex());			// index number of primary entity
-	WRITE_SHORT(inflictor->entindex()); // index number of secondary entity
-	WRITE_LONG(5);						// eventflags (priority and flags)
-	MESSAGE_END();
-
-
-	// how bad is it, doc?
-
-	ftrivial = (pev->health > 75 || m_lastDamageAmount < 5);
-	fmajor = (m_lastDamageAmount > 25);
-	fcritical = (pev->health < 30);
-
-	// handle all bits set in this damage message,
-	// let the suit give player the diagnosis
-
-	// UNDONE: add sounds for types of damage sustained (ie: burn, shock, slash )
-
-	// UNDONE: still need to record damage and heal messages for the following types
-
-	// DMG_BURN
-	// DMG_FREEZE
-	// DMG_BLAST
-	// DMG_SHOCK
-
-	m_bitsDamageType |= bitsDamage; // Save this so we can report it to the client
-	m_bitsHUDDamage = -1;			// make sure the damage bits get resent
-
-	while (fTookDamage && (!ftrivial || (bitsDamage & DMG_TIMEBASED) != 0) && ffound && 0 != bitsDamage)
-	{
-		ffound = false;
-
-		if ((bitsDamage & DMG_CLUB) != 0)
-		{
-			if (fmajor)
-				SetSuitUpdate("!HEV_DMG4", SUIT_NEXT_IN_30SEC); // minor fracture
-			bitsDamage &= ~DMG_CLUB;
-			ffound = true;
-		}
-		if ((bitsDamage & (DMG_FALL | DMG_CRUSH)) != 0)
-		{
-			if (fmajor)
-				SetSuitUpdate("!HEV_DMG5", SUIT_NEXT_IN_30SEC); // major fracture
-			else
-				SetSuitUpdate("!HEV_DMG4", SUIT_NEXT_IN_30SEC); // minor fracture
-
-			bitsDamage &= ~(DMG_FALL | DMG_CRUSH);
-			ffound = true;
-		}
-
-		if ((bitsDamage & DMG_BULLET) != 0)
-		{
-			if (m_lastDamageAmount > 5)
-				SetSuitUpdate("!HEV_DMG6", SUIT_NEXT_IN_30SEC); // blood loss detected
-			// else
-			//	SetSuitUpdate("!HEV_DMG0", SUIT_NEXT_IN_30SEC);	// minor laceration
-
-			bitsDamage &= ~DMG_BULLET;
-			ffound = true;
-		}
-
-		if ((bitsDamage & DMG_SLASH) != 0)
-		{
-			if (fmajor)
-				SetSuitUpdate("!HEV_DMG1", SUIT_NEXT_IN_30SEC); // major laceration
-			else
-				SetSuitUpdate("!HEV_DMG0", SUIT_NEXT_IN_30SEC); // minor laceration
-
-			bitsDamage &= ~DMG_SLASH;
-			ffound = true;
-		}
-
-		if ((bitsDamage & DMG_SONIC) != 0)
-		{
-			if (fmajor)
-				SetSuitUpdate("!HEV_DMG2", SUIT_NEXT_IN_1MIN); // internal bleeding
-			bitsDamage &= ~DMG_SONIC;
-			ffound = true;
-		}
-
-		if ((bitsDamage & (DMG_POISON | DMG_PARALYZE)) != 0)
-		{
-			SetSuitUpdate("!HEV_DMG3", SUIT_NEXT_IN_1MIN); // blood toxins detected
-			bitsDamage &= ~(DMG_POISON | DMG_PARALYZE);
-			ffound = true;
-		}
-
-		if ((bitsDamage & DMG_ACID) != 0)
-		{
-			SetSuitUpdate("!HEV_DET1", SUIT_NEXT_IN_1MIN); // hazardous chemicals detected
-			bitsDamage &= ~DMG_ACID;
-			ffound = true;
-		}
-
-		if ((bitsDamage & DMG_NERVEGAS) != 0)
-		{
-			SetSuitUpdate("!HEV_DET0", SUIT_NEXT_IN_1MIN); // biohazard detected
-			bitsDamage &= ~DMG_NERVEGAS;
-			ffound = true;
-		}
-
-		if ((bitsDamage & DMG_RADIATION) != 0)
-		{
-			SetSuitUpdate("!HEV_DET2", SUIT_NEXT_IN_1MIN); // radiation detected
-			bitsDamage &= ~DMG_RADIATION;
-			ffound = true;
-		}
-		if ((bitsDamage & DMG_SHOCK) != 0)
-		{
-			bitsDamage &= ~DMG_SHOCK;
-			ffound = true;
-		}
-	}
-
-	pev->punchangle.x = -2;
-
-	if (fTookDamage && !ftrivial && fmajor && flHealthPrev >= 75)
-	{
-		// first time we take major damage...
-		// turn automedic on if not on
-		SetSuitUpdate("!HEV_MED1", SUIT_NEXT_IN_30MIN); // automedic on
-
-		// give morphine shot if not given recently
-		SetSuitUpdate("!HEV_HEAL7", SUIT_NEXT_IN_30MIN); // morphine shot
-	}
-
-	if (fTookDamage && !ftrivial && fcritical && flHealthPrev < 75)
-	{
-
-		// already took major damage, now it's critical...
-		if (pev->health < 6)
-			SetSuitUpdate("!HEV_HLTH3", SUIT_NEXT_IN_10MIN); // near death
-		else if (pev->health < 20)
-			SetSuitUpdate("!HEV_HLTH2", SUIT_NEXT_IN_10MIN); // health critical
-
-		// give critical health warnings
-		if (!RANDOM_LONG(0, 3) && flHealthPrev < 50)
-			SetSuitUpdate("!HEV_DMG7", SUIT_NEXT_IN_5MIN); // seek medical attention
-	}
-
-	// if we're taking time based damage, warn about its continuing effects
-	if (fTookDamage && (bitsDamageType & DMG_TIMEBASED) != 0 && flHealthPrev < 75)
-	{
-		if (flHealthPrev < 50)
-		{
-			if (!RANDOM_LONG(0, 3))
-				SetSuitUpdate("!HEV_DMG7", SUIT_NEXT_IN_5MIN); // seek medical attention
-		}
-		else
-			SetSuitUpdate("!HEV_HLTH1", SUIT_NEXT_IN_10MIN); // health dropping
-	}
-
-	return fTookDamage;
-}
 
 void CBasePlayer::PackDeadPlayerItems()
 {
@@ -1039,7 +753,7 @@ void CBasePlayer::WaterMove()
 
 				const float oldHealth = pev->health;
 
-				TakeDamage(World, World, pev->dmg, DMG_DROWN);
+				//TakeDamage(World, World, pev->dmg, DMG_DROWN);
 
 				pev->pain_finished = gpGlobals->time + 1;
 
@@ -1095,13 +809,13 @@ void CBasePlayer::WaterMove()
 
 	if (pev->watertype == CONTENTS_LAVA) // do damage
 	{
-		if (pev->dmgtime < gpGlobals->time)
-			TakeDamage(World, World, 10 * static_cast<int>(pev->waterlevel), DMG_BURN);
+		//if (pev->dmgtime < gpGlobals->time)
+			//TakeDamage(World, World, 10 * static_cast<int>(pev->waterlevel), DMG_BURN);
 	}
 	else if (pev->watertype == CONTENTS_SLIME) // do damage
 	{
 		pev->dmgtime = gpGlobals->time + 1;
-		TakeDamage(World, World, 4 * static_cast<int>(pev->waterlevel), DMG_ACID);
+		//TakeDamage(World, World, 4 * static_cast<int>(pev->waterlevel), DMG_ACID);
 	}
 
 	if (!FBitSet(pev->flags, FL_INWATER))
@@ -1911,7 +1625,7 @@ void CBasePlayer::CheckTimeBasedDamage()
 				bDuration = NERVEGAS_DURATION;
 				break;
 			case itbd_Poison:
-				TakeDamage(this, this, POISON_DAMAGE, DMG_GENERIC);
+				//TakeDamage(this, this, POISON_DAMAGE, DMG_GENERIC);
 				bDuration = POISON_DURATION;
 				break;
 			case itbd_Radiation:
@@ -2372,7 +2086,7 @@ void CBasePlayer::PostThink()
 
 			if (flFallDamage > 0)
 			{
-				TakeDamage(World, World, flFallDamage, DMG_FALL);
+				//TakeDamage(World, World, flFallDamage, DMG_FALL);
 				pev->punchangle.x = 0;
 			}
 		}
@@ -3752,7 +3466,7 @@ bool CBasePlayer::FBecomeProne()
 
 void CBasePlayer::BarnacleVictimBitten(CBaseEntity* pevBarnacle)
 {
-	TakeDamage(pevBarnacle, pevBarnacle, pev->health + pev->armorvalue, DMG_SLASH | DMG_ALWAYSGIB);
+	//TakeDamage(pevBarnacle, pevBarnacle, pev->health + pev->armorvalue, DMG_SLASH | DMG_ALWAYSGIB);
 }
 
 void CBasePlayer::BarnacleVictimReleased()

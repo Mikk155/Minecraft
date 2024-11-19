@@ -114,6 +114,26 @@ enum class InventorySlot : int
 };
 
 /**
+*	@brief Hit Groups Bits enum.
+*/
+enum HITGROUP : int
+{
+    /**
+    *	@brief Generic. This ignores armor deductions and damage multiplications.
+    */
+    NONE = 0,
+    HELMET = ( 1 << 0 ),
+    CHEST = ( 1 << 1 ),
+    LEGS = ( 1 << 2 ),
+    BOOTS = ( 1 << 3 ),
+
+    /**
+    *	@brief These results are used for TraceResult->Hitgroup and will be converted to the above bits
+    */
+    Feet = 0, Legs, Chest, Head
+};
+
+/**
 *	@brief DMG Bits enum.
 */
 enum DMG : int
@@ -129,12 +149,20 @@ enum DMG : int
 	SLASH	= ( 1 << 0 ),
 
     /**
-    *	@brief Displays fire on the HUD.
+    *	@brief Apply effect fire I to the victim
     */
 	FIRE	= ( 1 << 1 ),
 
     /**
-    *	@brief Apply effect fire I to the victim
+    *	@brief Apply effect fire II to the victim
     */
-	LAVA	= ( 1 << 2 )
+	LAVA	= ( 1 << 2 ),
+
+
+
+
+    /**
+    *	@brief Show hud effect
+    */
+	HUD_FIRE = ( 1 << 6 )
 };

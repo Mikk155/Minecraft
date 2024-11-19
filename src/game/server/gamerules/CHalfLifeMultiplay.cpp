@@ -78,8 +78,6 @@ void CHalfLifeMultiplay::Think()
 {
 	g_VoiceGameMgr.Update(gpGlobals->frametime);
 
-	m_pEffectShedule();
-
 	///// Check game rules /////
 	if (g_fGameOver) // someone else quit the game already
 	{

@@ -652,8 +652,8 @@ void CTriggerHurt::HurtTouch(CBaseEntity* pOther)
 
 	if (fldmg < 0)
 		pOther->GiveHealth(-fldmg, m_bitsDamageInflict);
-	else
-		pOther->TakeDamage(this, this, fldmg, m_bitsDamageInflict);
+	//else
+		//pOther->TakeDamage(this, this, fldmg, m_bitsDamageInflict);
 
 	// Store pain time so we can get all of the other entities on this frame
 	pev->pain_finished = gpGlobals->time;
@@ -1554,8 +1554,8 @@ void CTriggerKillNoGib::Spawn()
 
 void CTriggerKillNoGib::KillTouch(CBaseEntity* pOther)
 {
-	if (pOther->pev->takedamage != DAMAGE_NO)
-		pOther->TakeDamage(this, pOther, 500000, DMG_NEVERGIB);
+	//if (pOther->pev->takedamage != DAMAGE_NO)
+		//pOther->TakeDamage(this, pOther, 500000, DMG_NEVERGIB);
 }
 
 class CTriggerXenReturn : public CBaseTrigger

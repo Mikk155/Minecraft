@@ -15,40 +15,71 @@
 
 #pragma once
 
-#include "MC_MacroData.h"
+#include "CMinecraft.h"
 
-class CEffects : public MCMacroData
+struct EffectInfo
 {
+	std::string_view effect_id;
+	float duration = 0;
+	int level = 0;
+	CBaseEntity* attacker = nullptr;
+	float cooldown = 0;
+	float time = 0;
+
+	EffectInfo(
+		std::string_view effect_id,
+		float duration,
+		int level = 0,
+		CBaseEntity* attacker = nullptr,
+		float cooldown = 0
+	) :
+	effect_id(effect_id),
+	duration(duration),
+	level(level),
+	attacker(attacker),
+	cooldown(cooldown)
+	{}
+};
+
+class CEffects
+{
+	private:
+		std::string_view stv(std::string_view s, int i) { return ( i > 0 ? fmt::format( "{}.{}"sv, s, i ) : s ); }
+
 	public:
 
-		std::string fire;
-		std::string speed;
-		std::string slowness;
-		std::string fire_resistance;
-		std::string haste;
-		std::string fatigue;
-		std::string strength;
-		std::string instant_health;
-		std::string instant_damage;
-		std::string jump_boost;
-		std::string nausea;
-		std::string regeneration;
-		std::string resistance;
-		std::string water_breathing;
-		std::string invisibility;
-		std::string blindness;
-		std::string night_vision;
-		std::string weakness;
-		std::string poison;
-		std::string wither;
-		std::string absorption;
-		std::string glowing;
-		std::string levitation;
-		std::string luck;
-		std::string bad_luck;
-		std::string fatal_poison;
-		std::string slow_falling;
-		std::string darkness;
+		void RemoveAll(CBaseEntity* entity);
+		void Remove(CBaseEntity* entity, std::string_view effect_name);
+		void Add(CBaseEntity* entity, std::string_view effect_name, const EffectInfo&& effect);
+
+		std::string_view fire(int i){return stv("fire"sv,i);}
+		std::string_view speed(int i){return stv("speed"sv,i);}
+		std::string_view slowness(int i){return stv("slowness"sv,i);}
+		std::string_view fire_resistance(int i){return stv("fire_resistance"sv,i);}
+		std::string_view haste(int i){return stv("haste"sv,i);}
+		std::string_view fatigue(int i){return stv("fatigue"sv,i);}
+		std::string_view strength(int i){return stv("strength"sv,i);}
+		std::string_view instant_health(int i){return stv("instant_health"sv,i);}
+		std::string_view instant_damage(int i){return stv("instant_damage"sv,i);}
+		std::string_view jump_boost(int i){return stv("jump_boost"sv,i);}
+		std::string_view nausea(int i){return stv("nausea"sv,i);}
+		std::string_view regeneration(int i){return stv("regeneration"sv,i);}
+		std::string_view resistance(int i){return stv("resistance"sv,i);}
+		std::string_view water_breathing(int i){return stv("water_breathing"sv,i);}
+		std::string_view invisibility(int i){return stv("invisibility"sv,i);}
+		std::string_view blindness(int i){return stv("blindness"sv,i);}
+		std::string_view night_vision(int i){return stv("night_vision"sv,i);}
+		std::string_view weakness(int i){return stv("weakness"sv,i);}
+		std::string_view poison(int i){return stv("poison"sv,i);}
+		std::string_view wither(int i){return stv("wither"sv,i);}
+		std::string_view absorption(int i){return stv("absorption"sv,i);}
+		std::string_view glowing(int i){return stv("glowing"sv,i);}
+		std::string_view levitation(int i){return stv("levitation"sv,i);}
+		std::string_view luck(int i){return stv("luck"sv,i);}
+		std::string_view bad_luck(int i){return stv("bad_luck"sv,i);}
+		std::string_view fatal_poison(int i){return stv("fatal_poison"sv,i);}
+		std::string_view slow_falling(int i){return stv("slow_falling"sv,i);}
+		std::string_view darkness(int i){return stv("darkness"sv,i);}
 
 		CEffects();
 };

@@ -15,9 +15,9 @@
 
 #pragma once
 
-#include "MC_MacroData.h"
+#include "CMinecraft.h"
 
-class CEnchants : public MCMacroData
+class CEnchants
 {
 	public:
 

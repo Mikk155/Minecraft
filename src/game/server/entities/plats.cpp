@@ -378,7 +378,7 @@ void CFuncPlat::Blocked(CBaseEntity* pOther)
 {
 	Logger->trace("{} Blocked by {}", STRING(pev->classname), STRING(pOther->pev->classname));
 	// Hurt the blocker a little
-	pOther->TakeDamage(this, this, 1, DMG_CRUSH);
+	//pOther->TakeDamage(this, this, 1, DMG_CRUSH);
 
 	StopSound(CHAN_STATIC, STRING(m_MoveSound));
 
@@ -532,7 +532,7 @@ void CFuncTrain::Blocked(CBaseEntity* pOther)
 
 	m_flActivateFinished = gpGlobals->time + 0.5;
 
-	pOther->TakeDamage(this, this, pev->dmg, DMG_CRUSH);
+	//pOther->TakeDamage(this, this, pev->dmg, DMG_CRUSH);
 }
 
 void CFuncTrain::Use(CBaseEntity* pActivator, CBaseEntity* pCaller, USE_TYPE useType, float value)
@@ -827,7 +827,7 @@ void CSpriteTrain::Blocked(CBaseEntity* pOther)
 
 	m_flActivateFinished = pev->ltime + 0.5;
 
-	pOther->TakeDamage(this, this, pev->dmg, DMG_CRUSH);
+	//pOther->TakeDamage(this, this, pev->dmg, DMG_CRUSH);
 }
 
 void CSpriteTrain::Use(CBaseEntity* pActivator, CBaseEntity* pCaller, USE_TYPE useType, float value)
@@ -1165,7 +1165,7 @@ void CFuncTrackTrain::Blocked(CBaseEntity* pOther)
 	if (pev->dmg <= 0)
 		return;
 	// we can't hurt this thing, so we're not concerned with it
-	pOther->TakeDamage(this, this, pev->dmg, DMG_CRUSH);
+	//pOther->TakeDamage(this, this, pev->dmg, DMG_CRUSH);
 }
 
 void CFuncTrackTrain::Use(CBaseEntity* pActivator, CBaseEntity* pCaller, USE_TYPE useType, float value)
@@ -2181,7 +2181,7 @@ public:
 	bool IsMachine() const override { return true; }
 
 	int BloodColor() override { return DONT_BLEED; }
-	bool TakeDamage(CBaseEntity* inflictor, CBaseEntity* attacker, float flDamage, int bitsDamageType) override;
+	bool TakeDamage(DamageInfo* info) override;
 	void Use(CBaseEntity* pActivator, CBaseEntity* pCaller, USE_TYPE useType, float value) override;
 	Vector BodyTarget(const Vector& posSrc) override { return pev->origin; }
 
@@ -2305,8 +2305,9 @@ void CGunTarget::Stop()
 	pev->takedamage = DAMAGE_NO;
 }
 
-bool CGunTarget::TakeDamage(CBaseEntity* inflictor, CBaseEntity* attacker, float flDamage, int bitsDamageType)
+bool CGunTarget::TakeDamage(DamageInfo* info)
 {
+/*
 	if (pev->health > 0)
 	{
 		pev->health -= flDamage;
@@ -2318,6 +2319,7 @@ bool CGunTarget::TakeDamage(CBaseEntity* inflictor, CBaseEntity* attacker, float
 				FireTargets(STRING(pev->message), this, this, USE_TOGGLE, 0);
 		}
 	}
+*/
 	return false;
 }
 
