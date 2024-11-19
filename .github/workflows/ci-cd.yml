@@ -81,7 +81,7 @@ jobs:
 
       - name: Configure
         run: >
-          cmake -B ${{github.workspace}}/build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} -DCMAKE_INSTALL_PREFIX=${{env.game}}/${{env.MOD_NAME}}
+          cmake -B ${{github.workspace}}/build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} -DCMAKE_INSTALL_PREFIX=${{env.game}}/${{env.mod}}
           -DCMAKE_TOOLCHAIN_FILE=${{github.workspace}}/cmake/WindowsToolchain.cmake -A Win32
 
       - name: Build
