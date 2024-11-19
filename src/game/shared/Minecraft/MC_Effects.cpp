@@ -56,8 +56,6 @@ void CEffects::Add(CBaseEntity* entity, std::string_view effect_name, const Effe
 */
 		}
 
-		effect.duration = gpGlobals->time + effect.duration;
-
 		if( auto it = monster->effects.find( effect_name ); it != monster->effects.end() )
 		{
 			if( it->second->duration < effect.duration )
