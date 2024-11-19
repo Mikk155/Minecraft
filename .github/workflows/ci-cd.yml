@@ -99,3 +99,22 @@ jobs:
         with:
           name: Win32
           path: ${{env.game}}
+
+  assets:
+    name: Game assets
+    runs-on: windows-latest
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+
+    - name: Rename mod folder
+      run: Rename-Item -Path game -NewName minecraft
+
+    - name: Zip mod assets
+      run: Compress-Archive -Path minecraft -DestinationPath minecraft.zip
+
+    - name: Upload Artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: game-assets
+        path: minecraft.zip
