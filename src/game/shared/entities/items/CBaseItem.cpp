@@ -240,6 +240,53 @@ ItemAddResult CBaseItem::InventoryAddItem(CBaseMonster* monster)
 	return ItemAddResult::NotAdded;
 }
 
+void CBaseItem::DropItem(std::optional<Vector2D> VecAngle, std::optional<Vector> VecOrigin)
+{
+	if( !FNullEnt(pev->owner) || FBitSet( pev->effects, EF_NODRAW ) )
+	{
+		pev->owner = nullptr;
+		SetBits( pev->effects, EF_NODRAW );
+	}
+
+	SetOrigin( ( VecOrigin != std::nullopt && VecOrigin.has_value() ?
+		VecOrigin.value() : !FNullEnt(pev->owner) ? CBaseEntity::Instance(pev->owner)->Center() : g_vecZero ) );
+
+	Vector2D VecDir = ( VecAngle != std::nullopt && VecAngle.has_value() ?
+		VecAngle.value() : Vector2D( RANDOM_FLOAT( 0, 360 ), RANDOM_FLOAT( 0, 360 ) ) );
+
+	Vector Direction = Vector( VecDir.x, VecDir.y, 100 );
+	UTIL_MakeVectors( Direction );
+	pev->velocity = Direction * RANDOM_FLOAT( 50, 500 );
+
+	pev->movetype = MOVETYPE_TOSS;
+
+	SetThink( &CBaseItem::DropThink );
+
+	pev->nextthink = gpGlobals->time;
+	m_flTouchTime = gpGlobals->time + 0.5;
+	m_flDropDieTime = gpGlobals->time + g_Cfg.GetValue( "item_drop_die_time"sv, 60 );
+}
+
+void CBaseItem::DropThink()
+{
+	if( m_flTouchTime > 0 && gpGlobals->time > m_flTouchTime )
+	{
+		SetTouch(&CBaseItem::ItemTouch);
+	}
+
+	if( m_flDropDieTime > 0 && gpGlobals->time > m_flDropDieTime )
+	{
+		SetTouch(nullptr);
+		SetThink(nullptr);
+		UTIL_Remove(this);
+		return;
+	}
+
+	// -MC Rotate?
+
+	pev->nextthink = gpGlobals->time + 0.1f;
+}
+
 CBaseItem* CBaseItem::GetItemToRespawn(const Vector& respawnPoint)
 {
 #ifndef CLIENT_DLL

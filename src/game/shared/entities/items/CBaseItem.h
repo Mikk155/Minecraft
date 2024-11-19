@@ -84,11 +84,6 @@ public:
 	void ItemTouch(CBaseEntity* pOther);
 
 	/**
-	 *	@brief Tries to given this item to the player.
-	 */
-	ItemAddResult InventoryAddItem(CBaseMonster* player);
-
-	/**
 	 *	@brief make an item visible and tangible.
 	 */
 	void Materialize();
@@ -134,9 +129,33 @@ protected:
 
 	public:
 
+		/**
+		 *	@brief Tries to given this item to the player.
+		*/
+		ItemAddResult InventoryAddItem(CBaseMonster* player);
+
+		/**
+		*	@brief Drops a item
+		*	@param VecAngle The angle to drop the item, if not provided it will be random
+		*	@param VecOrigin The origin to throw the item from, if not provided is pev->owner's origin or g_vecZero if owner null
+		*/
+		void DropItem(std::optional<Vector2D> VecAngle = std::nullopt, std::optional<Vector> VecOrigin = std::nullopt);
+
+		/**
+		*	@brief This item is on the floor and in proccess to die
+		*/
+		void DropThink();
+
 		const int max_items = 64;
 		int items = 1;
 		bool unbreakable = false;
 		int durability;
 		int max_durability;
+
+	private:
+
+		// Time till a dropped item is despawned
+		float m_flDropDieTime;
+		// Time till a dropped item can be picked up again.
+		float m_flTouchTime;
 };
