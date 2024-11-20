@@ -237,15 +237,19 @@ void ConfigurationSystem::LoadConfigFile(const char* name)
 float ConfigurationSystem::GetValue(std::string_view name, float defaultValue, CBaseEntity* pEntity) const
 {
 #ifndef CLIENT_DLL
-	if( pEntity != nullptr && pEntity->m_config != nullptr && pEntity->m_config->contains( name ) && (*pEntity->m_config)[ name ].is_number() )
+	if( pEntity != nullptr && pEntity->m_config->contains( name ) )
 	{
-		return (*pEntity->m_config)[name].get<float>();
+		if( (*pEntity->m_config)[ name ].is_number() )
+			return (*pEntity->m_config)[name].get<float>();
+		return std::stof( (*pEntity->m_config)[name].get<std::string>() );
 	}
 #endif
 
-    if( m_config->contains( name ) && (*m_config)[ name ].is_number() )
-    {
-        return (*m_config)[name].get<float>();
+    if( m_config->contains( name ) )
+	{
+		if( (*m_config)[ name ].is_number() )
+	        return (*m_config)[name].get<float>();
+        return std::stof( (*m_config)[name].get<std::string>() );
     }
 
 	_list_log_(name, defaultValue);
@@ -256,14 +260,19 @@ float ConfigurationSystem::GetValue(std::string_view name, float defaultValue, C
 std::string ConfigurationSystem::GetValue(std::string_view name, std::string_view defaultValue, CBaseEntity* pEntity) const
 {
 #ifndef CLIENT_DLL
-	if( pEntity != nullptr && pEntity->m_config != nullptr
-		&& pEntity->m_config->contains( name ) && (*pEntity->m_config)[ name ].is_string() ) {
+	if( pEntity != nullptr && pEntity->m_config->contains( name ) )
+	{
+		if( (*pEntity->m_config)[ name ].is_string() )
 			return (*pEntity->m_config)[name].get<std::string>();
+		return std::to_string( (*pEntity->m_config)[name].get<float>() );
 	}
 #endif
 
-    if( m_config->contains( name ) && (*m_config)[ name ].is_string() ) {
-        return (*m_config)[name].get<std::string>();
+    if( m_config->contains( name ) )
+	{
+		if( (*m_config)[ name ].is_string() )
+        	return (*m_config)[name].get<std::string>();
+        return std::to_string( (*m_config)[name].get<float>() );
     }
 
 	_list_log_(name, defaultValue);
@@ -274,28 +283,52 @@ std::string ConfigurationSystem::GetValue(std::string_view name, std::string_vie
 void ConfigurationSystem::SetValue(std::string_view name, float value, CBaseEntity* pEntity)
 {
 #ifndef CLIENT_DLL
-	if( pEntity != nullptr && pEntity->m_config != nullptr
-		&& pEntity->m_config->contains( name ) && (*pEntity->m_config)[ name ].is_string() ) {
-			(*pEntity->m_config)[name] = value;	
-				return;
-	}
+	if( pEntity != nullptr )
+		(*pEntity->m_config)[name] = value;
+	else
 #endif
-
 	(*m_config)[name] = value;
 }
 
 void ConfigurationSystem::SetValue(std::string_view name, std::string_view value, CBaseEntity* pEntity)
 {
 #ifndef CLIENT_DLL
-	if( pEntity != nullptr && pEntity->m_config != nullptr
-		&& pEntity->m_config->contains( name ) && (*pEntity->m_config)[ name ].is_number() ) {
-			(*pEntity->m_config)[name] = value;	
-				return;
-	}
+	if( pEntity != nullptr )
+		(*pEntity->m_config)[name] = value;
+	else
 #endif
-
 	(*m_config)[name] = value;
 }
+
+#if 0
+// This is stupid but left here just as a reminder that i'll need to implement a safest system in a future :/
+bool ConfigurationSystem::_SetValue_(std::string_view name, std::optional<std::string_view> sopt, std::optional<float> fopt, CBaseEntity* pEntity)
+{
+	if( pEntity->m_config->contains( name ) )
+	{
+		std::vector<std::string> Is = { "string", "float" };
+		std::string value;
+
+		if( sopt.has_value() )
+		{
+			if( (*pEntity->m_config)[ name ].is_string() ) { return true; }
+			value = sopt.value();
+		}
+		else if( fopt.has_value() )
+		{
+			if( (*pEntity->m_config)[ name ].is_number() ) { return true; }
+			value = std::to_string( fopt.value() );
+			Is = { "float", "string" };
+		}
+
+		m_Logger->error(
+			"Ignoring SetValue \"{}\" to a {} value \"{}\" to entity {}:{}, This key is originaly a {} value \"{}\"",
+			name, Is[0], value, pEntity->GetClassname(), pEntity->GetTargetname(), Is[1], (*pEntity->m_config)[name].get<std::string>() );
+		return false;
+	}
+	return true;
+}
+#endif
 
 void ConfigurationSystem::_list_log_(std::string_view log, std::variant<float, std::string_view> defaultValue) const
 {
