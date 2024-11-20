@@ -49,6 +49,18 @@ class ConfigurationSystem final : public IGameSystem
 
 		void LoadConfigFile(const char* name);
 
+		const char* ConfigFileServer()
+		{
+			return "cfg/server/default_configuration.json";
+		}
+
+		const char* ConfigFileClient()
+		{
+			return "cfg/client/configuration.json";
+		}
+
+		void RemoveTempData(const char* PathID);
+
 		/**
 		 *	@brief Get a value from a key-value pair configuration
 		*	@param CBaseEntity The entity to check first for its custom config before the global config

@@ -42,6 +42,8 @@
 
 #include "utils/ReplacementMaps.h"
 
+#include "config_system.h"
+
 bool ClientLibrary::Initialize()
 {
 	// Enable buffering for non-debug print output so it isn't ignored outright by the engine.
@@ -77,6 +79,7 @@ void ClientLibrary::VidInit()
 	// Remove downloaded files only. The server is responsible for removing generated files.
 	// This has to happen now since not all cases are caught in RunFrame.
 	g_NetworkData.RemoveNetworkDataFiles("GAMEDOWNLOAD");
+	g_Cfg.RemoveTempData("GAMEDOWNLOAD");
 
 	// Hud vid init has been delayed until after the network data file has been received to allow use of its data.
 	// gHUD.VidInit();
@@ -152,6 +155,7 @@ void ClientLibrary::RunFrame()
 	{
 		m_Activated = false;
 		m_NetworkDataFileLoaded = false;
+		m_ConfigSystemFileLoaded = false;
 
 		// If we're connecting to a dedicated server then remove the local config files as well
 		// so the engine won't think the old locally generated one is what we need.
@@ -161,6 +165,7 @@ void ClientLibrary::RunFrame()
 		if (isConnected && mapName[0] != '\0' && status.remote_address.type != NA_LOOPBACK)
 		{
 			g_NetworkData.RemoveNetworkDataFiles("GAMECONFIG");
+			g_Cfg.RemoveTempData("GAMECONFIG");
 		}
 
 		// Stop all sounds if we connect, disconnect, start a new map using "map" (resets connection time), change servers or change maps.
@@ -231,6 +236,12 @@ void ClientLibrary::OnUserMessageReceived()
 
 void ClientLibrary::CheckNetworkDataFile()
 {
+	if( !m_ConfigSystemFileLoaded )
+	{
+		m_ConfigSystemFileLoaded = true;
+		g_Cfg.LoadConfigFiles();
+	}
+
 	if (!m_NetworkDataFileLoaded)
 	{
 		// Always set this so we only show errors once.

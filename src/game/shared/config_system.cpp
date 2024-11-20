@@ -100,15 +100,111 @@ void ConfigurationSystem::LoadConfigFiles()
 		_list_logged_ = std::make_unique<std::vector<std::string_view>>();
 
 #ifndef CLIENT_DLL
-	LoadConfigFile("cfg/server/default_configuration.json");
 
+	LoadConfigFile(ConfigFileServer());
+
+	// Include custom config for the current map
 	if( auto mapCfgFileName = fmt::format("cfg/maps/{}.json", STRING( gpGlobals->mapname ) );
 		g_pFileSystem->FileExists( mapCfgFileName.c_str() ) ) {
 			g_Cfg.LoadConfigFile( mapCfgFileName.c_str() );
 	}
+
+	// Remove any existing files first to prevent problems if it isn't purged by the filesystem on open.
+	RemoveTempData("GAMECONFIG");
+
+	FSFile file{ ConfigFileClient(), "wb", "GAMECONFIG" };
+
+	if( !file.IsOpen() )
+	{
+		m_Logger->error( fmt::format( "Failed to create \"{}\" Clients will use their default configuration.", ConfigFileClient() ) );
+	}
+	else
+	{
+		try
+		{
+			// The engine generally accepts invalid UTF8 text in things like filenames so ignore invalid UTF8.
+			auto fileData = m_config->dump(-1, ' ', false, nlohmann::detail::error_handler_t::ignore);
+
+			/**
+			 *	@brief The minimum size that the generated file must be.
+			*	See https://github.com/ValveSoftware/halflife/issues/3326 for why this is necessary.
+			*/
+			std::size_t MinimumFileDataSize = MAX_QPATH + "uncompressed"sv.size() + 1 + sizeof(int);
+
+			// Pad the file with whitespace to reach the minium valid size.
+			if (fileData.size() < MinimumFileDataSize)
+			{
+				fileData.append(MinimumFileDataSize - fileData.size(), ' ');
+			}
+
+			file.Write(fileData.data(), fileData.size());
+
+			m_Logger->debug("Client config file saved: {} bytes", fileData.size());
+
+			// Precache the file so clients download it.
+			UTIL_PrecacheGenericDirect(ConfigFileClient());
+		}
+		catch(const std::exception& e)
+		{
+			// Remove in case it's been writted.
+			RemoveTempData("GAMECONFIG");
+			m_Logger->error("Error converting JSON to UTF8 text: {}", e.what());
+		}
+	}
+
 #else
-	LoadConfigFile("cfg/networking/default_configuration.json");
+
+	auto LoadServerDefault = [](const char* message)
+	{
+		g_Cfg.m_Logger->error(fmt::format( "{}, Using \"{}\"", message, g_Cfg.ConfigFileServer() ) );
+		g_Cfg.LoadConfigFile(g_Cfg.ConfigFileServer());
+	};
+
+	// The file can be in either of these, so check both.
+	// Do NOT use a null path ID, since that allows overriding the file using alternate directories!
+	// Check downloads first since we clear it no matter what.
+	// If this is a listen server we'll fall back to the file saved by the server.
+	FSFile file{ ConfigFileClient(), "rb", "GAMEDOWNLOAD" };
+
+	if( !file.IsOpen() ) {
+		file.Open(ConfigFileClient(), "rb", "GAMECONFIG");
+	}
+
+	if( !file.IsOpen() ) {
+		LoadServerDefault("Server failed to network custom game configuration");
+		return;
+	}
+
+	std::size_t sizeInBytes = file.Size();
+
+	std::vector<std::uint8_t> fileData;
+
+	fileData.resize(sizeInBytes);
+
+	if( static_cast<std::size_t>( file.Read( fileData.data(), fileData.size() ) ) != fileData.size() )
+	{
+		LoadServerDefault("Error loading custom game configuration: read error");
+		return;
+	}
+
+	json input = json::parse(fileData);
+
+	if (!input.is_object())
+	{
+		LoadServerDefault("Error loading custom game configuration: data is invalid");
+		return;
+	}
+
+	m_config = std::make_unique<json>(input);
+
+	m_Logger->debug("Network custom configuration loaded: {} bytes", fileData.size());
+
 #endif
+}
+
+void ConfigurationSystem::RemoveTempData(const char* PathID)
+{
+	g_pFileSystem->RemoveFile( g_Cfg.ConfigFileClient(), PathID );
 }
 
 void ConfigurationSystem::LoadConfigFile(const char* name)

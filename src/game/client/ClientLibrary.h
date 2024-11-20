@@ -88,6 +88,7 @@ private:
 
 	bool m_Activated{false};
 	bool m_NetworkDataFileLoaded{false};
+	bool m_ConfigSystemFileLoaded{false};
 };
 
 inline ClientLibrary g_Client;
