@@ -21,7 +21,7 @@ void CZombie::OnCreate()
 {
 	CBaseMonster::OnCreate();
 
-	pev->health = 100;
+	pev->health = g_Cfg.GetValue("mob_zombie_health"sv, 20.0);
 	pev->model = MAKE_STRING("models/zombie.mdl");
 
 	SetClassification("monsters");
@@ -104,12 +104,12 @@ void CZombie::ZombieSlashAttack(float damage, const Vector& punchAngle, const Ve
 
 void CZombie::HandleAnimEvent(MonsterEvent_t* pEvent)
 {
-	float SlashDamage = 25;
+	float SlashDamage = 0.5;
 
 	switch (pEvent->event)
 	{
 		case ZOMBIE_ATTACK_RIGHT:
-		ZombieSlashAttack(SlashDamage, {5, 0, -18}, -(gpGlobals->v_right * 100));
+			ZombieSlashAttack(SlashDamage, {5, 0, -18}, -(gpGlobals->v_right * 100));
 			break;
 
 		case ZOMBIE_ATTACK_LEFT:
