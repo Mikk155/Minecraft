@@ -1,0 +1,98 @@
+// DO NOT MESS WITH THIS UNLESS YOU KNOW WHAT YOU'RE DOING
+{
+    "player":
+    {
+        // 0.5 = half heart
+        "health": 10.0,
+        "max_health": 10.0,
+
+        // a capped value of how many hearts a player could gain using absortion effect
+        "max_absortion": 8.0,
+
+        // Hitbox damage multipliers (This is applied before any damage math)
+        "damage_multiplier_helmet": 3,
+        "damage_multiplier_chest": 2,
+        "damage_multiplier_legs": 1.5,
+        "damage_multiplier_boots": 1,
+
+        // cooldown when using the right click to interact with anything
+        "interaction_time": 0.2,
+
+        // Distance to interact with anything (In blocks)
+        "interaction_distance": 3,
+
+        // cooldown when the player deploys
+        "deploy_time": 0.2
+    },
+
+    "mob":
+    {
+        // Hitbox damage multipliers (This is applied before any damage math)
+        "damage_multiplier_helmet": 3,
+        "damage_multiplier_chest": 2,
+        "damage_multiplier_legs": 1.5,
+        "damage_multiplier_boots": 1
+    },
+
+    "mob_zombie":
+    {
+        "health": 20.0
+    },
+
+    "item":
+    {
+        // Time until a droped item is de-spawned
+        "drop_die_time": 60
+        // -1 never despawns
+    },
+
+    "effect":
+    {
+        // Burns the victim and apply 0.5 ♥ every second for fire_time seconds.
+        "fire_damage": 0.5,
+        // fire_time * effect level so Fire II will double the value.
+        "fire_time": 4.0,
+
+        // Increase the victim speed in ( speed * ( speed * level ) )
+        // If the victim is a player it apply FOV depending on speed added
+        "speed": 1.2,
+        // Contrarly to speed. this will slow down the victim using the same math
+        "slowness": 0.85
+    },
+
+    "enchant":
+    {
+        // Adds sharpness_mul * level + sharpness_add extra damage.
+        "sharpness_mul": 0.5,
+        "sharpness_add": 0.5,
+    
+        // Each level adds this ammount of damage to each hit on arthropods only..
+        "bane_of_arthropods_dmg": 2.5,
+        // The enchantment also inflicts Slowness IV on an arthropod when hit
+        // With a random duration between 1 and 1.5 + ( bane_of_arthropods_slow_level * level )
+        "bane_of_arthropods_slow_level": 0.5,
+    
+        // Adds smite * level to un-dead mobs only.
+        "smite": 2.5,
+    
+        // Restores health based on the damage dealt * life_steal * level
+        // This is done before any damage multiplication and after damage deductions.
+        "life_steal": 0.1,
+    
+        // Increases the chance of a critical hit, ( random( 0, 1 ) <= critical_chance )
+        "critical_chance": 0.1,
+        // When dealt a critical hit. it will multiply the damage to a random value between 1.0 and critical_damage
+        "critical_damage": 2.0,
+        // This is done before any damage multiplication and after damage deductions.
+    
+        // Will push the hit entity based on the received damage * knockback * level.
+        "knockback": 2.0,
+    
+        // Expands from the attacker in a half-circle to to sweeping_edge_range units
+        "sweeping_edge_range": 512,
+        // Does damage * ( sweeping_edge_damage * level ) damage to all entities in the range.
+        // The formula is done after both the entity and weapon buffs
+        "sweeping_edge_damage": 1.25
+        // This uses DMG::SLASH to prevent recursion.
+    }
+}

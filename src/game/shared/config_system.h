@@ -46,6 +46,8 @@ class ConfigurationSystem final : public IGameSystem
 
 		void LoadConfigFiles();
 
+		void LoadConfigFile(const char* name);
+
 		/**
 		 *	@brief Get a value from a key-value pair configuration
 		*	@param CBaseEntity The entity to check first for its custom config before the global config
@@ -68,8 +70,6 @@ class ConfigurationSystem final : public IGameSystem
 		void SetValue(std::string_view name, std::string_view value, CBaseEntity* pEntity = nullptr);
 
 	private:
-
-		void LoadConfigFile(const char* name);
 
 		std::shared_ptr<spdlog::logger> m_Logger;
 

@@ -89,8 +89,6 @@ void ConfigurationSystem::Shutdown()
 
 void ConfigurationSystem::LoadConfigFiles()
 {
-#ifndef CLIENT_DLL
-
 	m_list_logged->clear();
 
 	if( m_config != nullptr )
@@ -103,25 +101,36 @@ void ConfigurationSystem::LoadConfigFiles()
 		m_config = std::make_unique<json>();
 	}
 
-	// -MC Merge all in one json, for the moment is just as for dev
-	LoadConfigFile( "cfg/player.json" );
-	LoadConfigFile( "cfg/mobs.json" );
-	LoadConfigFile( "cfg/effects.json" );
-	LoadConfigFile( "cfg/enchants.json" );
+#ifndef CLIENT_DLL
+	LoadConfigFile("cfg/server/default_configuration.json");
+
+	if( auto mapCfgFileName = fmt::format("cfg/maps/{}.json", STRING( gpGlobals->mapname ) );
+		g_pFileSystem->FileExists( mapCfgFileName.c_str() ) ) {
+			g_Cfg.LoadConfigFile( mapCfgFileName.c_str() );
+	}
 #endif
 }
 
-void ConfigurationSystem::LoadConfigFile( const char* name )
+void ConfigurationSystem::LoadConfigFile(const char* name)
 {
-    if( std::optional<json> m_Configuration = g_JSON.LoadJSONFile( name ); m_Configuration.has_value() )
+    if( std::optional<json> opt_cfg = g_JSON.LoadJSONFile( name ); opt_cfg.has_value() )
 	{
-		std::unique_ptr<json> customConfig = std::make_unique<json>( m_Configuration.value() );
+		json new_cfg = opt_cfg.value();
 
-		for( auto it = customConfig->begin(); it != customConfig->end(); ++it )
+		for( auto okv_cfg = new_cfg.begin(); okv_cfg != new_cfg.end(); okv_cfg++ )
 		{
-			(*m_config)[ it.key() ] = it.value();
+			if( json obj_cfg = okv_cfg.value(); obj_cfg && obj_cfg.is_object() )
+			{
+				for( auto okv_obj = obj_cfg.begin(); okv_obj != obj_cfg.end(); okv_obj++ )
+				{
+					(*m_config)[ fmt::format( "{}_{}", okv_cfg.key(), okv_obj.key() ) ] = okv_obj.value();
+				}
+			}
+			else
+			{
+				(*m_config)[ okv_cfg.key() ] = okv_cfg.value();
+			}
 		}
-		customConfig = nullptr;
     }
 	else
 	{
