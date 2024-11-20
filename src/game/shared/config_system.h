@@ -33,7 +33,7 @@
 #include "utils/GameSystem.h"
 
 /**
- *	@brief Loads a global configuration and a per-entity-basis
+ *	@brief Loads configuration for a server, map and entity instances
  */
 class ConfigurationSystem final : public IGameSystem
 {
