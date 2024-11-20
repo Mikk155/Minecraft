@@ -82,9 +82,9 @@ class ConfigurationSystem final : public IGameSystem
 		*/
 		void SetValue(std::string_view name, std::string_view value, CBaseEntity* pEntity = nullptr);
 
-	private:
-
 		std::shared_ptr<spdlog::logger> m_Logger;
+
+	private:
 
 		std::unique_ptr<json> m_config = std::make_unique<json>();
 
