@@ -89,17 +89,15 @@ void ConfigurationSystem::Shutdown()
 
 void ConfigurationSystem::LoadConfigFiles()
 {
-	m_list_logged->clear();
-
 	if( m_config != nullptr )
-	{
-		if(!m_config->empty())
-			m_config->clear();
-	}
+		m_config->clear();
 	else
-	{
 		m_config = std::make_unique<json>();
-	}
+
+	if( _list_logged_ != nullptr )
+		_list_logged_->clear();
+	else
+		_list_logged_ = std::make_unique<std::vector<std::string_view>>();
 
 #ifndef CLIENT_DLL
 	LoadConfigFile("cfg/server/default_configuration.json");
@@ -108,6 +106,8 @@ void ConfigurationSystem::LoadConfigFiles()
 		g_pFileSystem->FileExists( mapCfgFileName.c_str() ) ) {
 			g_Cfg.LoadConfigFile( mapCfgFileName.c_str() );
 	}
+#else
+	LoadConfigFile("cfg/networking/default_configuration.json");
 #endif
 }
 
@@ -152,11 +152,7 @@ float ConfigurationSystem::GetValue(std::string_view name, float defaultValue, C
         return (*m_config)[name].get<float>();
     }
 
-	if( std::find( m_list_logged->begin(), m_list_logged->end(), name ) != m_list_logged->end() )
-	{
-		m_Logger->warn( "Undefined variable \"{}\". Using default value \"{}\"", name, defaultValue );
-		m_list_logged->push_back(name);
-	}
+	_list_log_(name, defaultValue);
 
     return defaultValue;
 }
@@ -164,22 +160,17 @@ float ConfigurationSystem::GetValue(std::string_view name, float defaultValue, C
 std::string ConfigurationSystem::GetValue(std::string_view name, std::string_view defaultValue, CBaseEntity* pEntity) const
 {
 #ifndef CLIENT_DLL
-	if( pEntity != nullptr && pEntity->m_config != nullptr && pEntity->m_config->contains( name ) && (*pEntity->m_config)[ name ].is_string() )
-	{
-		return (*pEntity->m_config)[name].get<std::string>();
+	if( pEntity != nullptr && pEntity->m_config != nullptr
+		&& pEntity->m_config->contains( name ) && (*pEntity->m_config)[ name ].is_string() ) {
+			return (*pEntity->m_config)[name].get<std::string>();
 	}
 #endif
 
-    if( m_config->contains( name ) && (*m_config)[ name ].is_string() )
-    {
+    if( m_config->contains( name ) && (*m_config)[ name ].is_string() ) {
         return (*m_config)[name].get<std::string>();
     }
 
-	if( std::find( m_list_logged->begin(), m_list_logged->end(), name ) != m_list_logged->end() )
-	{
-		m_Logger->warn( "Undefined variable \"{}\". Using default value \"{}\"", name, defaultValue );
-		m_list_logged->push_back(name);
-	}
+	_list_log_(name, defaultValue);
 
     return std::string( defaultValue );
 }
@@ -187,10 +178,10 @@ std::string ConfigurationSystem::GetValue(std::string_view name, std::string_vie
 void ConfigurationSystem::SetValue(std::string_view name, float value, CBaseEntity* pEntity)
 {
 #ifndef CLIENT_DLL
-	if( pEntity != nullptr && pEntity->m_config != nullptr && pEntity->m_config->contains( name ) && (*pEntity->m_config)[ name ].is_string() )
-	{
-		(*pEntity->m_config)[name] = value;	
-		return;
+	if( pEntity != nullptr && pEntity->m_config != nullptr
+		&& pEntity->m_config->contains( name ) && (*pEntity->m_config)[ name ].is_string() ) {
+			(*pEntity->m_config)[name] = value;	
+				return;
 	}
 #endif
 
@@ -200,12 +191,24 @@ void ConfigurationSystem::SetValue(std::string_view name, float value, CBaseEnti
 void ConfigurationSystem::SetValue(std::string_view name, std::string_view value, CBaseEntity* pEntity)
 {
 #ifndef CLIENT_DLL
-	if( pEntity != nullptr && pEntity->m_config != nullptr && pEntity->m_config->contains( name ) && (*pEntity->m_config)[ name ].is_number() )
-	{
-		(*pEntity->m_config)[name] = value;	
-		return;
+	if( pEntity != nullptr && pEntity->m_config != nullptr
+		&& pEntity->m_config->contains( name ) && (*pEntity->m_config)[ name ].is_number() ) {
+			(*pEntity->m_config)[name] = value;	
+				return;
 	}
 #endif
 
 	(*m_config)[name] = value;
+}
+
+void ConfigurationSystem::_list_log_(std::string_view log, std::variant<float, std::string_view> defaultValue) const
+{
+	if( std::find( _list_logged_->begin(), _list_logged_->end(), log ) == _list_logged_->end() )
+	{
+		std::visit( [&]( auto&& value ) {
+			m_Logger->warn( "Undefined variable \"{}\". Using default value \"{}\"", log, value );
+		}, defaultValue );
+
+		_list_logged_->push_back(log);
+	}
 }

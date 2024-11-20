@@ -23,6 +23,7 @@
 #include <string>
 #include <string_view>
 #include <vector>
+#include <variant>
 
 #include <fmt/core.h>
 
@@ -75,7 +76,8 @@ class ConfigurationSystem final : public IGameSystem
 
 		std::unique_ptr<json> m_config = std::make_unique<json>();
 
-		std::unique_ptr<std::vector<std::string_view>> m_list_logged = std::make_unique<std::vector<std::string_view>>();
+		std::unique_ptr<std::vector<std::string_view>> _list_logged_;
+		void _list_log_(std::string_view log, std::variant<float, std::string_view> defaultValue) const;
 };
 
 inline ConfigurationSystem g_Cfg;
