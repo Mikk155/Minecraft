@@ -89,10 +89,6 @@ public:
 				"minimum": -1
 			}
 		}
-	},
-	"WeaponToSelect": {
-		"title": "Weapon to select if player has no active weapon",
-		"type": "string"
 	}
 })|";
 	}
@@ -143,11 +139,6 @@ public:
 			{
 				inventory.SetAmmoCount(name, count.get<int>());
 			}
-		}
-
-		if (auto it = context.Input.find("WeaponToSelect"); it != context.Input.end())
-		{
-			inventory.WeaponToSelect = it->get<std::string>();
 		}
 
 		return true;

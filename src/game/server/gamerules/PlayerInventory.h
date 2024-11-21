@@ -78,8 +78,6 @@ public:
 	std::optional<int> Health;
 	std::optional<int> Armor;
 
-	std::string WeaponToSelect;
-
 private:
 	eastl::fixed_vector<WeaponData, 16> m_WeaponData;
 	eastl::fixed_vector<AmmoValue, MAX_AMMO_TYPES> m_AmmoValues;

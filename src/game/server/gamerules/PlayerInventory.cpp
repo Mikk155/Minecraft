@@ -91,11 +91,6 @@ PlayerInventory PlayerInventory::CreateFromPlayer(CBasePlayer* player)
 		}
 	}
 
-	if (player->m_pActiveWeapon)
-	{
-		inventory.WeaponToSelect = player->m_pActiveWeapon->GetClassname();
-	}
-
 	return inventory;
 }
 
@@ -117,8 +112,6 @@ void PlayerInventory::ApplyToPlayer(CBasePlayer* player) const
 	{
 		player->pev->armorvalue = std::clamp(*Armor, 0, MAX_NORMAL_BATTERY);
 	}
-
-	const bool hasActiveWeapon = player->m_pActiveWeapon != nullptr;
 
 	// Set ammo first so weapons can reload themselves if needed.
 	for (const auto& ammoValue : m_AmmoValues)
@@ -143,10 +136,5 @@ void PlayerInventory::ApplyToPlayer(CBasePlayer* player) const
 		}
 
 		weapon->LoadPersistentState(*itemData.PersistentState);
-	}
-
-	if (!hasActiveWeapon && !WeaponToSelect.empty())
-	{
-		player->SelectItem(WeaponToSelect.c_str());
 	}
 }
