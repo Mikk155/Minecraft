@@ -3125,7 +3125,6 @@ void CBasePlayer::UpdateClientData()
 	{
 		m_HasActivated = true;
 		g_Server.PlayerActivating(this);
-		FireTargets("game_playeractivate", this, this, USE_TOGGLE, 0);
 	}
 
 	if (m_fInitHUD)
@@ -3146,11 +3145,6 @@ void CBasePlayer::UpdateClientData()
 			m_fGameHUDInitialized = true;
 
 			m_iObserverLastMode = OBS_ROAMING;
-
-			if (g_pGameRules->IsMultiplayer())
-			{
-				FireTargets("game_playerjoin", this, this, USE_TOGGLE, 0);
-			}
 		}
 
 		if (g_pGameRules->IsMultiplayer())
@@ -3171,7 +3165,6 @@ void CBasePlayer::UpdateClientData()
 
 		// This counts as spawning, it suppresses weapon pickup notifications.
 		m_bIsSpawning = true;
-		FireTargets("game_playerspawn", this, this, USE_TOGGLE, 0);
 		m_bIsSpawning = false;
 
 		m_AutoWepSwitch = savedAutoWepSwitch;
