@@ -2212,7 +2212,6 @@ void CBasePlayer::Spawn()
 	SetHasJetpack(false);
 
 	g_engfuncs.pfnSetPhysicsKeyValue(edict(), "hl", "1");
-	g_engfuncs.pfnSetPhysicsKeyValue(edict(), "bj", UTIL_ToString(sv_allowbunnyhopping.value != 0 ? 1 : 0).c_str());
 	g_engfuncs.pfnSetPhysicsKeyValue(edict(), "jpj", "0");
 
 	m_iFOV = 0;		   // init field of view.

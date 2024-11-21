@@ -119,11 +119,4 @@ DESCRIPTION SERVER_OPTIONS
 		{ "1" }
 	}
 
-	"mp_autocrosshair"
-	{
-		"#Valve_Autocrosshair"
-		{ BOOL }
-		{ "0" }
-	}
-
 }

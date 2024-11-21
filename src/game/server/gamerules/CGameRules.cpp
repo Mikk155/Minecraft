@@ -277,7 +277,7 @@ void CGameRules::BecomeSpectator(CBasePlayer* player, const CommandArgs& args)
 	// Default implementation: applies to all game modes, even singleplayer.
 
 	// always allow proxies to become a spectator
-	if ((player->pev->flags & FL_PROXY) != 0 || allow_spectators.value != 0)
+	if ((player->pev->flags & FL_PROXY) != 0 )
 	{
 		CBaseEntity* pSpawnSpot = GetPlayerSpawnSpot(player);
 		player->StartObserver(player->pev->origin, pSpawnSpot->pev->angles);

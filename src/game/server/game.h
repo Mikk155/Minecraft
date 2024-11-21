@@ -28,15 +28,11 @@ extern cvar_t fraglimit;
 extern cvar_t timelimit;
 extern cvar_t friendlyfire;
 extern cvar_t forcerespawn;
-extern cvar_t aimcrosshair;
 extern cvar_t decalfrequency;
 extern cvar_t teamlist;
 extern cvar_t teamoverride;
 extern cvar_t defaultteam;
-extern cvar_t allow_spectators;
 extern cvar_t mp_chattime;
-
-extern cvar_t sv_allowbunnyhopping;
 
 extern cvar_t ctf_capture;
 extern cvar_t multipower;

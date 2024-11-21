@@ -27,17 +27,12 @@ cvar_t fraglimit = {"mp_fraglimit", "0", FCVAR_SERVER};
 cvar_t timelimit = {"mp_timelimit", "0", FCVAR_SERVER};
 cvar_t friendlyfire = {"mp_friendlyfire", "0", FCVAR_SERVER};
 cvar_t forcerespawn = {"mp_forcerespawn", "1", FCVAR_SERVER};
-cvar_t aimcrosshair = {"mp_autocrosshair", "1", FCVAR_SERVER};
 cvar_t decalfrequency = {"decalfrequency", "30", FCVAR_SERVER};
 cvar_t teamlist = {"mp_teamlist", "hgrunt;scientist", FCVAR_SERVER};
 cvar_t teamoverride = {"mp_teamoverride", "1"};
 cvar_t defaultteam = {"mp_defaultteam", "0"};
 
-cvar_t allow_spectators = {"allow_spectators", "0.0", FCVAR_SERVER}; // 0 prevents players from being spectators
-
 cvar_t mp_chattime = {"mp_chattime", "10", FCVAR_SERVER};
-
-cvar_t sv_allowbunnyhopping = {"sv_allowbunnyhopping", "0", FCVAR_SERVER};
 
 // BEGIN Opposing Force variables
 
@@ -97,7 +92,6 @@ void GameDLLInit()
 	}
 
 	CVAR_REGISTER(&displaysoundlist);
-	CVAR_REGISTER(&allow_spectators);
 
 	CVAR_REGISTER(&fraglimit);
 	CVAR_REGISTER(&timelimit);
@@ -107,15 +101,12 @@ void GameDLLInit()
 
 	CVAR_REGISTER(&friendlyfire);
 	CVAR_REGISTER(&forcerespawn);
-	CVAR_REGISTER(&aimcrosshair);
 	CVAR_REGISTER(&decalfrequency);
 	CVAR_REGISTER(&teamlist);
 	CVAR_REGISTER(&teamoverride);
 	CVAR_REGISTER(&defaultteam);
 
 	CVAR_REGISTER(&mp_chattime);
-
-	CVAR_REGISTER(&sv_allowbunnyhopping);
 
 	// BEGIN REGISTER CVARS FOR OPPOSING FORCE
 

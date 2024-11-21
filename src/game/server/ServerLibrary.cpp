@@ -69,9 +69,6 @@ cvar_t servercfgfile = {"sv_servercfgfile", "cfg/server/server.json", FCVAR_NOEX
 cvar_t mp_gamemode = {"mp_gamemode", "", FCVAR_SERVER};
 cvar_t mp_createserver_gamemode = {"mp_createserver_gamemode", "", FCVAR_SERVER};
 
-cvar_t sv_infinite_ammo = {"sv_infinite_ammo", "0", FCVAR_SERVER};
-cvar_t sv_bottomless_magazines = {"sv_bottomless_magazines", "0", FCVAR_SERVER};
-
 ServerLibrary::ServerLibrary() = default;
 ServerLibrary::~ServerLibrary() = default;
 
@@ -108,9 +105,6 @@ bool ServerLibrary::Initialize()
 	g_engfuncs.pfnCVarRegister(&mp_gamemode);
 	g_engfuncs.pfnCVarRegister(&mp_createserver_gamemode);
 
-	g_engfuncs.pfnCVarRegister(&sv_infinite_ammo);
-	g_engfuncs.pfnCVarRegister(&sv_bottomless_magazines);
-
 	g_ConCommands.CreateCommand(
 		"mp_list_gamemodes", [](const auto&)
 		{ PrintMultiplayerGameModes(); },
@@ -122,24 +116,6 @@ bool ServerLibrary::Initialize()
 	// Escape hatch in case the command is executed in error.
 	g_ConCommands.CreateCommand("stop_loading_all_maps", [this](const auto&)
 		{ m_MapsToLoad.clear(); });
-
-	g_ConCommands.RegisterChangeCallback(&sv_allowbunnyhopping, [](const auto& state)
-		{
-			const bool allowBunnyHopping = state.Cvar->value != 0;
-
-			const auto setting = UTIL_ToString(allowBunnyHopping ? 1 : 0);
-
-			for (int i = 1; i <= gpGlobals->maxClients; ++i)
-			{
-				auto player = UTIL_PlayerByIndex(i);
-
-				if (!player)
-				{
-					continue;
-				}
-
-				g_engfuncs.pfnSetPhysicsKeyValue(player->edict(), "bj", setting.c_str());
-			} });
 
 	CreateConfigDefinitions();
 
