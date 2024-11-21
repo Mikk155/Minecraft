@@ -118,11 +118,6 @@ enum WeaponId
 	WEAPON_PENGUIN,
 };
 
-enum HudFlag
-{
-	HUD_HASSUIT = 0, //!< The player has the HEV suit.
-};
-
 /**
  *	@brief Indicates that a weapon does not use magazines.
  */

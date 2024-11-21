@@ -168,7 +168,6 @@ class CStripWeapons : public CPointEntity
 public:
 	static constexpr int StripFlagAllPlayers = 1 << 0;
 	static constexpr int StripFlagRemoveWeapons = 1 << 1;
-	static constexpr int StripFlagRemoveSuit = 1 << 2;
 	static constexpr int StripFlagRemoveLongJump = 1 << 3;
 
 	bool KeyValue(KeyValueData* pkvd) override;
@@ -213,19 +212,6 @@ bool CStripWeapons::KeyValue(KeyValueData* pkvd)
 
 		return true;
 	}
-	else if (FStrEq(pkvd->szKeyName, "strip_suit"))
-	{
-		if (atoi(pkvd->szValue) != 0)
-		{
-			SetBits(m_Flags, StripFlagRemoveSuit);
-		}
-		else
-		{
-			ClearBits(m_Flags, StripFlagRemoveSuit);
-		}
-
-		return true;
-	}
 	else if (FStrEq(pkvd->szKeyName, "strip_longjump"))
 	{
 		if (atoi(pkvd->szValue) != 0)
@@ -249,12 +235,7 @@ void CStripWeapons::Use(CBaseEntity* pActivator, CBaseEntity* pCaller, USE_TYPE 
 	{
 		if ((m_Flags & StripFlagRemoveWeapons) != 0)
 		{
-			player->RemoveAllItems(false);
-		}
-
-		if ((m_Flags & StripFlagRemoveSuit) != 0)
-		{
-			player->SetHasSuit(false);
+			player->RemoveAllItems();
 		}
 
 		if ((m_Flags & StripFlagRemoveLongJump) != 0)
@@ -409,69 +390,6 @@ void CPlayerSetHealth::Use(CBaseEntity* pActivator, CBaseEntity* pCaller, USE_TY
 		if (player)
 		{
 			executor(player);
-		}
-	}
-}
-
-class CPlayerHasSuit : public CPointEntity
-{
-	DECLARE_CLASS(CPlayerHasSuit, CPointEntity);
-	DECLARE_DATAMAP();
-
-public:
-	bool KeyValue(KeyValueData* pkvd) override;
-
-	void Use(CBaseEntity* pActivator, CBaseEntity* pCaller, USE_TYPE useType, float value) override;
-
-private:
-	string_t m_PassTarget;
-	string_t m_FailTarget;
-};
-
-LINK_ENTITY_TO_CLASS(player_hassuit, CPlayerHasSuit);
-
-BEGIN_DATAMAP(CPlayerHasSuit)
-DEFINE_FIELD(m_PassTarget, FIELD_STRING),
-	DEFINE_FIELD(m_FailTarget, FIELD_STRING),
-	END_DATAMAP();
-
-bool CPlayerHasSuit::KeyValue(KeyValueData* pkvd)
-{
-	if (FStrEq(pkvd->szKeyName, "pass_target"))
-	{
-		m_PassTarget = ALLOC_STRING(pkvd->szValue);
-		return true;
-	}
-	else if (FStrEq(pkvd->szKeyName, "fail_target"))
-	{
-		m_FailTarget = ALLOC_STRING(pkvd->szValue);
-		return true;
-	}
-
-	return CPointEntity::KeyValue(pkvd);
-}
-
-void CPlayerHasSuit::Use(CBaseEntity* pActivator, CBaseEntity* pCaller, USE_TYPE useType, float value)
-{
-	auto player = ToBasePlayer(pActivator);
-
-	if (!player)
-	{
-		return;
-	}
-
-	if (player->HasSuit())
-	{
-		if (!FStringNull(m_PassTarget))
-		{
-			FireTargets(STRING(m_PassTarget), pActivator, this, USE_TOGGLE, 0);
-		}
-	}
-	else
-	{
-		if (!FStringNull(m_FailTarget))
-		{
-			FireTargets(STRING(m_FailTarget), pActivator, this, USE_TOGGLE, 0);
 		}
 	}
 }

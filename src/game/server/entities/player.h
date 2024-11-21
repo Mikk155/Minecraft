@@ -342,7 +342,7 @@ public:
 	 *	This is pretty brute force :(
 	 */
 	void PackDeadPlayerItems();
-	void RemoveAllItems(bool removeSuit);
+	void RemoveAllItems();
 	bool SwitchWeapon(CBasePlayerWeapon* weapon);
 
 	/**
@@ -352,9 +352,6 @@ public:
 
 	void SetWeaponBit(int id);
 	void ClearWeaponBit(int id);
-
-	bool HasSuit() const;
-	void SetHasSuit(bool hasSuit);
 
 	bool HasLongJump() const;
 	void SetHasLongJump(bool hasLongJump);
@@ -602,23 +599,6 @@ inline void CBasePlayer::SetWeaponBit(int id)
 inline void CBasePlayer::ClearWeaponBit(int id)
 {
 	m_WeaponBits &= ~(1ULL << id);
-}
-
-inline bool CBasePlayer::HasSuit() const
-{
-	return (m_HudFlags & (1U << HUD_HASSUIT)) != 0;
-}
-
-inline void CBasePlayer::SetHasSuit(bool hasSuit)
-{
-	if (hasSuit)
-	{
-		m_HudFlags |= 1U << HUD_HASSUIT;
-	}
-	else
-	{
-		m_HudFlags &= ~(1U << HUD_HASSUIT);
-	}
 }
 
 #define AUTOAIM_2DEGREES 0.0348994967025

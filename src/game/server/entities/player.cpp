@@ -265,7 +265,7 @@ void CBasePlayer::PackDeadPlayerItems()
 	if (iWeaponRules == GR_PLR_DROP_GUN_NO && iAmmoRules == GR_PLR_DROP_AMMO_NO)
 	{
 		// nothing to pack. Remove the weapons and return. Don't call create on the box!
-		RemoveAllItems(true);
+		RemoveAllItems();
 		return;
 	}
 
@@ -367,10 +367,10 @@ void CBasePlayer::PackDeadPlayerItems()
 
 	pWeaponBox->pev->velocity = pev->velocity * 1.2; // weaponbox has player's velocity, then some.
 
-	RemoveAllItems(true); // now strip off everything that wasn't handled by the code above.
+	RemoveAllItems(); // now strip off everything that wasn't handled by the code above.
 }
 
-void CBasePlayer::RemoveAllItems(bool removeSuit)
+void CBasePlayer::RemoveAllItems()
 {
 	if (m_pActiveWeapon)
 	{
@@ -405,9 +405,6 @@ void CBasePlayer::RemoveAllItems(bool removeSuit)
 	pev->weaponmodel = string_t::Null;
 
 	m_WeaponBits = 0ULL;
-
-	// Re-add suit bit if needed.
-	SetHasSuit(!removeSuit);
 
 	for (i = 0; i < MAX_AMMO_TYPES; i++)
 		m_rgAmmo[i] = 0;
@@ -1033,7 +1030,7 @@ void CBasePlayer::StartObserver(Vector vecPosition, Vector vecViewAngle)
 	MESSAGE_END();
 
 	// Remove all the player's stuff
-	RemoveAllItems(false);
+	RemoveAllItems();
 
 	// Move them to the new position
 	SetOrigin(vecPosition);
@@ -1782,10 +1779,6 @@ void CBasePlayer::UpdateGeigerCounter()
 
 void CBasePlayer::CheckSuitUpdate()
 {
-	// Ignore suit updates if no suit
-	if (!HasSuit())
-		return;
-
 	// if in range of radiation source, ping geiger counter
 	UpdateGeigerCounter();
 
@@ -1838,10 +1831,6 @@ void CBasePlayer::CheckSuitUpdate()
 
 void CBasePlayer::SetSuitUpdate(const char* name, int iNoRepeatTime)
 {
-	// Ignore suit updates if no suit
-	if (!HasSuit())
-		return;
-
 	if (g_pGameRules->IsMultiplayer())
 	{
 		// due to static channel design, etc. We don't play HEV sounds in multiplayer right now.
@@ -2221,7 +2210,6 @@ void CBasePlayer::Spawn()
 	m_afPhysicsFlags = 0;
 	SetHasLongJump(false); // no longjump module.
 	SetHasJetpack(false);
-	SetHasSuit(true);
 
 	g_engfuncs.pfnSetPhysicsKeyValue(edict(), "hl", "1");
 	g_engfuncs.pfnSetPhysicsKeyValue(edict(), "bj", UTIL_ToString(sv_allowbunnyhopping.value != 0 ? 1 : 0).c_str());

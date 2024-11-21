@@ -467,15 +467,12 @@ bool CItemAcceleratorCTF::MyTouch(CBasePlayer* pPlayer)
 
 		if (team_no == CTFTeam::None || team_no == pPlayer->m_iTeamNum)
 		{
-			if (pPlayer->HasSuit())
-			{
-				pPlayer->m_iItems = static_cast<CTFItem::CTFItem>(pPlayer->m_iItems | CTFItem::Acceleration);
-				MESSAGE_BEGIN(MSG_ONE, gmsgItemPickup, nullptr, pPlayer);
-				WRITE_STRING(STRING(pev->classname));
-				MESSAGE_END();
-				EmitSound(CHAN_VOICE, "items/ammopickup1.wav", VOL_NORM, ATTN_NORM);
-				return true;
-			}
+			pPlayer->m_iItems = static_cast<CTFItem::CTFItem>(pPlayer->m_iItems | CTFItem::Acceleration);
+			MESSAGE_BEGIN(MSG_ONE, gmsgItemPickup, nullptr, pPlayer);
+			WRITE_STRING(STRING(pev->classname));
+			MESSAGE_END();
+			EmitSound(CHAN_VOICE, "items/ammopickup1.wav", VOL_NORM, ATTN_NORM);
+			return true;
 		}
 	}
 
@@ -514,29 +511,26 @@ bool CItemBackpackCTF::MyTouch(CBasePlayer* pPlayer)
 
 		if (static_cast<int>(team_no) <= 0 || team_no == pPlayer->m_iTeamNum)
 		{
-			if (pPlayer->HasSuit())
-			{
-				pPlayer->m_iItems = static_cast<CTFItem::CTFItem>(pPlayer->m_iItems | CTFItem::Backpack);
-				MESSAGE_BEGIN(MSG_ONE, gmsgItemPickup, nullptr, pPlayer);
-				g_engfuncs.pfnWriteString(STRING(pev->classname));
-				g_engfuncs.pfnMessageEnd();
+			pPlayer->m_iItems = static_cast<CTFItem::CTFItem>(pPlayer->m_iItems | CTFItem::Backpack);
+			MESSAGE_BEGIN(MSG_ONE, gmsgItemPickup, nullptr, pPlayer);
+			g_engfuncs.pfnWriteString(STRING(pev->classname));
+			g_engfuncs.pfnMessageEnd();
 
-				EmitSound(CHAN_VOICE, "items/ammopickup1.wav", VOL_NORM, ATTN_NORM);
+			EmitSound(CHAN_VOICE, "items/ammopickup1.wav", VOL_NORM, ATTN_NORM);
 
-				pPlayer->GiveAmmo(AMMO_URANIUMBOX_GIVE, "uranium");
-				pPlayer->GiveAmmo(AMMO_GLOCKCLIP_GIVE, "9mm");
-				pPlayer->GiveAmmo(AMMO_357BOX_GIVE, "357");
-				pPlayer->GiveAmmo(AMMO_BUCKSHOTBOX_GIVE, "buckshot");
-				pPlayer->GiveAmmo(CROSSBOW_DEFAULT_GIVE, "bolts");
-				pPlayer->GiveAmmo(1, "rockets");
-				pPlayer->GiveAmmo(HANDGRENADE_DEFAULT_GIVE, "Hand Grenade");
-				pPlayer->GiveAmmo(SNARK_DEFAULT_GIVE, "Snarks");
-				pPlayer->GiveAmmo(SPORELAUNCHER_DEFAULT_GIVE, "spores");
-				pPlayer->GiveAmmo(SNIPERRIFLE_DEFAULT_GIVE, "762");
-				pPlayer->GiveAmmo(M249_MAX_CARRY, "556");
+			pPlayer->GiveAmmo(AMMO_URANIUMBOX_GIVE, "uranium");
+			pPlayer->GiveAmmo(AMMO_GLOCKCLIP_GIVE, "9mm");
+			pPlayer->GiveAmmo(AMMO_357BOX_GIVE, "357");
+			pPlayer->GiveAmmo(AMMO_BUCKSHOTBOX_GIVE, "buckshot");
+			pPlayer->GiveAmmo(CROSSBOW_DEFAULT_GIVE, "bolts");
+			pPlayer->GiveAmmo(1, "rockets");
+			pPlayer->GiveAmmo(HANDGRENADE_DEFAULT_GIVE, "Hand Grenade");
+			pPlayer->GiveAmmo(SNARK_DEFAULT_GIVE, "Snarks");
+			pPlayer->GiveAmmo(SPORELAUNCHER_DEFAULT_GIVE, "spores");
+			pPlayer->GiveAmmo(SNIPERRIFLE_DEFAULT_GIVE, "762");
+			pPlayer->GiveAmmo(M249_MAX_CARRY, "556");
 
-				return true;
-			}
+			return true;
 		}
 	}
 
@@ -593,21 +587,18 @@ bool CItemLongJumpCTF::MyTouch(CBasePlayer* pPlayer)
 
 		if (static_cast<int>(team_no) <= 0 || team_no == pPlayer->m_iTeamNum)
 		{
-			if (pPlayer->HasSuit())
-			{
-				pPlayer->m_fLongJump = true;
-				g_engfuncs.pfnSetPhysicsKeyValue(pPlayer->edict(), "jpj", "1");
+			pPlayer->m_fLongJump = true;
+			g_engfuncs.pfnSetPhysicsKeyValue(pPlayer->edict(), "jpj", "1");
 
-				pPlayer->m_iItems = static_cast<CTFItem::CTFItem>(pPlayer->m_iItems | CTFItem::LongJump);
+			pPlayer->m_iItems = static_cast<CTFItem::CTFItem>(pPlayer->m_iItems | CTFItem::LongJump);
 
-				MESSAGE_BEGIN(MSG_ONE, gmsgItemPickup, nullptr, pPlayer);
-				g_engfuncs.pfnWriteString(STRING(pev->classname));
-				g_engfuncs.pfnMessageEnd();
+			MESSAGE_BEGIN(MSG_ONE, gmsgItemPickup, nullptr, pPlayer);
+			g_engfuncs.pfnWriteString(STRING(pev->classname));
+			g_engfuncs.pfnMessageEnd();
 
-				EmitSound(CHAN_VOICE, "items/ammopickup1.wav", VOL_NORM, ATTN_NORM);
+			EmitSound(CHAN_VOICE, "items/ammopickup1.wav", VOL_NORM, ATTN_NORM);
 
-				return true;
-			}
+			return true;
 		}
 	}
 
@@ -662,19 +653,16 @@ bool CItemPortableHEVCTF::MyTouch(CBasePlayer* pPlayer)
 
 		if (static_cast<int>(team_no) <= 0 || team_no == pPlayer->m_iTeamNum)
 		{
-			if (pPlayer->HasSuit())
-			{
-				pPlayer->m_iItems = static_cast<CTFItem::CTFItem>(pPlayer->m_iItems | CTFItem::PortableHEV);
-				pPlayer->m_fPlayingAChargeSound = false;
+			pPlayer->m_iItems = static_cast<CTFItem::CTFItem>(pPlayer->m_iItems | CTFItem::PortableHEV);
+			pPlayer->m_fPlayingAChargeSound = false;
 
-				MESSAGE_BEGIN(MSG_ONE, gmsgItemPickup, nullptr, pPlayer);
-				g_engfuncs.pfnWriteString(STRING(pev->classname));
-				g_engfuncs.pfnMessageEnd();
+			MESSAGE_BEGIN(MSG_ONE, gmsgItemPickup, nullptr, pPlayer);
+			g_engfuncs.pfnWriteString(STRING(pev->classname));
+			g_engfuncs.pfnMessageEnd();
 
-				EmitSound(CHAN_VOICE, "items/ammopickup1.wav", VOL_NORM, ATTN_NORM);
+			EmitSound(CHAN_VOICE, "items/ammopickup1.wav", VOL_NORM, ATTN_NORM);
 
-				return true;
-			}
+			return true;
 		}
 	}
 	return false;

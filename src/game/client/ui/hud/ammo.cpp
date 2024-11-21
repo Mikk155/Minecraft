@@ -493,9 +493,6 @@ void WeaponsResource::SelectSlot(int iSlot, bool fAdvance, int iDirection)
 	if (gHUD.m_fPlayerDead || (gHUD.m_iHideHUDDisplay & (HIDEHUD_WEAPONS | HIDEHUD_ALL)) != 0)
 		return;
 
-	if (!gHUD.HasSuit())
-		return;
-
 	if (!gHUD.HasAnyWeapons())
 		return;
 
@@ -984,9 +981,6 @@ bool CHudAmmo::Draw(float flTime)
 {
 	int x, y;
 	int AmmoWidth;
-
-	if (!gHUD.HasSuit())
-		return true;
 
 	if ((gHUD.m_iHideHUDDisplay & (HIDEHUD_WEAPONS | HIDEHUD_ALL)) != 0)
 		return true;

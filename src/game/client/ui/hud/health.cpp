@@ -191,12 +191,8 @@ bool CHudHealth::Draw(float flTime)
 	if ((gHUD.m_iHideHUDDisplay & HIDEHUD_HEALTH) != 0 || 0 != gEngfuncs.IsSpectateOnly())
 		return true;
 
-	// Only draw health and armor if we have the suit.
-	if (gHUD.HasSuit())
-	{
-		const int armorStartX = DrawHealth();
-		DrawArmor(armorStartX);
-	}
+	const int armorStartX = DrawHealth();
+	DrawArmor(armorStartX);
 
 	DrawDamage(flTime);
 	return DrawPain(flTime);

@@ -7,7 +7,6 @@
 			{
 				"SpawnInventory":
 				{
-					"HasSuit": true,
 					"Weapons":
 					{
 						"minecraft_sword": {}

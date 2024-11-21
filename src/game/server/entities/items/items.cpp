@@ -17,41 +17,6 @@
 #include "items.h"
 #include "UserMessages.h"
 
-#define SF_SUIT_SHORTLOGON 0x0001
-
-class CItemSuit : public CItem
-{
-public:
-	void OnCreate() override
-	{
-		CItem::OnCreate();
-
-		pev->model = MAKE_STRING("models/w_suit.mdl");
-	}
-
-	bool AddItem(CBasePlayer* player) override
-	{
-		if (player->HasSuit())
-			return false;
-
-		if (m_PlayPickupSound)
-		{
-			if ((pev->spawnflags & SF_SUIT_SHORTLOGON) != 0)
-				EMIT_SOUND_SUIT(player, "!HEV_A0"); // short version of suit logon,
-			else
-				EMIT_SOUND_SUIT(player, "!HEV_AAx"); // long version of suit logon
-		}
-
-		player->SetHasSuit(true);
-		return true;
-	}
-};
-
-LINK_ENTITY_TO_CLASS(item_suit, CItemSuit);
-
-// Unused alias of the suit
-LINK_ENTITY_TO_CLASS(item_vest, CItemSuit);
-
 class CItemAntidote : public CItem
 {
 public:
@@ -91,22 +56,18 @@ public:
 			return false;
 		}
 
-		if (player->HasSuit())
+		player->SetHasLongJump(true); // player now has longjump module
+
+		MESSAGE_BEGIN(MSG_ONE, gmsgItemPickup, nullptr, player);
+		WRITE_STRING(STRING(pev->classname));
+		MESSAGE_END();
+
+		if (m_PlayPickupSound)
 		{
-			player->SetHasLongJump(true); // player now has longjump module
-
-			MESSAGE_BEGIN(MSG_ONE, gmsgItemPickup, nullptr, player);
-			WRITE_STRING(STRING(pev->classname));
-			MESSAGE_END();
-
-			if (m_PlayPickupSound)
-			{
-				EMIT_SOUND_SUIT(player, "!HEV_A1"); // Play the longjump sound UNDONE: Kelly? correct sound?
-			}
-
-			return true;
+			EMIT_SOUND_SUIT(player, "!HEV_A1"); // Play the longjump sound UNDONE: Kelly? correct sound?
 		}
-		return false;
+
+		return true;
 	}
 };
 
@@ -237,7 +198,7 @@ protected:
 			amount = MAX_NORMAL_BATTERY;
 		}
 
-		if (player->pev->armorvalue < MAX_NORMAL_BATTERY && player->HasSuit())
+		if (player->pev->armorvalue < MAX_NORMAL_BATTERY)
 		{
 			player->pev->armorvalue += amount;
 			player->pev->armorvalue = std::min(player->pev->armorvalue, static_cast<float>(MAX_NORMAL_BATTERY));

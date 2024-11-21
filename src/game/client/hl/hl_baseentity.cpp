@@ -244,7 +244,7 @@ int TrainSpeed(int iSpeed, int iMax) { return 0; }
 void CBasePlayer::DeathSound() {}
 bool CBasePlayer::GiveHealth(float flHealth, int bitsDamageType) { return false; }
 void CBasePlayer::PackDeadPlayerItems() {}
-void CBasePlayer::RemoveAllItems(bool removeSuit) {}
+void CBasePlayer::RemoveAllItems() {}
 void CBasePlayer::SetAnimation(PLAYER_ANIM playerAnim) {}
 void CBasePlayer::WaterMove() {}
 bool CBasePlayer::IsOnLadder() { return false; }

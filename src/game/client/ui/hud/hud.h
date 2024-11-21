@@ -716,11 +716,6 @@ public:
 		return (m_iWeaponBits & (1ULL << id)) != 0;
 	}
 
-	bool HasSuit() const
-	{
-		return (m_HudFlags & (1U << HUD_HASSUIT)) != 0;
-	}
-
 	bool HasAnyWeapons() const
 	{
 		return m_iWeaponBits != 0;
