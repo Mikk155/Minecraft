@@ -411,7 +411,6 @@ public:
 	bool HasWeapons(); // do I have ANY weapons?
 	void SelectPrevItem(int iItem);
 	void SelectNextItem(int iItem);
-	void SelectLastItem();
 	void SelectItem(const char* pstr);
 
 private:

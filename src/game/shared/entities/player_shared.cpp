@@ -115,21 +115,6 @@ void CBasePlayer::SelectItem(const char* pstr)
 	DeployWeapon(pItem);
 }
 
-void CBasePlayer::SelectLastItem()
-{
-	if (!m_pLastWeapon)
-	{
-		return;
-	}
-
-	if (m_pActiveWeapon && !m_pActiveWeapon->CanHolster())
-	{
-		return;
-	}
-
-	DeployWeapon(m_pLastWeapon);
-}
-
 void CBasePlayer::DeployWeapon(CBasePlayerWeapon* weapon)
 {
 	// FIX, this needs to queue them up and delay

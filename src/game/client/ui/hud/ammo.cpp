@@ -33,6 +33,8 @@
 
 #include "sound/ISoundSystem.h"
 
+#include "Minecraft/MC_ConstDefs.h"
+
 extern engine_studio_api_t IEngineStudio;
 
 WEAPON* gpActiveSel; // nullptr means off, 1 means just the menu bar, otherwise
@@ -351,10 +353,7 @@ bool CHudAmmo::Init()
 	RegisterClientCommand("slot7", &CHudAmmo::UserCmd_Slot7, this);
 	RegisterClientCommand("slot8", &CHudAmmo::UserCmd_Slot8, this);
 	RegisterClientCommand("slot9", &CHudAmmo::UserCmd_Slot9, this);
-	RegisterClientCommand("slot10", &CHudAmmo::UserCmd_Slot10, this);
 	RegisterClientCommand("cancelselect", &CHudAmmo::UserCmd_Close, this);
-	RegisterClientCommand("invnext", &CHudAmmo::UserCmd_NextWeapon, this);
-	RegisterClientCommand("invprev", &CHudAmmo::UserCmd_PrevWeapon, this);
 
 	Reset();
 
@@ -487,55 +486,12 @@ void WeaponsResource::SelectSlot(int iSlot, bool fAdvance, int iDirection)
 		return;
 	}
 
-	if (iSlot >= MAX_WEAPON_SLOTS)
-		return;
-
 	if (gHUD.m_fPlayerDead || (gHUD.m_iHideHUDDisplay & (HIDEHUD_WEAPONS | HIDEHUD_ALL)) != 0)
 		return;
 
-	if (!gHUD.HasAnyWeapons())
-		return;
-
-	WEAPON* p = nullptr;
-	bool fastSwitch = CVAR_GET_FLOAT("hud_fastswitch") != 0;
-
-	if ((gpActiveSel == nullptr) || (gpActiveSel == (WEAPON*)1) || (iSlot != gpActiveSel->Info->Slot))
-	{
-		PlaySound(CHAN_HUD_SOUND, "common/wpn_hudon.wav", 1);
-		p = GetFirstPos(iSlot);
-
-		if (p && fastSwitch) // check for fast weapon switch mode
-		{
-			// if fast weapon switch is on, then weapons can be selected in a single keypress
-			// but only if there is only one item in the bucket
-			WEAPON* p2 = GetNextActivePos(p->Info->Slot, p->Info->Position);
-			if (!p2)
-			{ // only one active item in bucket, so change directly to weapon
-				SendWeaponSelectCommand(p->Info->Name.c_str());
-				return;
-			}
-		}
-	}
-	else
-	{
-		PlaySound(CHAN_HUD_SOUND, "common/wpn_moveselect.wav", 1);
-		if (gpActiveSel)
-			p = GetNextActivePos(gpActiveSel->Info->Slot, gpActiveSel->Info->Position);
-		if (!p)
-			p = GetFirstPos(iSlot);
-	}
-
-
-	if (!p) // no selection found
-	{
-		// just display the weapon list, unless fastswitch is on just ignore it
-		if (!fastSwitch)
-			gpActiveSel = (WEAPON*)1;
-		else
-			gpActiveSel = nullptr;
-	}
-	else
-		gpActiveSel = p;
+	// -MC Update visual data on the client, This commands updates the server's vector
+	std::string command = fmt::format( "slot {}\n" );
+	gEngfuncs.pfnClientCmd( command.c_str() );
 }
 
 //------------------------------------------------------------------------
@@ -694,52 +650,47 @@ void CHudAmmo::SlotInput(int iSlot)
 
 void CHudAmmo::UserCmd_Slot1()
 {
-	SlotInput(0);
+	SlotInput((int)InventorySlot::Hotbar1);
 }
 
 void CHudAmmo::UserCmd_Slot2()
 {
-	SlotInput(1);
+	SlotInput((int)InventorySlot::Hotbar2);
 }
 
 void CHudAmmo::UserCmd_Slot3()
 {
-	SlotInput(2);
+	SlotInput((int)InventorySlot::Hotbar3);
 }
 
 void CHudAmmo::UserCmd_Slot4()
 {
-	SlotInput(3);
+	SlotInput((int)InventorySlot::Hotbar4);
 }
 
 void CHudAmmo::UserCmd_Slot5()
 {
-	SlotInput(4);
+	SlotInput((int)InventorySlot::Hotbar5);
 }
 
 void CHudAmmo::UserCmd_Slot6()
 {
-	SlotInput(5);
+	SlotInput((int)InventorySlot::Hotbar6);
 }
 
 void CHudAmmo::UserCmd_Slot7()
 {
-	SlotInput(6);
+	SlotInput((int)InventorySlot::Hotbar7);
 }
 
 void CHudAmmo::UserCmd_Slot8()
 {
-	SlotInput(7);
+	SlotInput((int)InventorySlot::Hotbar8);
 }
 
 void CHudAmmo::UserCmd_Slot9()
 {
-	SlotInput(8);
-}
-
-void CHudAmmo::UserCmd_Slot10()
-{
-	SlotInput(9);
+	SlotInput((int)InventorySlot::Hotbar9);
 }
 
 void CHudAmmo::UserCmd_Close()
@@ -752,98 +703,6 @@ void CHudAmmo::UserCmd_Close()
 	}
 	else
 		EngineClientCmd("escape");
-}
-
-
-// Selects the next item in the weapon menu
-void CHudAmmo::UserCmd_NextWeapon()
-{
-	if (gHUD.m_fPlayerDead || (gHUD.m_iHideHUDDisplay & (HIDEHUD_WEAPONS | HIDEHUD_ALL)) != 0)
-		return;
-
-	if (!gpActiveSel || gpActiveSel == (WEAPON*)1)
-		gpActiveSel = m_pWeapon;
-
-	int pos = 0;
-	int slot = 0;
-	if (gpActiveSel)
-	{
-		pos = gpActiveSel->Info->Position + 1;
-		slot = gpActiveSel->Info->Slot;
-	}
-
-	for (int loop = 0; loop <= 1; loop++)
-	{
-		for (; slot < MAX_WEAPON_SLOTS; slot++)
-		{
-			const int highestPosition = gWR.GetHighestPositionInSlot(slot);
-
-			for (; pos <= highestPosition; pos++)
-			{
-				WEAPON* wsp = gWR.GetWeaponSlot(slot, pos);
-
-				if (wsp && gWR.HasAmmo(wsp))
-				{
-					gpActiveSel = wsp;
-					return;
-				}
-			}
-
-			pos = 0;
-		}
-
-		slot = 0; // start looking from the first slot again
-	}
-
-	gpActiveSel = nullptr;
-}
-
-// Selects the previous item in the menu
-void CHudAmmo::UserCmd_PrevWeapon()
-{
-	if (gHUD.m_fPlayerDead || (gHUD.m_iHideHUDDisplay & (HIDEHUD_WEAPONS | HIDEHUD_ALL)) != 0)
-		return;
-
-	if (!gpActiveSel || gpActiveSel == (WEAPON*)1)
-		gpActiveSel = m_pWeapon;
-
-	int slot;
-	int pos;
-
-	if (gpActiveSel)
-	{
-		slot = gpActiveSel->Info->Slot;
-		pos = gpActiveSel->Info->Position - 1;
-	}
-	else
-	{
-		slot = gWR.GetSlotCount() - 1;
-		pos = gWR.GetHighestPositionInSlot(slot);
-	}
-
-	for (int loop = 0; loop <= 1; loop++)
-	{
-		for (; slot >= 0; slot--)
-		{
-			for (; pos >= 0; pos--)
-			{
-				WEAPON* wsp = gWR.GetWeaponSlot(slot, pos);
-
-				if (wsp && gWR.HasAmmo(wsp))
-				{
-					gpActiveSel = wsp;
-					return;
-				}
-			}
-
-			pos = gWR.GetHighestPositionInSlot(slot - 1);
-		}
-
-		slot = gWR.GetSlotCount() - 1;
-		pos = gWR.GetHighestPositionInSlot(slot - 1);
-	}
-
-	gpActiveSel = nullptr;
 }
 
 void CHudAmmo::SetCrosshair(HSPRITE sprite, Rect rect)

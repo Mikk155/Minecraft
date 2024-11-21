@@ -124,10 +124,7 @@ public:
 	void UserCmd_Slot7();
 	void UserCmd_Slot8();
 	void UserCmd_Slot9();
-	void UserCmd_Slot10();
 	void UserCmd_Close();
-	void UserCmd_NextWeapon();
-	void UserCmd_PrevWeapon();
 
 	bool IsCrosshairDrawn() const { return m_DrawCrosshair; }
 

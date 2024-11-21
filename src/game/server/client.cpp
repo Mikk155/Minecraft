@@ -690,9 +690,6 @@ error C2780: 'auto SV_CreateClientCommands::<lambda_12>::operator ()(CBasePlayer
 	}{.Flags = ClientCommandFlag::Cheat});
 */
 
-	g_ClientCommands.Create("lastinv", [](CBasePlayer* player, const auto& args)
-		{ player->SelectLastItem(); });
-
 	g_ClientCommands.Create("closemenus", [](CBasePlayer* player, const auto& args)
 		{
 			/* just ignore it*/ });
