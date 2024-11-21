@@ -631,6 +631,20 @@ void SV_CreateClientCommands()
 			player->InventorySwapSlot(atoi(args.Argument(1)),atoi(args.Argument(2)));
 	} } );
 
+	g_ClientCommands.Create("drop", [](CBasePlayer* player, const auto& args)
+	{
+		if( args.Count() > 2 )
+		{
+			int index = atoi(args.Argument(2));
+
+			int iDrop = ( index == -1 ? static_cast<int>(player->m_iActiveItem) : index );
+
+			if( auto pItem = player->inventory.at(iDrop); pItem != nullptr )
+			{
+				pItem->DropItem( Vector2D(player->pev->v_angle.x, player->pev->v_angle.y) );
+			}
+	} } );
+
 	g_ClientCommands.Create("gamemode", [](CBasePlayer* player, const CommandArgs& args)
 	{
 		if( args.Count() > 1 )
@@ -646,11 +660,6 @@ void SV_CreateClientCommands()
 			}
 		}
 	}, {.Flags = ClientCommandFlag::Cheat} );
-
-	g_ClientCommands.Create("drop", [](CBasePlayer* player, const auto& args)
-	{
-		// -MC drop current item in slot
-	} );
 
 /*
 error C3321: en este contexto no se espera ninguna lista de inicializadores
