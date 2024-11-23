@@ -46,10 +46,6 @@ public:
 		"description": "Reset Spawn Inventory configuration to its default empty state",
 		"type": "boolean"
 	},
-	"HasLongJump": {
-		"title": "Player has Long Jump Module",
-		"type": "boolean"
-	},
 	"Health": {
 		"title": "Player Health",
 		"type": "integer",
@@ -100,11 +96,6 @@ public:
 		if (context.Input.value("Reset", false))
 		{
 			inventory = {};
-		}
-
-		if (auto it = context.Input.find("HasLongJump"); it != context.Input.end())
-		{
-			inventory.HasLongJump = it->get<bool>();
 		}
 
 		if (auto it = context.Input.find("Health"); it != context.Input.end())

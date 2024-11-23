@@ -171,21 +171,6 @@ private:
 //
 //-----------------------------------------------------
 //
-class CHudGeiger : public CHudBase
-{
-public:
-	bool Init() override;
-	bool VidInit() override;
-	bool Draw(float flTime) override;
-	void MsgFunc_Geiger(const char* pszName, BufferReader& reader);
-
-private:
-	int m_iGeigerRange;
-};
-
-//
-//-----------------------------------------------------
-//
 class CHudTrain : public CHudBase
 {
 public:
@@ -743,7 +728,6 @@ public:
 	CHudAmmo m_Ammo;
 	CHudHealth m_Health;
 	CHudSpectator m_Spectator;
-	CHudGeiger m_Geiger;
 	CHudTrain m_Train;
 	CHudMessage m_Message;
 	CHudScoreboard m_Scoreboard;

@@ -484,8 +484,6 @@ public:
 	string_t m_PlayerModel;
 };
 
-constexpr char DefaultItemPickupSound[] = "items/9mmclip1.wav";
-
 /**
  *	@brief Base class for ammo entities.
  *	@details Inheriting classes must set m_AmmoAmount to the default give amount

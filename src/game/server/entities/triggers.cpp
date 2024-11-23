@@ -503,12 +503,6 @@ public:
 	 */
 	void HurtTouch(CBaseEntity* pOther);
 
-	/**
-	 *	@brief trigger hurt that causes radiation will do a radius check and set the player's geiger counter level
-	 *	according to distance from center of trigger
-	 */
-	void RadiationThink();
-
 private:
 	int m_bitsDamageInflict; // DMG_ damage type that the trigger does
 };
@@ -516,7 +510,6 @@ private:
 BEGIN_DATAMAP(CTriggerHurt)
 DEFINE_FIELD(m_bitsDamageInflict, FIELD_INTEGER),
 	DEFINE_FUNCTION(HurtTouch),
-	DEFINE_FUNCTION(RadiationThink),
 	END_DATAMAP();
 
 LINK_ENTITY_TO_CLASS(trigger_hurt, CTriggerHurt);
@@ -544,12 +537,6 @@ void CTriggerHurt::Spawn()
 	else
 	{
 		SetUse(nullptr);
-	}
-
-	if ((m_bitsDamageInflict & DMG_RADIATION) != 0)
-	{
-		SetThink(&CTriggerHurt::RadiationThink);
-		pev->nextthink = gpGlobals->time + RANDOM_FLOAT(0.0, 0.5);
 	}
 
 	if (FBitSet(pev->spawnflags, SF_TRIGGER_HURT_START_OFF)) // if flagged to Start Turned Off, make trigger nonsolid.
@@ -679,53 +666,6 @@ void CTriggerHurt::HurtTouch(CBaseEntity* pOther)
 		if ((pev->spawnflags & SF_TRIGGER_HURT_TARGETONCE) != 0)
 			pev->target = string_t::Null;
 	}
-}
-
-void CTriggerHurt::RadiationThink()
-{
-	float flRange;
-	Vector vecSpot1;
-	Vector vecSpot2;
-	Vector vecRange;
-	Vector origin;
-	Vector view_ofs;
-
-	// check to see if a player is in pvs
-	// if not, continue
-
-	// set origin to center of trigger so that this check works
-	origin = pev->origin;
-	view_ofs = pev->view_ofs;
-
-	pev->origin = (pev->absmin + pev->absmax) * 0.5;
-	pev->view_ofs = pev->view_ofs * 0.0;
-
-	CBasePlayer* player = UTIL_FindClientInPVS(this);
-
-	pev->origin = origin;
-	pev->view_ofs = view_ofs;
-
-	// reset origin
-
-	if (player)
-	{
-		// get range to player;
-
-		vecSpot1 = (pev->absmin + pev->absmax) * 0.5;
-		vecSpot2 = (player->pev->absmin + player->pev->absmax) * 0.5;
-
-		vecRange = vecSpot1 - vecSpot2;
-		flRange = vecRange.Length();
-
-		// if player's current geiger counter range is larger
-		// than range to this trigger hurt, reset player's
-		// geiger counter range
-
-		if (player->m_flgeigerRange >= flRange)
-			player->m_flgeigerRange = flRange;
-	}
-
-	pev->nextthink = gpGlobals->time + 0.25;
 }
 
 class CTriggerMonsterJump : public CBaseTrigger

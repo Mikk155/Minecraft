@@ -306,8 +306,6 @@ void ClientLibrary::AddCheatCommands()
 	AddForwardedCommand("cheat_noclip");
 	AddForwardedCommand("cheat_infiniteair");
 	AddForwardedCommand("cheat_infinitearmor");
-	AddForwardedCommand("cheat_givemagazine");
-	AddForwardedCommand("cheat_jetpack");
 }
 
 void ClientLibrary::LoadBackgroundMap()

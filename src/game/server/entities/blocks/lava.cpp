@@ -89,13 +89,6 @@ void CTriggerHurt::RadiationThink()
 
 		vecRange = vecSpot1 - vecSpot2;
 		flRange = vecRange.Length();
-
-		// if player's current geiger counter range is larger
-		// than range to this trigger hurt, reset player's
-		// geiger counter range
-
-		if (player->m_flgeigerRange >= flRange)
-			player->m_flgeigerRange = flRange;
 	}
 
 	pev->nextthink = m_flNextThink = gpGlobals->time + 0.25;

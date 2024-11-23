@@ -103,31 +103,6 @@ public:
 			CanHaveItem = false;
 			return;
 		}
-
-		if (weapon->pszAmmo1())
-		{
-			if (!GameRules->CanHaveAmmo(Player, weapon->pszAmmo1()))
-			{
-				// we can't carry anymore ammo for this gun. We can only
-				// have the gun if we aren't already carrying one of this type
-				if (Player->HasPlayerWeapon(weapon))
-				{
-					CanHaveItem = false;
-					return;
-				}
-			}
-		}
-		else
-		{
-			// weapon doesn't use ammo, don't take another if you already have it.
-			if (Player->HasPlayerWeapon(weapon))
-			{
-				CanHaveItem = false;
-				return;
-			}
-		}
-
-		// note: will fall through to here if GetItemInfo doesn't fill the struct!
 	}
 
 	void Visit(CItem* pickupItem) override {}

@@ -356,30 +356,13 @@ CBasePlayerWeapon* CBasePlayerWeapon::GetItemToRespawn(const Vector& respawnPoin
 
 ItemAddResult CBasePlayerWeapon::Apply(CBasePlayer* player)
 {
-	const ItemAddResult result = player->AddPlayerWeapon(this);
-
-	if (result == ItemAddResult::Added)
-	{
-		AttachToPlayer(player);
-
-		if (m_PlayPickupSound)
-		{
-			player->EmitSound(CHAN_ITEM, "items/gunpickup2.wav", 1, ATTN_NORM);
-		}
-
-		// Clear out think functions so they don't try to run item spawn/respawn logic.
-		SetThink(nullptr);
-	}
-
-	return result;
+	return ItemAddResult::NotAdded;
 }
 
 void CBasePlayerWeapon::DestroyItem()
 {
 	if (m_pPlayer)
 	{
-		// if attached to a player, remove.
-		m_pPlayer->RemovePlayerWeapon(this);
 	}
 
 	Kill();
@@ -493,76 +476,12 @@ bool CBasePlayerWeapon::UpdateClientData(CBasePlayer* pPlayer)
 
 bool CBasePlayerWeapon::AddPrimaryAmmo(CBasePlayerWeapon* origin, int iCount, const char* szName, int iMaxClip)
 {
-	auto type = g_AmmoTypes.GetByName(szName);
-
-	if (!type)
-	{
-		assert(!"Unknown ammo type");
-		CBasePlayerWeapon::WeaponsLogger->error("Trying to add unknown ammo type \"{}\"", szName);
-		return false;
-	}
-
-	// Don't double for single shot weapons (e.g. RPG)
-	if ((m_pPlayer->m_iItems & CTFItem::Backpack) != 0 && iMaxClip > 1)
-	{
-		iMaxClip *= 2;
-	}
-
-	int iIdAmmo;
-
-	if (iMaxClip <= 0)
-	{
-		m_iClip = WEAPON_NOCLIP;
-		iIdAmmo = m_pPlayer->GiveAmmo(iCount, szName);
-	}
-	else if (m_iClip == 0)
-	{
-		if (iCount == RefillAllAmmoAmount)
-		{
-			// Full magazine + spare.
-			iCount = type->MaximumCapacity + iMaxClip;
-		}
-
-		m_iClip = std::min(iCount, iMaxClip);
-		iIdAmmo = m_pPlayer->GiveAmmo(iCount - m_iClip, szName);
-
-		// Make sure we count this as ammo taken.
-		if (iCount > 0 && iIdAmmo == -1)
-		{
-			iIdAmmo = type->Id;
-		}
-	}
-	else
-	{
-		iIdAmmo = m_pPlayer->GiveAmmo(iCount, szName);
-	}
-
-	// m_pPlayer->SetAmmoCountByIndex(m_iPrimaryAmmoType, iMaxCarry); // hack for testing
-
-	if (iIdAmmo > 0)
-	{
-		if (this != origin)
-		{
-			// play the "got ammo" sound only if we gave some ammo to a player that already had this gun.
-			// if the player is just getting this gun for the first time, DefaultTouch will play the "picked up gun" sound for us.
-			EmitSound(CHAN_ITEM, "items/9mmclip1.wav", 1, ATTN_NORM);
-		}
-	}
-
-	return iIdAmmo > 0;
+	return false;
 }
 
 bool CBasePlayerWeapon::AddSecondaryAmmo(int iCount, const char* szName)
 {
-	const int iIdAmmo = m_pPlayer->GiveAmmo(iCount, szName);
-
-	// m_pPlayer->SetAmmoCountByIndex(m_iSecondaryAmmoType, iMax); // hack for testing
-
-	if (iIdAmmo > 0)
-	{
-		EmitSound(CHAN_ITEM, "items/9mmclip1.wav", 1, ATTN_NORM);
-	}
-	return iIdAmmo > 0;
+	return false;
 }
 
 void CBasePlayerWeapon::SetWeaponModels(const char* viewModel, const char* weaponModel)
@@ -616,7 +535,7 @@ bool CBasePlayerWeapon::ExtractClipAmmo(CBasePlayerWeapon* weapon)
 	// This should check against -1 to be correct,
 	// but that changes original HL behavior which causes players to always pick up dropped weapons,
 	// even if they have full ammo.
-	return weapon->m_pPlayer->GiveAmmo(iAmmo, pszAmmo1()) != 0;
+	return false;
 }
 
 void CBasePlayerWeapon::RetireWeapon()
@@ -637,12 +556,6 @@ void CBasePlayerWeapon::DoRetireWeapon()
 	m_pPlayer->pev->viewmodel = string_t::Null;
 	m_pPlayer->pev->weaponmodel = string_t::Null;
 	// m_pPlayer->pev->viewmodelindex = 0;
-
-	// If we're still equipped and we couldn't switch to another weapon, dequip this one
-	if (CanHolster() && m_pPlayer->m_pActiveWeapon == this)
-	{
-		m_pPlayer->SwitchWeapon(nullptr);
-	}
 }
 
 float CBasePlayerWeapon::GetNextAttackDelay(float delay)

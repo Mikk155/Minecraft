@@ -242,10 +242,7 @@ void CBaseMonster::StartFollowing(CBaseEntity* pLeader) {}
 void CBaseMonster::UpdateOnRemove() {}
 void CBaseMonster::OnCreate() {}
 
-int TrainSpeed(int iSpeed, int iMax) { return 0; }
 void CBasePlayer::DeathSound() {}
-bool CBasePlayer::GiveHealth(float flHealth, int bitsDamageType) { return false; }
-void CBasePlayer::RemoveAllItems() {}
 void CBasePlayer::SetAnimation(PLAYER_ANIM playerAnim) {}
 void CBasePlayer::WaterMove() {}
 bool CBasePlayer::IsOnLadder() { return false; }
@@ -256,8 +253,6 @@ void CBasePlayer::PlayerUse() {}
 void CBasePlayer::Jump() {}
 void CBasePlayer::Duck() {}
 void CBasePlayer::PreThink() {}
-void CBasePlayer::CheckTimeBasedDamage() {}
-void CBasePlayer::UpdateGeigerCounter() {}
 void CBasePlayer::CheckSuitUpdate() {}
 void CBasePlayer::SetSuitUpdate(const char* name, int iNoRepeatTime) {}
 void CBasePlayer::UpdatePlayerSound() {}
@@ -270,8 +265,6 @@ void CBasePlayer::SelectPrevItem(int iItem) {}
 void CBasePlayer::ForceClientDllUpdate() {}
 void CBasePlayer::ImpulseCommands() {}
 void CBasePlayer::CheatImpulseCommands(int iImpulse) {}
-ItemAddResult CBasePlayer::AddPlayerWeapon(CBasePlayerWeapon* weapon) { return ItemAddResult::NotAdded; }
-bool CBasePlayer::RemovePlayerWeapon(CBasePlayerWeapon* weapon) { return false; }
 void CBasePlayer::ItemPreFrame() {}
 void CBasePlayer::ItemPostFrame() {}
 void CBasePlayer::SendAmmoUpdate() {}
@@ -284,11 +277,8 @@ void CBasePlayer::EnableControl(bool fControl) {}
 Vector CBasePlayer::GetAutoaimVector(float flDelta) { return g_vecZero; }
 void CBasePlayer::SetCustomDecalFrames(int nFrames) {}
 int CBasePlayer::GetCustomDecalFrames() { return -1; }
-bool CBasePlayer::HasPlayerWeapon(CBasePlayerWeapon* weapon) { return false; }
-bool CBasePlayer::SwitchWeapon(CBasePlayerWeapon* weapon) { return false; }
 Vector CBasePlayer::GetGunPosition() { return g_vecZero; }
 const char* CBasePlayer::TeamID() { return ""; }
-int CBasePlayer::GiveAmmo(int iCount, const char* szName) { return 0; }
 void CBasePlayer::AddPoints(int score, bool bAllowNegativeScore) {}
 void CBasePlayer::AddPointsToTeam(int score, bool bAllowNegativeScore) {}
 void CBasePlayer::PostRestore() {}

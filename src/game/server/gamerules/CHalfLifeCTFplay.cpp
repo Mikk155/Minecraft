@@ -745,8 +745,6 @@ void CHalfLifeCTFplay::ClientDisconnected(edict_t* pClient)
 
 			pszPlayerIPs[ENTINDEX(pClient)] = nullptr;
 
-			v2->RemoveAllItems();
-
 			MESSAGE_BEGIN(MSG_ALL, gmsgSpectator);
 			g_engfuncs.pfnWriteByte(ENTINDEX(pClient));
 			g_engfuncs.pfnWriteByte(0);
@@ -1302,8 +1300,6 @@ void CHalfLifeCTFplay::ChangePlayerTeam(CBasePlayer* pPlayer, const char* pCharN
 		pPlayer->pev->flags &= ~FL_DUCKING;
 		pPlayer->Observer_SetMode(OBS_CHASE_FREE);
 		pPlayer->pev->deadflag = DEAD_RESPAWNABLE;
-
-		pPlayer->RemoveAllItems();
 
 		if (!g_fGameOver)
 		{

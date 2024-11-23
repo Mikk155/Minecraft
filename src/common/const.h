@@ -651,11 +651,6 @@ struct edict_t;
  */
 constexpr int CHAN_HUD_SOUND = 601;
 
-/**
- *	@brief Unique channel index used only for the geiger counter.
- */
-constexpr int CHAN_GEIGER = 602;
-
 // attenuation values
 #define ATTN_NONE 0
 #define ATTN_NORM (float)0.8

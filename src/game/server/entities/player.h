@@ -105,8 +105,7 @@ enum Cheat
 	Notarget,
 	Noclip,
 	InfiniteAir,
-	InfiniteArmor,
-	Jetpack
+	InfiniteArmor
 };
 
 enum class WeaponSwitchMode
@@ -190,9 +189,6 @@ public:
 	int m_lastDamageAmount;						 // Last damage taken
 	float m_tbdPrev;							 // Time-based damage timer
 
-	float m_flgeigerRange; // range to nearest radiation source
-	float m_flgeigerDelay; // delay per update of range msg to client
-	int m_igeigerRangePrev;
 	int m_iStepLeft;					  // alternate left/right foot stepping sound
 	char m_szTextureName[TextureNameMax]; // current texture name we're standing on
 	char m_chTextureType;				  // current texture type
@@ -213,7 +209,6 @@ public:
 	float m_fDeadTime;		 // the time at which the player died  (used in PlayerDeathThink())
 
 	bool m_fNoPlayerSound; // a debugging feature. Player makes no sound if this is true.
-	bool m_fLongJump;	   // does this player have the longjump module?
 
 	int m_iUpdateTime;	  // stores the number of frame ticks before sending HUD update messages
 	int m_iClientHealth;  // the health currently known by the client.  If this changes, send a new
@@ -305,7 +300,6 @@ public:
 	virtual void PreThink();
 	virtual void PostThink();
 	Vector GetGunPosition() override;
-	bool GiveHealth(float flHealth, int bitsDamageType) override;
 
 	/**
 	 *	@brief NOTE: each call to TakeDamage with bitsDamageType set to
@@ -336,9 +330,6 @@ public:
 	 */
 	void RenewItems();
 
-	void RemoveAllItems();
-	bool SwitchWeapon(CBasePlayerWeapon* weapon);
-
 	/**
 	 *	@brief Equips an appropriate weapon for the player if they don't have one equipped already.
 	 */
@@ -346,11 +337,6 @@ public:
 
 	void SetWeaponBit(int id);
 	void ClearWeaponBit(int id);
-
-	bool HasLongJump() const;
-	void SetHasLongJump(bool hasLongJump);
-
-	void SetHasJetpack(bool state);
 
 	/**
 	 *	@brief resends any changed player HUD info to the client.
@@ -393,15 +379,6 @@ public:
 	void AddPoints(int score, bool bAllowNegativeScore);
 	void AddPointsToTeam(int score, bool bAllowNegativeScore);
 
-	/**
-	 *	@brief Add a weapon to the player (Item == Weapon == Selectable Object)
-	 */
-	ItemAddResult AddPlayerWeapon(CBasePlayerWeapon* weapon);
-
-	bool RemovePlayerWeapon(CBasePlayerWeapon* weapon);
-
-	bool HasPlayerWeapon(CBasePlayerWeapon* checkWeapon);
-	bool HasNamedPlayerWeapon(const char* pszItemName);
 	bool HasWeapons(); // do I have ANY weapons?
 	void SelectPrevItem(int iItem);
 	void SelectNextItem(int iItem);
@@ -422,13 +399,6 @@ public:
 	void ItemPostFrame();
 	CBaseItem* GiveNamedItem(std::string_view className, std::optional<int> defaultAmmo = std::nullopt);
 	void EnableControl(bool fControl);
-
-	/**
-	 *	@brief Returns the unique ID for the ammo, or -1 if error
-	 */
-	int GiveAmmo(int iAmount, const char* szName);
-
-	int GiveMagazine(CBasePlayerWeapon* weapon, int attackMode);
 
 	/**
 	 *	@brief makes sure the client has all the necessary ammo info, if values have changed
@@ -456,9 +426,6 @@ public:
 	 *		for at least that number of seconds.
 	 */
 	void SetSuitUpdate(const char* name, int iNoRepeatTime);
-
-	void UpdateGeigerCounter();
-	void CheckTimeBasedDamage();
 
 	bool FBecomeProne() override;
 	void BarnacleVictimBitten(CBaseEntity* pevBarnacle) override;
@@ -557,7 +524,6 @@ private:
 
 	bool m_bInfiniteAir;
 	bool m_bInfiniteArmor;
-	bool m_JetpackEnabled = false;
 
 public:
 	/**

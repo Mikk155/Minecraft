@@ -73,8 +73,6 @@ private:
 	AmmoValue* FindOrCreateAmmoValue(std::string_view name);
 
 public:
-	std::optional<bool> HasLongJump;
-
 	std::optional<int> Health;
 	std::optional<int> Armor;
 

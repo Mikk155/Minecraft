@@ -178,7 +178,6 @@ target_sources(client PRIVATE
 	ui/hud/ammohistory.cpp
 	ui/hud/ammohistory.h
 	ui/hud/death.cpp
-	ui/hud/geiger.cpp
 	ui/hud/health.cpp
 	ui/hud/health.h
 	ui/hud/hud.cpp

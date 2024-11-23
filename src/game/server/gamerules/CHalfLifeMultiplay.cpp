@@ -270,7 +270,7 @@ void CHalfLifeMultiplay::ClientDisconnected(edict_t* pClient)
 			free(pszPlayerIPs[playerIndex]);
 			pszPlayerIPs[playerIndex] = nullptr;
 
-			pPlayer->RemoveAllItems(); // destroy all of the players weapons and items
+			// -MC Inventory drop/destroy?
 
 			MESSAGE_BEGIN(MSG_ALL, gmsgSpectator);
 			g_engfuncs.pfnWriteByte(pPlayer->entindex());

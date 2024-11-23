@@ -68,7 +68,6 @@ PlayerInventory PlayerInventory::CreateFromPlayer(CBasePlayer* player)
 
 	PlayerInventory inventory;
 
-	inventory.HasLongJump = player->HasLongJump();
 	inventory.Health = player->pev->health;
 	inventory.Armor = player->pev->armorvalue;
 
@@ -97,11 +96,6 @@ PlayerInventory PlayerInventory::CreateFromPlayer(CBasePlayer* player)
 void PlayerInventory::ApplyToPlayer(CBasePlayer* player) const
 {
 	assert(player);
-
-	if (HasLongJump)
-	{
-		player->SetHasLongJump(*HasLongJump);
-	}
 
 	if (Health)
 	{
