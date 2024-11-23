@@ -1215,6 +1215,22 @@ void CBaseMonster::MakeDamageBloodDecal(int cCount, float flNoise, TraceResult* 
 	}
 }
 
+void CBaseMonster::OnCreate()
+{
+	inventory.resize(static_cast<size_t>(InventorySlot::MAX_SLOTS), nullptr);
+}
+
+void CBaseMonster::UpdateOnRemove()
+{
+	for( auto pItem : inventory )
+	{
+		pItem->DropItem();
+	}
+	inventory.clear();
+
+	g_Minecraft.Effects.RemoveAll(this);
+}
+
 CBaseItem* CBaseMonster::InventoryAddItem(std::string_view className, std::optional<int> defaultAmmo)
 {
 	auto entity = g_ItemDictionary->Create(className);

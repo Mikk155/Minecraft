@@ -891,20 +891,8 @@ public:
 	std::unordered_map<std::string_view, EffectInfo*> effects;
 	void EffectsSchedule();
 
-    CBaseMonster()
-    {
-		inventory.resize(static_cast<size_t>(InventorySlot::MAX_SLOTS), nullptr);
-    }
-
-    ~CBaseMonster()
-    {
-        for( auto pItem : inventory ) {
-//			pItem->DropItem();
-        }
-        inventory.clear();
-
-		g_Minecraft.Effects.RemoveAll(this);
-    }
+	void UpdateOnRemove() override;
+	void OnCreate() override;
 };
 
 template <typename Callback>
