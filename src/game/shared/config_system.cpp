@@ -33,22 +33,6 @@ bool ConfigurationSystem::Initialize()
 
 #ifndef CLIENT_DLL
 
-/*
-	-MC Should we really waste resources on this? Seems pointless
-
-	g_ConCommands.CreateCommand(
-		"cfg_find", [this](const auto& args)
-		{
-			if( args.Count() < 2 )
-			{
-				Con_Printf("Usage: %s key_name_prefix\n", args.Argument(0) );
-				return;
-			}
-		},
-		CommandLibraryPrefix::No
-	);
-*/
-
 	g_ConCommands.CreateCommand(
 		"cfg_update", [this](const auto& args)
 		{
@@ -234,14 +218,17 @@ void ConfigurationSystem::LoadConfigFile(const char* name)
     }
 }
 
-float ConfigurationSystem::GetValue(std::string_view name, float defaultValue, CBaseEntity* pEntity) const
+float ConfigurationSystem::GetValue(std::string_view name, float defaultValue, std::optional<CBaseEntity*> entity) const
 {
 #ifndef CLIENT_DLL
-	if( pEntity != nullptr && pEntity->m_config->contains( name ) )
+	if( entity.has_value() )
 	{
-		if( (*pEntity->m_config)[ name ].is_number() )
-			return (*pEntity->m_config)[name].get<float>();
-		return std::stof( (*pEntity->m_config)[name].get<std::string>() );
+		if( auto pEntity = entity.value(); pEntity != nullptr && pEntity->m_config->contains( name ) )
+		{
+			if( (*pEntity->m_config)[ name ].is_number() )
+				return (*pEntity->m_config)[name].get<float>();
+			return std::stof( (*pEntity->m_config)[name].get<std::string>() );
+		}
 	}
 #endif
 
@@ -257,14 +244,17 @@ float ConfigurationSystem::GetValue(std::string_view name, float defaultValue, C
     return defaultValue;
 }
 
-std::string ConfigurationSystem::GetValue(std::string_view name, std::string_view defaultValue, CBaseEntity* pEntity) const
+std::string ConfigurationSystem::GetValue(std::string_view name, std::string_view defaultValue, std::optional<CBaseEntity*> entity) const
 {
 #ifndef CLIENT_DLL
-	if( pEntity != nullptr && pEntity->m_config->contains( name ) )
+	if( entity.has_value() )
 	{
-		if( (*pEntity->m_config)[ name ].is_string() )
-			return (*pEntity->m_config)[name].get<std::string>();
-		return std::to_string( (*pEntity->m_config)[name].get<float>() );
+		if( auto pEntity = entity.value(); pEntity != nullptr && pEntity->m_config->contains( name ) )
+		{
+			if( (*pEntity->m_config)[ name ].is_string() )
+				return (*pEntity->m_config)[name].get<std::string>();
+			return std::to_string( (*pEntity->m_config)[name].get<float>() );
+		}
 	}
 #endif
 
@@ -280,55 +270,35 @@ std::string ConfigurationSystem::GetValue(std::string_view name, std::string_vie
     return std::string( defaultValue );
 }
 
-void ConfigurationSystem::SetValue(std::string_view name, float value, CBaseEntity* pEntity)
+void ConfigurationSystem::SetValue(std::string_view name, float value, std::optional<CBaseEntity*> entity)
 {
 #ifndef CLIENT_DLL
-	if( pEntity != nullptr )
-		(*pEntity->m_config)[name] = value;
-	else
-#endif
-	(*m_config)[name] = value;
-}
-
-void ConfigurationSystem::SetValue(std::string_view name, std::string_view value, CBaseEntity* pEntity)
-{
-#ifndef CLIENT_DLL
-	if( pEntity != nullptr )
-		(*pEntity->m_config)[name] = value;
-	else
-#endif
-	(*m_config)[name] = value;
-}
-
-#if 0
-// This is stupid but left here just as a reminder that i'll need to implement a safest system in a future :/
-bool ConfigurationSystem::_SetValue_(std::string_view name, std::optional<std::string_view> sopt, std::optional<float> fopt, CBaseEntity* pEntity)
-{
-	if( pEntity->m_config->contains( name ) )
+	if( entity.has_value() )
 	{
-		std::vector<std::string> Is = { "string", "float" };
-		std::string value;
-
-		if( sopt.has_value() )
+		if( auto pEntity = entity.value(); pEntity != nullptr && pEntity->m_config->contains( name ) )
 		{
-			if( (*pEntity->m_config)[ name ].is_string() ) { return true; }
-			value = sopt.value();
+			(*pEntity->m_config)[name] = value;
+			return;
 		}
-		else if( fopt.has_value() )
-		{
-			if( (*pEntity->m_config)[ name ].is_number() ) { return true; }
-			value = std::to_string( fopt.value() );
-			Is = { "float", "string" };
-		}
-
-		m_Logger->error(
-			"Ignoring SetValue \"{}\" to a {} value \"{}\" to entity {}:{}, This key is originaly a {} value \"{}\"",
-			name, Is[0], value, pEntity->GetClassname(), pEntity->GetTargetname(), Is[1], (*pEntity->m_config)[name].get<std::string>() );
-		return false;
 	}
-	return true;
-}
 #endif
+	(*m_config)[name] = value;
+}
+
+void ConfigurationSystem::SetValue(std::string_view name, std::string_view value, std::optional<CBaseEntity*> entity)
+{
+#ifndef CLIENT_DLL
+	if( entity.has_value() )
+	{
+		if( auto pEntity = entity.value(); pEntity != nullptr && pEntity->m_config->contains( name ) )
+		{
+			(*pEntity->m_config)[name] = value;
+			return;
+		}
+	}
+#endif
+	(*m_config)[name] = value;
+}
 
 void ConfigurationSystem::_list_log_(std::string_view log, std::variant<float, std::string_view> defaultValue) const
 {
@@ -341,3 +311,4 @@ void ConfigurationSystem::_list_log_(std::string_view log, std::variant<float, s
 		_list_logged_->push_back(log);
 	}
 }
+

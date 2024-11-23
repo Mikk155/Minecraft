@@ -1699,13 +1699,13 @@ void CBasePlayer::Spawn()
 			m_bIsSpawning = false;
 		}};
 
-	pev->health = g_Cfg.GetValue( "player_health"sv, 10 );
+	pev->health = g_Cfg.GetValue( "player_health"sv, 10, this );
 	pev->takedamage = DAMAGE_AIM;
 	pev->solid = SOLID_SLIDEBOX;
 	pev->movetype = MOVETYPE_WALK;
-	pev->max_health = g_Cfg.GetValue( "player_max_health"sv, 10 );
+	pev->max_health = g_Cfg.GetValue( "player_max_health"sv, 10, this );
 	pev->armorvalue = 0;
-	pev->armortype = g_Cfg.GetValue( "player_max_absortion"sv, 5 );
+	pev->armortype = g_Cfg.GetValue( "player_max_absortion"sv, 5, this );
 	pev->flags &= FL_PROXY | FL_FAKECLIENT; // keep proxy and fakeclient flags set by engine
 	pev->flags |= FL_CLIENT;
 	pev->air_finished = gpGlobals->time + 12;
