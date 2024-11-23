@@ -42,10 +42,16 @@ bool ConfigurationSystem::Initialize()
 			}
 			else if( auto sv = std::string_view( args.Argument(1) ); m_config->contains( sv ) )
 			{
+				if( FStrEq( args.Argument(2), "false" ) || FStrEq( args.Argument(2), "true" ) )
+				{
+					Con_Printf( "Set key_name %s to bool value %f\n", sv, args.Argument(2) );
+					SetValue( sv, FStrEq( args.Argument(2), "true" ) );
+				}
 				if( (*m_config)[ sv ].is_number() )
 				{
 					Con_Printf( "Set key_name %s to float value %f\n", sv, atof( args.Argument(2) ) );
-					SetValue( sv, atof( args.Argument(2) ) );
+					float flValue = atof( args.Argument(2) );
+					SetValue( sv, flValue );
 				}
 				else
 				{
@@ -218,7 +224,8 @@ void ConfigurationSystem::LoadConfigFile(const char* name)
     }
 }
 
-float ConfigurationSystem::GetValue(std::string_view name, float defaultValue, std::optional<CBaseEntity*> entity) const
+/*
+float ConfigurationSystem::GetValue(std::string_view name, float value, std::optional<CBaseEntity*> entity) const
 {
 #ifndef CLIENT_DLL
 	if( entity.has_value() )
@@ -226,8 +233,13 @@ float ConfigurationSystem::GetValue(std::string_view name, float defaultValue, s
 		if( auto pEntity = entity.value(); pEntity != nullptr && pEntity->m_config->contains( name ) )
 		{
 			if( (*pEntity->m_config)[ name ].is_number() )
+			{
 				return (*pEntity->m_config)[name].get<float>();
-			return std::stof( (*pEntity->m_config)[name].get<std::string>() );
+			}
+			else
+			{
+				m_Logger->warn( "Variable \"{}\" in entity {}:{} is not a \"numeric\" value!", name, pEntity->GetClassname(), pEntity->GetTargetname() );
+			}
 		}
 	}
 #endif
@@ -235,16 +247,21 @@ float ConfigurationSystem::GetValue(std::string_view name, float defaultValue, s
     if( m_config->contains( name ) )
 	{
 		if( (*m_config)[ name ].is_number() )
+		{
 	        return (*m_config)[name].get<float>();
-        return std::stof( (*m_config)[name].get<std::string>() );
+		}
+		else
+		{
+			m_Logger->warn( "Variable \"{}\" is not a \"numeric\" value!", name );
+		}
     }
 
-	_list_log_(name, defaultValue);
+	_list_log_(name, value);
 
-    return defaultValue;
+    return value;
 }
 
-std::string ConfigurationSystem::GetValue(std::string_view name, std::string_view defaultValue, std::optional<CBaseEntity*> entity) const
+std::string ConfigurationSystem::GetValue(std::string_view name, std::string_view value, std::optional<CBaseEntity*> entity) const
 {
 #ifndef CLIENT_DLL
 	if( entity.has_value() )
@@ -252,8 +269,13 @@ std::string ConfigurationSystem::GetValue(std::string_view name, std::string_vie
 		if( auto pEntity = entity.value(); pEntity != nullptr && pEntity->m_config->contains( name ) )
 		{
 			if( (*pEntity->m_config)[ name ].is_string() )
+			{
 				return (*pEntity->m_config)[name].get<std::string>();
-			return std::to_string( (*pEntity->m_config)[name].get<float>() );
+			}
+			else
+			{
+				m_Logger->warn( "Variable \"{}\" in entity {}:{} is not a \"string\" value!", name, pEntity->GetClassname(), pEntity->GetTargetname() );
+			}
 		}
 	}
 #endif
@@ -261,54 +283,210 @@ std::string ConfigurationSystem::GetValue(std::string_view name, std::string_vie
     if( m_config->contains( name ) )
 	{
 		if( (*m_config)[ name ].is_string() )
+		{
         	return (*m_config)[name].get<std::string>();
-        return std::to_string( (*m_config)[name].get<float>() );
+		}
+		else
+		{
+			m_Logger->warn( "Variable \"{}\" is not a \"string\" value!", name );
+		}
     }
 
-	_list_log_(name, defaultValue);
+	_list_log_(name, value);
 
-    return std::string( defaultValue );
+    return std::string( value );
 }
 
-void ConfigurationSystem::SetValue(std::string_view name, float value, std::optional<CBaseEntity*> entity)
+bool ConfigurationSystem::GetValue(std::string_view name, bool value, std::optional<CBaseEntity*> entity) const
 {
 #ifndef CLIENT_DLL
 	if( entity.has_value() )
 	{
 		if( auto pEntity = entity.value(); pEntity != nullptr && pEntity->m_config->contains( name ) )
 		{
-			(*pEntity->m_config)[name] = value;
-			return;
+			if( (*pEntity->m_config)[ name ].is_boolean() )
+			{
+				return (*pEntity->m_config)[name].get<bool>();
+			}
+			else
+			{
+				m_Logger->warn( "Variable \"{}\" in entity {}:{} is not a \"boolean\" value!", name, pEntity->GetClassname(), pEntity->GetTargetname() );
+			}
 		}
 	}
 #endif
-	(*m_config)[name] = value;
-}
 
-void ConfigurationSystem::SetValue(std::string_view name, std::string_view value, std::optional<CBaseEntity*> entity)
-{
-#ifndef CLIENT_DLL
-	if( entity.has_value() )
+    if( m_config->contains( name ) )
 	{
-		if( auto pEntity = entity.value(); pEntity != nullptr && pEntity->m_config->contains( name ) )
+		if( (*m_config)[ name ].is_boolean() )
 		{
-			(*pEntity->m_config)[name] = value;
-			return;
+        	return (*m_config)[name].get<bool>();
 		}
-	}
-#endif
-	(*m_config)[name] = value;
-}
+		else
+		{
+			m_Logger->warn( "Variable \"{}\" is not a \"boolean\" value!", name );
+		}
+    }
 
-void ConfigurationSystem::_list_log_(std::string_view log, std::variant<float, std::string_view> defaultValue) const
+	_list_log_(name, value);
+
+    return value;
+}
+*/
+
+void ConfigurationSystem::_list_log_(std::string_view log, std::variant<float, std::string_view, bool> value) const
 {
 	if( std::find( _list_logged_->begin(), _list_logged_->end(), log ) == _list_logged_->end() )
 	{
-		std::visit( [&]( auto&& value ) {
-			m_Logger->warn( "Undefined variable \"{}\". Using default value \"{}\"", log, value );
-		}, defaultValue );
+		std::visit( [&]( auto&& avalue ) {
+			m_Logger->warn( "Undefined variable \"{}\". Using default value \"{}\"", log, avalue );
+		}, value );
 
 		_list_logged_->push_back(log);
 	}
 }
 
+void ConfigurationSystem::GetValue(std::string_view name, std::variant<float*, int*, const char*, bool*> value, std::optional<CBaseEntity*> entity) const
+{
+    std::visit([&](auto&& DefaultValue)
+	{
+#ifndef CLIENT_DLL
+		if( entity.has_value() )
+		{
+			if( auto pEntity = entity.value(); pEntity != nullptr && pEntity->m_config->contains( name ) )
+			{
+				using T = std::decay_t<decltype(DefaultValue)>;
+
+				if( (*pEntity->m_config)[ name ].is_string() ) {
+					if constexpr( std::is_same_v<T, const char*> )
+						DefaultValue = (*pEntity->m_config)[name].get<std::string>().c_str();
+				}
+				else if( (*pEntity->m_config)[ name ].is_number() ) {
+					if constexpr( std::is_same_v<T, float*> )
+						*DefaultValue = (*pEntity->m_config)[name].get<float>();
+					if constexpr( std::is_same_v<T, int*> )
+						*DefaultValue = (*pEntity->m_config)[name].get<int>();
+				}
+				else if( (*pEntity->m_config)[ name ].is_boolean() ) {
+					if constexpr( std::is_same_v<T, bool*> )
+						*DefaultValue = (*pEntity->m_config)[name].get<bool>();
+				}
+			}
+		}
+#endif
+
+		if( m_config->contains( name ) )
+		{
+			using T = std::decay_t<decltype(DefaultValue)>;
+
+			if( (*m_config)[ name ].is_string() ) {
+				if constexpr( std::is_same_v<T, const char*> )
+					DefaultValue = (*m_config)[name].get<std::string>().c_str();
+			}
+			else if( (*m_config)[ name ].is_number() ) {
+				if constexpr( std::is_same_v<T, float*> )
+					*DefaultValue = (*m_config)[name].get<float>();
+				if constexpr( std::is_same_v<T, int*> )
+					*DefaultValue = (*m_config)[name].get<int>();
+			}
+			else if( (*m_config)[ name ].is_boolean() ) {
+				if constexpr( std::is_same_v<T, bool*> )
+					*DefaultValue = (*m_config)[name].get<bool>();
+			}
+		}
+    }, value);
+}
+
+void ConfigurationSystem::SetValue(std::string_view name, std::variant<float, std::string_view, bool> value, std::optional<CBaseEntity*> entity) const
+{
+	std::visit([&](auto&& DefaultValue)
+	{
+#ifndef CLIENT_DLL
+		if( entity.has_value() )
+		{
+			if( m_config->contains( name ) )
+			{
+				if( auto pEntity = entity.value(); pEntity != nullptr )
+				{
+					using T = std::decay_t<decltype(DefaultValue)>;
+
+					if( (*pEntity->m_config)[ name ].is_string() )
+					{
+						if constexpr( !std::is_same_v<T, std::string> )
+						{
+							m_Logger->warn( "Can not set variable \"{}\" of type \"string\" to value \"{}\" for entity {}:{}:{}",
+								name, DefaultValue, pEntity->entindex(), pEntity->GetClassname(), pEntity->GetTargetname() );
+							return;
+						}
+					}
+					else if( (*pEntity->m_config)[ name ].is_number() )
+					{
+						if constexpr( !std::is_same_v<T, float> )
+						{
+							m_Logger->warn( "Can not set variable \"{}\" of type \"float\" to value \"{}\" for entity {}:{}:{}",
+								name, DefaultValue, pEntity->entindex(), pEntity->GetClassname(), pEntity->GetTargetname() );
+							return;
+						}
+					}
+					else if( (*pEntity->m_config)[ name ].is_boolean() )
+					{
+						if constexpr( !std::is_same_v<T, float> )
+						{
+							m_Logger->warn( "Can not set variable \"{}\" of type \"bool\" to value \"{}\" for entity {}:{}:{}",
+								name, DefaultValue, pEntity->entindex(), pEntity->GetClassname(), pEntity->GetTargetname() );
+							return;
+						}
+					}
+
+					(*pEntity->m_config)[name] = DefaultValue;
+					m_Logger->info( "Set key \"{}\" to \"{}\" for entity {}:{}:{}",
+						name, DefaultValue, pEntity->entindex(), pEntity->GetClassname(), pEntity->GetTargetname() );
+				}
+			}
+			else
+			{
+				m_Logger->warn( "Can't set variable \"{}\" it doesn't exists in the default configuration!", name );
+			}
+			return;
+		}
+#endif
+
+		if( m_config->contains( name ) )
+		{
+			using T = std::decay_t<decltype(DefaultValue)>;
+
+			if( (*m_config)[ name ].is_string() )
+			{
+				if constexpr( !std::is_same_v<T, std::string> )
+				{
+					m_Logger->warn( "Can not set variable \"{}\" of type \"string\" to value \"{}\"", name, DefaultValue );
+					return;
+				}
+			}
+			else if( (*m_config)[ name ].is_number() )
+			{
+				if constexpr( !std::is_same_v<T, float> )
+				{
+					m_Logger->warn( "Can not set variable \"{}\" of type \"float\" to value \"{}\"", name, DefaultValue );
+					return;
+				}
+			}
+			else if( (*m_config)[ name ].is_boolean() )
+			{
+				if constexpr( !std::is_same_v<T, float> )
+				{
+					m_Logger->warn( "Can not set variable \"{}\" of type \"bool\" to value \"{}\"", name, DefaultValue );
+					return;
+				}
+			}
+
+			(*m_config)[name] = DefaultValue;
+			m_Logger->info( "Set key \"{}\" to \"{}\"", name, DefaultValue );
+		}
+		else
+		{
+			m_Logger->warn( "Can't set variable \"{}\" it doesn't exists in the default configuration!", name );
+		}
+
+	}, value);
+}

@@ -264,7 +264,9 @@ void CBaseItem::DropItem(std::optional<Vector2D> VecAngle, std::optional<Vector>
 
 	pev->nextthink = gpGlobals->time;
 	m_flTouchTime = gpGlobals->time + 0.5;
-	m_flDropDieTime = gpGlobals->time + g_Cfg.GetValue( "item_drop_die_time"sv, 60 );
+	float item_drop_die_time = 60.0f;
+	g_Cfg.GetValue( "item_drop_die_time"sv, &item_drop_die_time );
+	m_flDropDieTime = gpGlobals->time + item_drop_die_time;
 }
 
 void CBaseItem::DropThink()

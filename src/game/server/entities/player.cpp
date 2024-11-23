@@ -1699,13 +1699,16 @@ void CBasePlayer::Spawn()
 			m_bIsSpawning = false;
 		}};
 
-	pev->health = g_Cfg.GetValue( "player_health"sv, 10, this );
+	pev->health = 10;
+	g_Cfg.GetValue( "player_health"sv, &pev->health, this );
 	pev->takedamage = DAMAGE_AIM;
 	pev->solid = SOLID_SLIDEBOX;
 	pev->movetype = MOVETYPE_WALK;
-	pev->max_health = g_Cfg.GetValue( "player_max_health"sv, 10, this );
+	pev->max_health = 10;
+	g_Cfg.GetValue( "player_max_health"sv, &pev->armorvalue, this );
 	pev->armorvalue = 0;
-	pev->armortype = g_Cfg.GetValue( "player_max_absortion"sv, 5, this );
+	pev->armortype = 5;
+	g_Cfg.GetValue( "player_max_absortion"sv, &pev->armortype, this );
 	pev->flags &= FL_PROXY | FL_FAKECLIENT; // keep proxy and fakeclient flags set by engine
 	pev->flags |= FL_CLIENT;
 	pev->air_finished = gpGlobals->time + 12;
@@ -3093,7 +3096,9 @@ void CBasePlayer::ActionRightHand( bool* bHandled )
 
 	Vector start = pev->origin + pev->view_ofs;
 
-	Vector end = start + gpGlobals->v_forward * ( 40 * g_Cfg.GetValue( "player_interaction_distance"sv, 3 ) );
+	float distance = 3;
+	g_Cfg.GetValue( "player_interaction_distance"sv, &distance, this );
+	Vector end = start + gpGlobals->v_forward * ( 40 * distance );
 
 	UTIL_TraceLine( start, end, dont_ignore_monsters, dont_ignore_glass, edict(), &tr );
 
@@ -3103,7 +3108,9 @@ void CBasePlayer::ActionRightHand( bool* bHandled )
 		// -MC Send hit anim
 		*bHandled = true;
 	}
-	m_ActionRightHand = gpGlobals->time + g_Cfg.GetValue( "player_interaction_time"sv, 0.2f );
+	float fInteractionTime = 0.2f;
+	g_Cfg.GetValue( "player_interaction_time"sv, &fInteractionTime, this );
+	m_ActionRightHand = gpGlobals->time + fInteractionTime;
 }
 
 void CBasePlayer::ActionLeftHand()
@@ -3127,8 +3134,12 @@ void CBasePlayer::InventoryDeploy()
 	{
 		const char* name = pItem->GetClassname();
 
-		pev->viewmodel = MAKE_STRING( g_Cfg.GetValue( fmt::format( "{}_view_model", name ), ""sv ).c_str() );
-		pev->weaponmodel = MAKE_STRING( g_Cfg.GetValue( fmt::format( "{}_player_model", name ), ""sv ).c_str() );
+		const char* view_model;
+		g_Cfg.GetValue( fmt::format( "{}_view_model", name ), view_model );
+		pev->viewmodel = MAKE_STRING( view_model );
+		const char* player_model;
+		g_Cfg.GetValue( fmt::format( "{}_player_model", name ), player_model );
+		pev->weaponmodel = MAKE_STRING( player_model );
 
 		pev->weaponanim = 0;
 
@@ -3139,7 +3150,9 @@ void CBasePlayer::InventoryDeploy()
 
 		// -MC Send skin https://discord.com/channels/291678871856742400/529986135896883211/1306627727918633042
 
-		m_ActionRightHand = m_ActionLeftHand = gpGlobals->time + g_Cfg.GetValue( "player_deploy_time"sv, 0.2f );
+		float player_deploy_time = 0.2f;
+		g_Cfg.GetValue( "player_deploy_time"sv, &player_deploy_time );
+		m_ActionRightHand = m_ActionLeftHand = gpGlobals->time + player_deploy_time;
 	}
 }
 

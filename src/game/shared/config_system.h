@@ -61,26 +61,8 @@ class ConfigurationSystem final : public IGameSystem
 
 		void RemoveTempData(const char* PathID);
 
-		/**
-		 *	@brief Get a value from a key-value pair configuration
-		*	@param CBaseEntity The entity to check first for its custom config before the global config
-		*/
-		float GetValue(std::string_view name, float defaultValue, std::optional<CBaseEntity*> entity = std::nullopt) const;
-		/**
-		 *	@brief Get a value from a key-value pair configuration
-		*	@param CBaseEntity The entity to check first for its custom config before the global config
-		*/
-		std::string GetValue(std::string_view name, std::string_view defaultValue, std::optional<CBaseEntity*> entity = std::nullopt) const;
-		/**
-		 *	@brief Get a value from a key-value pair configuration
-		*	@param CBaseEntity The entity to set the value instead of the global config, This only happens if the key already exists in the entity.
-		*/
-		void SetValue(std::string_view name, float value, std::optional<CBaseEntity*> entity = std::nullopt);
-		/**
-		 *	@brief Get a value from a key-value pair configuration
-		*	@param CBaseEntity The entity to set the value instead of the global config, This only happens if the key already exists in the entity.
-		*/
-		void SetValue(std::string_view name, std::string_view value, std::optional<CBaseEntity*> entity = std::nullopt);
+		void SetValue(std::string_view name, std::variant<float, std::string_view, bool> value, std::optional<CBaseEntity*> entity = std::nullopt) const;
+		void GetValue(std::string_view name, std::variant<float*, int*, const char*, bool*> value, std::optional<CBaseEntity*> entity = std::nullopt) const;
 
 		std::shared_ptr<spdlog::logger> m_Logger;
 
@@ -89,7 +71,8 @@ class ConfigurationSystem final : public IGameSystem
 		std::unique_ptr<json> m_config = std::make_unique<json>();
 
 		std::unique_ptr<std::vector<std::string_view>> _list_logged_;
-		void _list_log_(std::string_view log, std::variant<float, std::string_view> defaultValue) const;
+
+		void _list_log_(std::string_view log, std::variant<float, std::string_view, bool> value) const;
 };
 
 inline ConfigurationSystem g_Cfg;

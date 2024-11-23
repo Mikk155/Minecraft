@@ -1006,13 +1006,17 @@ bool CBaseMonster::TakeDamage(DamageInfo* info)
 {
 	if( FBitSet( info->bits, DMG::LAVA ) )
 	{
-		float time = gpGlobals->time + ( g_Cfg.GetValue( "effect_fire_time"sv, 4.0, info->attacker ) * 2 );
+		float effect_fire_time = 4.0f;
+		g_Cfg.GetValue( "effect_fire_time"sv, &effect_fire_time, info->attacker );
+		float time = gpGlobals->time + ( effect_fire_time * 2 );
 		g_Minecraft.Effects.Add(this, g_Minecraft.Effects.fire(2),
 			EffectInfo( g_Minecraft.Effects.fire(0), time, 2, info->attacker ) );
 	}
 	if( FBitSet( info->bits, DMG::FIRE ) )
 	{
-		float time = gpGlobals->time + g_Cfg.GetValue( "effect_fire_time"sv, 4.0, info->attacker );
+		float effect_fire_time = 4.0f;
+		g_Cfg.GetValue( "effect_fire_time"sv, &effect_fire_time, info->attacker );
+		float time = gpGlobals->time + effect_fire_time;
 		g_Minecraft.Effects.Add(this, g_Minecraft.Effects.fire(1),
 			EffectInfo( g_Minecraft.Effects.fire(0), time, 2, info->attacker ) );
 	}
@@ -1048,9 +1052,9 @@ void CBaseMonster::TraceAttack(DamageInfo* info)
 			HITGROUP hitgroup
 		) -> void
 		{
-			info->damage *= g_Cfg.GetValue(
-				fmt::format( "{}_damage_multiplier_{}",
-					( monster->IsPlayer() ? "player"sv : "mob"sv ), svgroup ), multiplier );
+			g_Cfg.GetValue( fmt::format( "{}_damage_multiplier_{}",
+				( monster->IsPlayer() ? "player"sv : "mob"sv ), svgroup ), &multiplier );
+			info->damage *= multiplier;
 
 			if( auto armor = monster->inventory.at(static_cast<size_t>(slot)); armor != nullptr )
 			{
