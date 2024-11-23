@@ -239,11 +239,12 @@ bool CBaseMonster::GiveHealth(float flHealth, int bitsDamageType) { return false
 void CBaseMonster::PostRestore() {}
 void CBaseMonster::StopFollowing(bool clearSchedule) {}
 void CBaseMonster::StartFollowing(CBaseEntity* pLeader) {}
+void CBaseMonster::UpdateOnRemove() {}
+void CBaseMonster::OnCreate() {}
 
 int TrainSpeed(int iSpeed, int iMax) { return 0; }
 void CBasePlayer::DeathSound() {}
 bool CBasePlayer::GiveHealth(float flHealth, int bitsDamageType) { return false; }
-void CBasePlayer::PackDeadPlayerItems() {}
 void CBasePlayer::RemoveAllItems() {}
 void CBasePlayer::SetAnimation(PLAYER_ANIM playerAnim) {}
 void CBasePlayer::WaterMove() {}

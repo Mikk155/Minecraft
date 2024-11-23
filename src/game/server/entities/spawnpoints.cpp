@@ -17,7 +17,6 @@
 #include "spawnpoints.h"
 
 LINK_ENTITY_TO_CLASS(info_player_start, CPointEntity);
-LINK_ENTITY_TO_CLASS(info_player_deathmatch, CBaseDMStart);
 
 bool CBaseDMStart::IsTriggered(CBaseEntity* pEntity)
 {
@@ -116,24 +115,14 @@ static CBaseEntity* EntTrySelectSpawnPoint(CBasePlayer* pPlayer)
 		}
 	}
 
-	// choose a info_player_deathmatch point
-	if (g_pGameRules->IsCoOp())
-	{
-		pSpot = UTIL_FindEntityByClassname(g_pLastSpawn, "info_player_coop");
-		if (!FNullEnt(pSpot))
-			return pSpot;
-		pSpot = UTIL_FindEntityByClassname(g_pLastSpawn, "info_player_start");
-		if (!FNullEnt(pSpot))
-			return pSpot;
-	}
-	else if (g_pGameRules->IsMultiplayer())
+	if (g_pGameRules->IsMultiplayer())
 	{
 		pSpot = g_pLastSpawn;
 		// Randomize the start spot
 		for (int i = RANDOM_LONG(1, 5); i > 0; i--)
-			pSpot = UTIL_FindEntityByClassname(pSpot, "info_player_deathmatch");
+			pSpot = UTIL_FindEntityByClassname(pSpot, "info_player_start");
 		if (FNullEnt(pSpot)) // skip over the null point
-			pSpot = UTIL_FindEntityByClassname(pSpot, "info_player_deathmatch");
+			pSpot = UTIL_FindEntityByClassname(pSpot, "info_player_start");
 
 		CBaseEntity* pFirstSpot = pSpot;
 
@@ -146,7 +135,7 @@ static CBaseEntity* EntTrySelectSpawnPoint(CBasePlayer* pPlayer)
 				{
 					if (pSpot->pev->origin == Vector(0, 0, 0))
 					{
-						pSpot = UTIL_FindEntityByClassname(pSpot, "info_player_deathmatch");
+						pSpot = UTIL_FindEntityByClassname(pSpot, "info_player_start");
 						continue;
 					}
 
@@ -155,7 +144,7 @@ static CBaseEntity* EntTrySelectSpawnPoint(CBasePlayer* pPlayer)
 				}
 			}
 			// increment pSpot
-			pSpot = UTIL_FindEntityByClassname(pSpot, "info_player_deathmatch");
+			pSpot = UTIL_FindEntityByClassname(pSpot, "info_player_start");
 		} while (pSpot != pFirstSpot); // loop if we're not back to the start
 
 		// we haven't found a place to spawn yet,  so kill any guy at the first spawn point and spawn there

@@ -17,8 +17,6 @@
 #include "ctf/CTFDetect.h"
 #include "CHalfLifeCTFplay.h"
 
-LINK_ENTITY_TO_CLASS(info_ctfdetect, CTFDetect);
-
 bool CTFDetect::KeyValue(KeyValueData* pkvd)
 {
 	if (FStrEq("is_ctf", pkvd->szKeyName))

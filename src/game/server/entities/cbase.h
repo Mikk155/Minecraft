@@ -24,7 +24,6 @@ CBaseEntity
 		CBaseToggle
 			CBaseItem
 			CBaseMonster
-				CBaseCycler
 				CBasePlayer
 				CBaseGroup
 */

@@ -48,44 +48,11 @@ void CTriggerVolume::Spawn()
 	pev->modelindex = 0;
 }
 
-/**
- *	@brief Fires a target after level transition and then dies
- */
-class CFireAndDie : public CBaseDelay
-{
-public:
-	void Spawn() override;
-	void Precache() override;
-	void Think() override;
-	int ObjectCaps() override { return CBaseDelay::ObjectCaps() | FCAP_FORCE_TRANSITION; } // Always go across transitions
-};
-
-LINK_ENTITY_TO_CLASS(fireanddie, CFireAndDie);
-
-void CFireAndDie::Spawn()
-{
-	// Don't call Precache() - it should be called on restore
-}
-
-void CFireAndDie::Precache()
-{
-	// This gets called on restore
-	pev->nextthink = gpGlobals->time + m_flDelay;
-}
-
-void CFireAndDie::Think()
-{
-	SUB_UseTargets(this, USE_TOGGLE, 0);
-	UTIL_Remove(this);
-}
-
 LINK_ENTITY_TO_CLASS(trigger_changelevel, CChangeLevel);
 
 BEGIN_DATAMAP(CChangeLevel)
 DEFINE_ARRAY(m_szMapName, FIELD_CHARACTER, cchMapNameMost),
 	DEFINE_ARRAY(m_szLandmarkName, FIELD_CHARACTER, cchMapNameMost),
-	DEFINE_FIELD(m_changeTarget, FIELD_STRING),
-	DEFINE_FIELD(m_changeTargetDelay, FIELD_FLOAT),
 	DEFINE_FIELD(m_UsePersistentLevelChange, FIELD_BOOLEAN),
 	DEFINE_FUNCTION(UseChangeLevel),
 	DEFINE_FUNCTION(TouchChangeLevel),
@@ -105,16 +72,6 @@ bool CChangeLevel::KeyValue(KeyValueData* pkvd)
 		if (strlen(pkvd->szValue) >= cchMapNameMost)
 			Logger->error("Landmark name '{}' too long (32 chars)", pkvd->szValue);
 		strcpy(m_szLandmarkName, pkvd->szValue);
-		return true;
-	}
-	else if (FStrEq(pkvd->szKeyName, "changetarget"))
-	{
-		m_changeTarget = ALLOC_STRING(pkvd->szValue);
-		return true;
-	}
-	else if (FStrEq(pkvd->szKeyName, "changedelay"))
-	{
-		m_changeTargetDelay = atof(pkvd->szValue);
 		return true;
 	}
 	else if (FStrEq(pkvd->szKeyName, "use_persistent_level_change"))
@@ -224,21 +181,6 @@ void CChangeLevel::ChangeLevelNow(CBaseEntity* pActivator)
 		{
 			Logger->debug("Player isn't in the transition volume {}, aborting", m_szLandmarkName);
 			return;
-		}
-
-		// Create an entity to fire the changetarget
-		if (!FStringNull(m_changeTarget))
-		{
-			CFireAndDie* pFireAndDie = g_EntityDictionary->Create<CFireAndDie>("fireanddie");
-			if (pFireAndDie)
-			{
-				// Set target and delay
-				pFireAndDie->pev->target = m_changeTarget;
-				pFireAndDie->m_flDelay = m_changeTargetDelay;
-				pFireAndDie->pev->origin = pPlayer->pev->origin;
-				// Call spawn
-				DispatchSpawn(pFireAndDie->edict());
-			}
 		}
 	}
 
@@ -450,128 +392,6 @@ int CChangeLevel::ChangeList(LEVELLIST* pLevelList, int maxList)
 	}
 
 	return count;
-}
-
-class CTriggerSave : public CBaseTrigger
-{
-	DECLARE_CLASS(CTriggerSave, CBaseTrigger);
-	DECLARE_DATAMAP();
-
-public:
-	void Spawn() override;
-	void SaveTouch(CBaseEntity* pOther);
-};
-
-BEGIN_DATAMAP(CTriggerSave)
-DEFINE_FUNCTION(SaveTouch),
-	END_DATAMAP();
-
-LINK_ENTITY_TO_CLASS(trigger_autosave, CTriggerSave);
-
-void CTriggerSave::Spawn()
-{
-	if (g_pGameRules->IsMultiplayer())
-	{
-		REMOVE_ENTITY(edict());
-		return;
-	}
-
-	InitTrigger();
-	SetTouch(&CTriggerSave::SaveTouch);
-}
-
-void CTriggerSave::SaveTouch(CBaseEntity* pOther)
-{
-	if (!UTIL_IsMasterTriggered(m_sMaster, pOther))
-		return;
-
-	// Only save on clients
-	if (!pOther->IsPlayer())
-		return;
-
-	SetTouch(nullptr);
-	UTIL_Remove(this);
-	SERVER_COMMAND("autosave\n");
-}
-
-#define SF_ENDSECTION_USEONLY 0x0001
-
-class CTriggerEndSection : public CBaseTrigger
-{
-	DECLARE_CLASS(CTriggerEndSection, CBaseTrigger);
-	DECLARE_DATAMAP();
-
-public:
-	void Spawn() override;
-	void EndSectionTouch(CBaseEntity* pOther);
-	bool KeyValue(KeyValueData* pkvd) override;
-	void EndSectionUse(CBaseEntity* pActivator, CBaseEntity* pCaller, USE_TYPE useType, float value);
-};
-
-BEGIN_DATAMAP(CTriggerEndSection)
-DEFINE_FUNCTION(EndSectionTouch),
-	DEFINE_FUNCTION(EndSectionUse),
-	END_DATAMAP();
-
-LINK_ENTITY_TO_CLASS(trigger_endsection, CTriggerEndSection);
-
-void CTriggerEndSection::EndSectionUse(CBaseEntity* pActivator, CBaseEntity* pCaller, USE_TYPE useType, float value)
-{
-	// Only save on clients
-	if (pActivator && !pActivator->IsNetClient())
-		return;
-
-	SetUse(nullptr);
-
-	if (!FStringNull(pev->message))
-	{
-		g_engfuncs.pfnEndSection(STRING(pev->message));
-	}
-	UTIL_Remove(this);
-}
-
-void CTriggerEndSection::Spawn()
-{
-	if (g_pGameRules->IsMultiplayer())
-	{
-		REMOVE_ENTITY(edict());
-		return;
-	}
-
-	InitTrigger();
-
-	SetUse(&CTriggerEndSection::EndSectionUse);
-	// If it is a "use only" trigger, then don't set the touch function.
-	if ((pev->spawnflags & SF_ENDSECTION_USEONLY) == 0)
-		SetTouch(&CTriggerEndSection::EndSectionTouch);
-}
-
-void CTriggerEndSection::EndSectionTouch(CBaseEntity* pOther)
-{
-	// Only save on clients
-	if (!pOther->IsNetClient())
-		return;
-
-	SetTouch(nullptr);
-
-	if (!FStringNull(pev->message))
-	{
-		g_engfuncs.pfnEndSection(STRING(pev->message));
-	}
-	UTIL_Remove(this);
-}
-
-bool CTriggerEndSection::KeyValue(KeyValueData* pkvd)
-{
-	if (FStrEq(pkvd->szKeyName, "section"))
-	{
-		//		m_iszSectionName = ALLOC_STRING( pkvd->szValue );
-		// Store this in message so we don't have to write save/restore for this ent
-		pev->message = ALLOC_STRING(pkvd->szValue);
-		return true;
-	}
-
-	return CBaseTrigger::KeyValue(pkvd);
 }
 
 class CRevertSaved : public CPointEntity

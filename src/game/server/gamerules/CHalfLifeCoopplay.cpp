@@ -15,7 +15,6 @@
 
 #include "cbase.h"
 #include "CHalfLifeCoopplay.h"
-#include "items.h"
 #include "UserMessages.h"
 #include "items/CBaseItem.h"
 

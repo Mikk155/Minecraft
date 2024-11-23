@@ -28,11 +28,9 @@
 #include "nodes.h"
 #include "talkmonster.h"
 #include "squadmonster.h"
-#include "items/CWeaponBox.h"
 #include "shake.h"
 #include "spawnpoints.h"
 #include "CHalfLifeCTFplay.h"
-#include "ctf/CHUDIconTrigger.h"
 #include "pm_shared.h"
 #include "hltv.h"
 #include "UserMessages.h"
@@ -240,134 +238,6 @@ Vector CBasePlayer::GetGunPosition()
 	origin = pev->origin + pev->view_ofs;
 
 	return origin;
-}
-
-#define ARMOR_RATIO 0.2 // Armor Takes 80% of the damage
-#define ARMOR_BONUS 0.5 // Each Point of Armor is work 1/x points of health
-
-void CBasePlayer::PackDeadPlayerItems()
-{
-	int iWeaponRules;
-	int iAmmoRules;
-	int i;
-	CBasePlayerWeapon* rgpPackWeapons[MAX_WEAPONS];
-	int iPackAmmo[MAX_AMMO_TYPES + 1];
-	int iPW = 0; // index into packweapons array
-	int iPA = 0; // index into packammo array
-
-	memset(rgpPackWeapons, 0, sizeof(rgpPackWeapons));
-	memset(iPackAmmo, -1, sizeof(iPackAmmo));
-
-	// get the game rules
-	iWeaponRules = g_pGameRules->DeadPlayerWeapons(this);
-	iAmmoRules = g_pGameRules->DeadPlayerAmmo(this);
-
-	if (iWeaponRules == GR_PLR_DROP_GUN_NO && iAmmoRules == GR_PLR_DROP_AMMO_NO)
-	{
-		// nothing to pack. Remove the weapons and return. Don't call create on the box!
-		RemoveAllItems();
-		return;
-	}
-
-	// go through all of the weapons and make a list of the ones to pack
-	for (i = 0; i < MAX_WEAPON_SLOTS; i++)
-	{
-		if (m_rgpPlayerWeapons[i])
-		{
-			// there's a weapon here. Should I pack it?
-			CBasePlayerWeapon* weapon = m_rgpPlayerWeapons[i];
-
-			while (weapon)
-			{
-				switch (iWeaponRules)
-				{
-				case GR_PLR_DROP_GUN_ACTIVE:
-					if (m_pActiveWeapon && weapon == m_pActiveWeapon)
-					{
-						// this is the active item. Pack it.
-						rgpPackWeapons[iPW++] = weapon;
-					}
-					break;
-
-				case GR_PLR_DROP_GUN_ALL:
-					rgpPackWeapons[iPW++] = weapon;
-					break;
-
-				default:
-					break;
-				}
-
-				weapon = weapon->m_pNext;
-			}
-		}
-	}
-
-	// now go through ammo and make a list of which types to pack.
-	if (iAmmoRules != GR_PLR_DROP_AMMO_NO)
-	{
-		for (i = 0; i < MAX_AMMO_TYPES; i++)
-		{
-			if (m_rgAmmo[i] > 0)
-			{
-				// player has some ammo of this type.
-				switch (iAmmoRules)
-				{
-				case GR_PLR_DROP_AMMO_ALL:
-					iPackAmmo[iPA++] = i;
-					break;
-
-				case GR_PLR_DROP_AMMO_ACTIVE:
-					if (m_pActiveWeapon && i == m_pActiveWeapon->PrimaryAmmoIndex())
-					{
-						// this is the primary ammo type for the active weapon
-						iPackAmmo[iPA++] = i;
-					}
-					else if (m_pActiveWeapon && i == m_pActiveWeapon->SecondaryAmmoIndex())
-					{
-						// this is the secondary ammo type for the active weapon
-						iPackAmmo[iPA++] = i;
-					}
-					break;
-
-				default:
-					break;
-				}
-			}
-		}
-	}
-
-	// create a box to pack the stuff into.
-	CWeaponBox* pWeaponBox = (CWeaponBox*)CBaseEntity::Create("weaponbox", pev->origin, pev->angles, this);
-
-	pWeaponBox->pev->angles.x = 0; // don't let weaponbox tilt.
-	pWeaponBox->pev->angles.z = 0;
-
-	pWeaponBox->SetThink(&CWeaponBox::Kill);
-	pWeaponBox->pev->nextthink = gpGlobals->time + 120;
-
-	// back these two lists up to their first elements
-	iPA = 0;
-	iPW = 0;
-
-	// pack the ammo
-	while (iPackAmmo[iPA] != -1)
-	{
-		pWeaponBox->PackAmmo(MAKE_STRING(g_AmmoTypes.GetByIndex(iPackAmmo[iPA])->Name.c_str()), m_rgAmmo[iPackAmmo[iPA]]);
-		iPA++;
-	}
-
-	// now pack all of the items in the lists
-	while (rgpPackWeapons[iPW])
-	{
-		// weapon unhooked from the player. Pack it into der box.
-		pWeaponBox->PackWeapon(rgpPackWeapons[iPW]);
-
-		iPW++;
-	}
-
-	pWeaponBox->pev->velocity = pev->velocity * 1.2; // weaponbox has player's velocity, then some.
-
-	RemoveAllItems(); // now strip off everything that wasn't handled by the code above.
 }
 
 void CBasePlayer::RemoveAllItems()
@@ -840,16 +710,6 @@ void CBasePlayer::PlayerDeathThink()
 			pev->velocity = flForward * pev->velocity.Normalize();
 	}
 
-	if (HasWeapons())
-	{
-		// we drop the guns here because weapons that have an area effect and can kill their user
-		// will sometimes crash coming back from CBasePlayer::Killed() if they kill their owner because the
-		// player class sometimes is freed. It's safer to manipulate the weapons once we know
-		// we aren't calling into any of their code anymore through the player pointer.
-		PackDeadPlayerItems();
-	}
-
-
 	if (0 != pev->modelindex && (!m_fSequenceFinished) && (pev->deadflag == DEAD_DYING))
 	{
 		StudioFrameAdvance();
@@ -922,39 +782,13 @@ void CBasePlayer::StartDeathCam()
 		return;
 	}
 
-	auto pSpot = UTIL_FindEntityByClassname(nullptr, "info_intermission");
+	// -MC Third person death camera with buttons
 
-	if (!FNullEnt(pSpot))
-	{
-		// at least one intermission spot in the world.
-		int iRand = RANDOM_LONG(0, 3);
+	TraceResult tr;
+	UTIL_TraceLine(pev->origin, pev->origin + Vector(0, 0, 128), ignore_monsters, edict(), &tr);
 
-		CBaseEntity* pNewSpot;
-
-		while (iRand > 0)
-		{
-			pNewSpot = UTIL_FindEntityByClassname(pSpot, "info_intermission");
-
-			if (pNewSpot)
-			{
-				pSpot = pNewSpot;
-			}
-
-			iRand--;
-		}
-
-		SetOrigin(pSpot->pev->origin);
-		pev->angles = pev->v_angle = pSpot->pev->v_angle;
-	}
-	else
-	{
-		// no intermission spot. Push them up in the air, looking down at their corpse
-		TraceResult tr;
-		UTIL_TraceLine(pev->origin, pev->origin + Vector(0, 0, 128), ignore_monsters, edict(), &tr);
-
-		SetOrigin(tr.vecEndPos);
-		pev->angles = pev->v_angle = UTIL_VecToAngles(tr.vecEndPos - pev->origin);
-	}
+	SetOrigin(tr.vecEndPos);
+	pev->angles = pev->v_angle = UTIL_VecToAngles(tr.vecEndPos - pev->origin);
 
 	// start death cam
 
@@ -2546,40 +2380,6 @@ void CSprayCan::Think()
 	pev->nextthink = gpGlobals->time + 0.1;
 }
 
-class CBloodSplat : public CBaseEntity
-{
-public:
-	void Spawn(CBaseEntity* owner);
-	void Spray();
-};
-
-LINK_ENTITY_TO_CLASS(blood_splat, CBloodSplat);
-
-void CBloodSplat::Spawn(CBaseEntity* owner)
-{
-	pev->origin = owner->pev->origin + Vector(0, 0, 32);
-	pev->angles = owner->pev->v_angle;
-	pev->owner = owner->edict();
-
-	SetThink(&CBloodSplat::Spray);
-	pev->nextthink = gpGlobals->time + 0.1;
-}
-
-void CBloodSplat::Spray()
-{
-	TraceResult tr;
-
-	if (g_Language != LANGUAGE_GERMAN)
-	{
-		UTIL_MakeVectors(pev->angles);
-		UTIL_TraceLine(pev->origin, pev->origin + gpGlobals->v_forward * 128, ignore_monsters, pev->owner, &tr);
-
-		UTIL_BloodDecalTrace(&tr, BLOOD_COLOR_RED);
-	}
-	SetThink(&CBloodSplat::SUB_Remove);
-	pev->nextthink = gpGlobals->time + 0.1;
-}
-
 CBaseItem* CBasePlayer::GiveNamedItem(std::string_view className, std::optional<int> defaultAmmo)
 {
 	// Only give items to player.
@@ -2813,20 +2613,6 @@ void CBasePlayer::CheatImpulseCommands(int iImpulse)
 		WorldGraph.ShowNodeConnections(WorldGraph.FindNearestNode(pev->origin, bits_NODE_GROUP_REALM));
 	}
 	break;
-	case 202: // Random blood splatter
-	{
-		UTIL_MakeVectors(pev->v_angle);
-
-		TraceResult tr;
-		UTIL_TraceLine(pev->origin + pev->view_ofs, pev->origin + pev->view_ofs + gpGlobals->v_forward * 128, ignore_monsters, edict(), &tr);
-
-		if (tr.flFraction != 1.0)
-		{ // line hit something, so paint a decal
-			CBloodSplat* pBlood = g_EntityDictionary->Create<CBloodSplat>("blood_splat");
-			pBlood->Spawn(this);
-		}
-		break;
-	}
 	case 203: // remove creature.
 	{
 		CBaseEntity* pEntity = UTIL_FindEntityForward(this);
@@ -3144,11 +2930,6 @@ void CBasePlayer::UpdateClientData()
 			m_fGameHUDInitialized = true;
 
 			m_iObserverLastMode = OBS_ROAMING;
-		}
-
-		if (g_pGameRules->IsMultiplayer())
-		{
-			RefreshCustomHUD(this);
 		}
 
 		InitStatusBar();
@@ -4074,99 +3855,3 @@ CBasePlayer* FindPlayerByName(const char* name)
 
 	return nullptr;
 }
-
-class CDeadHEV : public CBaseMonster
-{
-public:
-	void OnCreate() override;
-	void Spawn() override;
-
-	bool HasHumanGibs() override { return true; }
-
-	bool KeyValue(KeyValueData* pkvd) override;
-
-	int m_iPose; // which sequence to display	-- temporary, don't need to save
-	static const char* m_szPoses[4];
-};
-
-const char* CDeadHEV::m_szPoses[] = {"deadback", "deadsitting", "deadstomach", "deadtable"};
-
-void CDeadHEV::OnCreate()
-{
-	CBaseMonster::OnCreate();
-
-	// Corpses have less health
-	pev->health = 8;
-	pev->model = MAKE_STRING("models/deadhaz.mdl");
-
-	SetClassification("human_military");
-}
-
-bool CDeadHEV::KeyValue(KeyValueData* pkvd)
-{
-	if (FStrEq(pkvd->szKeyName, "pose"))
-	{
-		m_iPose = atoi(pkvd->szValue);
-		return true;
-	}
-
-	return CBaseMonster::KeyValue(pkvd);
-}
-
-LINK_ENTITY_TO_CLASS(monster_hevsuit_dead, CDeadHEV);
-
-void CDeadHEV::Spawn()
-{
-	PrecacheModel(STRING(pev->model));
-	SetModel(STRING(pev->model));
-
-	pev->effects = 0;
-	pev->yaw_speed = 8;
-	pev->sequence = 0;
-	pev->body = 1;
-	m_bloodColor = BLOOD_COLOR_RED;
-
-	pev->sequence = LookupSequence(m_szPoses[m_iPose]);
-
-	if (pev->sequence == -1)
-	{
-		Logger->debug("Dead hevsuit with bad pose");
-		pev->sequence = 0;
-		pev->effects = EF_BRIGHTFIELD;
-	}
-
-	MonsterInitDead();
-}
-
-/**
- *	@brief Multiplayer intermission spots.
- */
-class CInfoIntermission : public CPointEntity
-{
-	void Spawn() override;
-	void Think() override;
-};
-
-void CInfoIntermission::Spawn()
-{
-	SetOrigin(pev->origin);
-	pev->solid = SOLID_NOT;
-	pev->effects = EF_NODRAW;
-	pev->v_angle = g_vecZero;
-
-	pev->nextthink = gpGlobals->time + 2; // let targets spawn!
-}
-
-void CInfoIntermission::Think()
-{
-	// find my target
-	auto pTarget = UTIL_FindEntityByTargetname(nullptr, STRING(pev->target));
-
-	if (!FNullEnt(pTarget))
-	{
-		pev->v_angle = UTIL_VecToAngles((pTarget->pev->origin - pev->origin).Normalize());
-		pev->v_angle.x = -pev->v_angle.x;
-	}
-}
-
-LINK_ENTITY_TO_CLASS(info_intermission, CInfoIntermission);

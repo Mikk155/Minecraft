@@ -92,7 +92,6 @@ target_sources(server PRIVATE
 	entities/changelevel.h
 	entities/CMultiSource.h
 	entities/CPointEntity.h
-	entities/CTriggerChangeKeyValue.cpp
 	entities/doors.cpp
 	entities/doors.h
 	entities/effects.cpp
@@ -104,19 +103,15 @@ target_sources(server PRIVATE
 	entities/func_break.cpp
 	entities/func_break.h
 	entities/func_tank.cpp
-	entities/h_cycler.cpp
 	entities/lights.cpp
-	entities/logic_entities.cpp
 	entities/maprules.cpp
 	entities/maprules.h
 	entities/monsterevent.h
-	entities/mortar.cpp
 	entities/observer.cpp
 	entities/pathcorner.cpp
 	entities/plats.cpp
 	entities/player.cpp
 	entities/player.h
-	entities/player_entities.cpp
 	entities/spawnpoints.cpp
 	entities/spawnpoints.h
 	entities/sound.cpp
@@ -129,8 +124,6 @@ target_sources(server PRIVATE
 	entities/world.cpp
 	entities/world.h
 	
-	entities/ctf/CHUDIconTrigger.cpp
-	entities/ctf/CHUDIconTrigger.h
 	entities/ctf/ctf_goals.cpp
 	entities/ctf/ctf_goals.h
 	entities/ctf/ctf_items.cpp
@@ -141,14 +134,8 @@ target_sources(server PRIVATE
 	entities/ctf/CTFSpawn.cpp
 	entities/ctf/CTFSpawn.h
 	
-	entities/items/airtank.cpp
-	entities/items/CWeaponBox.cpp
-	entities/items/CWeaponBox.h
 	entities/items/ggrenade.cpp
 	entities/items/item_generic.cpp
-	entities/items/items.cpp
-	entities/items/items.h
-	entities/items/nuclearbomb.cpp
 	entities/items/weapons/weapons.cpp
 
 	entities/NPCs/mobs/zombie.cpp

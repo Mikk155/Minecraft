@@ -16,7 +16,6 @@
 #include "cbase.h"
 #include "CHalfLifeMultiplay.h"
 
-#include "items.h"
 #include "voice_gamemgr.h"
 #include "hltv.h"
 #include "UserMessages.h"

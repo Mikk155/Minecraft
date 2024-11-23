@@ -336,12 +336,6 @@ public:
 	 */
 	void RenewItems();
 
-	/**
-	 *	@brief call this when a player dies to pack up the appropriate weapons and ammo items,
-	 *	and to destroy anything that shouldn't be packed.
-	 *	This is pretty brute force :(
-	 */
-	void PackDeadPlayerItems();
 	void RemoveAllItems();
 	bool SwitchWeapon(CBasePlayerWeapon* weapon);
 

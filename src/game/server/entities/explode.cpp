@@ -21,81 +21,6 @@
 #include "cbase.h"
 #include "explode.h"
 
-/**
- *	@brief Spark Shower
- */
-class CShower : public CBaseEntity
-{
-public:
-	void OnCreate() override;
-	void Precache() override;
-	void Spawn() override;
-	void Think() override;
-	void Touch(CBaseEntity* pOther) override;
-	int ObjectCaps() override { return FCAP_DONT_SAVE; }
-};
-
-LINK_ENTITY_TO_CLASS(spark_shower, CShower);
-
-void CShower::OnCreate()
-{
-	CBaseEntity::OnCreate();
-
-	// Need a model, just use the grenade, we don't draw it anyway
-	pev->model = MAKE_STRING("models/grenade.mdl");
-}
-
-void CShower::Precache()
-{
-	PrecacheModel(STRING(pev->model));
-}
-
-void CShower::Spawn()
-{
-	Precache();
-
-	pev->velocity = RANDOM_FLOAT(200, 300) * pev->angles;
-	pev->velocity.x += RANDOM_FLOAT(-100.f, 100.f);
-	pev->velocity.y += RANDOM_FLOAT(-100.f, 100.f);
-	if (pev->velocity.z >= 0)
-		pev->velocity.z += 200;
-	else
-		pev->velocity.z -= 200;
-	pev->movetype = MOVETYPE_BOUNCE;
-	pev->gravity = 0.5;
-	pev->nextthink = gpGlobals->time + 0.1;
-	pev->solid = SOLID_NOT;
-	SetModel(STRING(pev->model));
-	SetSize(g_vecZero, g_vecZero);
-	pev->effects |= EF_NODRAW;
-	pev->speed = RANDOM_FLOAT(0.5, 1.5);
-
-	pev->angles = g_vecZero;
-}
-
-void CShower::Think()
-{
-	UTIL_Sparks(pev->origin);
-
-	pev->speed -= 0.1;
-	if (pev->speed > 0)
-		pev->nextthink = gpGlobals->time + 0.1;
-	else
-		UTIL_Remove(this);
-	pev->flags &= ~FL_ONGROUND;
-}
-
-void CShower::Touch(CBaseEntity* pOther)
-{
-	if ((pev->flags & FL_ONGROUND) != 0)
-		pev->velocity = pev->velocity * 0.1;
-	else
-		pev->velocity = pev->velocity * 0.6;
-
-	if ((pev->velocity.x * pev->velocity.x + pev->velocity.y * pev->velocity.y) < 10.0)
-		pev->speed = 0;
-}
-
 class CEnvExplosion : public CBaseMonster
 {
 	DECLARE_CLASS(CEnvExplosion, CBaseMonster);
@@ -210,17 +135,6 @@ void CEnvExplosion::Use(CBaseEntity* pActivator, CBaseEntity* pCaller, USE_TYPE 
 
 	SetThink(&CEnvExplosion::Smoke);
 	pev->nextthink = gpGlobals->time + 0.3;
-
-	// draw sparks
-	if ((pev->spawnflags & SF_ENVEXPLOSION_NOSPARKS) == 0)
-	{
-		int sparkCount = RANDOM_LONG(0, 3);
-
-		for (int i = 0; i < sparkCount; i++)
-		{
-			Create("spark_shower", pev->origin, tr.vecPlaneNormal, nullptr);
-		}
-	}
 }
 
 void CEnvExplosion::Smoke()

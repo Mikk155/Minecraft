@@ -128,8 +128,6 @@ BEGIN_DATAMAP(CTFGoalBase)
 DEFINE_FUNCTION(BaseThink),
 	END_DATAMAP();
 
-LINK_ENTITY_TO_CLASS(item_ctfbase, CTFGoalBase);
-
 void CTFGoalBase::BaseThink()
 {
 	Vector vecLightPos, vecLightAng;
@@ -255,8 +253,6 @@ DEFINE_FUNCTION(PlaceItem),
 	DEFINE_FUNCTION(ScoreFlagTouch),
 	DEFINE_FUNCTION(goal_item_touch),
 	END_DATAMAP();
-
-LINK_ENTITY_TO_CLASS(item_ctfflag, CTFGoalFlag);
 
 void CTFGoalFlag::Precache()
 {

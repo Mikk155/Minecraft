@@ -406,8 +406,6 @@ void CItemCTF::ThrowItem(CBasePlayer* pPlayer)
 	CGameRules::Logger->trace("{} triggered \"drop_{}_Powerup\"", PlayerLogInfo{*pPlayer}, m_pszItemName);
 }
 
-LINK_ENTITY_TO_CLASS(info_ctfspawn_powerup, CItemSpawnCTF);
-
 bool CItemSpawnCTF::KeyValue(KeyValueData* pkvd)
 {
 	if (FStrEq("team_no", pkvd->szKeyName))
@@ -418,8 +416,6 @@ bool CItemSpawnCTF::KeyValue(KeyValueData* pkvd)
 
 	return CPointEntity::KeyValue(pkvd);
 }
-
-LINK_ENTITY_TO_CLASS(item_ctfaccelerator, CItemAcceleratorCTF);
 
 void CItemAcceleratorCTF::OnCreate()
 {
@@ -478,8 +474,6 @@ bool CItemAcceleratorCTF::MyTouch(CBasePlayer* pPlayer)
 
 	return false;
 }
-
-LINK_ENTITY_TO_CLASS(item_ctfbackpack, CItemBackpackCTF);
 
 void CItemBackpackCTF::OnCreate()
 {
@@ -553,8 +547,6 @@ void CItemBackpackCTF::Spawn()
 	m_pszItemName = "Ammo";
 }
 
-LINK_ENTITY_TO_CLASS(item_ctflongjump, CItemLongJumpCTF);
-
 void CItemLongJumpCTF::OnCreate()
 {
 	CItemCTF::OnCreate();
@@ -620,8 +612,6 @@ void CItemLongJumpCTF::Spawn()
 	m_iItemFlag = CTFItem::LongJump;
 	m_pszItemName = "Jump";
 }
-
-LINK_ENTITY_TO_CLASS(item_ctfportablehev, CItemPortableHEVCTF);
 
 void CItemPortableHEVCTF::OnCreate()
 {

@@ -114,13 +114,6 @@ void CGrenade::Explode(TraceResult* pTrace, int bitsDamageType)
 	SetThink(&CGrenade::Smoke);
 	pev->velocity = g_vecZero;
 	pev->nextthink = gpGlobals->time + 0.3;
-
-	if (iContents != CONTENTS_WATER)
-	{
-		int sparkCount = RANDOM_LONG(0, 3);
-		for (int i = 0; i < sparkCount; i++)
-			Create("spark_shower", pev->origin, pTrace->vecPlaneNormal, nullptr);
-	}
 }
 
 void CGrenade::Smoke()

@@ -23,8 +23,6 @@ const char* const sTeamSpawnNames[] =
 		"ctfs2",
 };
 
-LINK_ENTITY_TO_CLASS(info_ctfspawn, CTFSpawn);
-
 bool CTFSpawn::KeyValue(KeyValueData* pkvd)
 {
 	if (FStrEq("team_no", pkvd->szKeyName))
